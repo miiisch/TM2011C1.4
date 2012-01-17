@@ -38,7 +38,7 @@ private:
     void errorSender();
     QTcpServer * tcpServer;
     ChatSocket * udpChatSocket;
-    quint16 port;
+    quint16 tcpPort;
     ChatRooms * chatRooms;
     int userIdCounter;
     Users users;

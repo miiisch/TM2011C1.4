@@ -28,6 +28,7 @@ void ChatSocket::readUdpData()
         qint64 size = udpSocket->pendingDatagramSize();
         char data[size];
         udpSocket->readDatagram(data,size,senderAddress,senderPort);
+        //qDebug() << "read from port: " << *senderPort << " and address " << *senderAddress;
         QByteArray ba(data, size);
         if(!checkMagicNumber(ba.left(8)))
         {

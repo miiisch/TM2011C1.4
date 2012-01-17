@@ -27,6 +27,7 @@ public slots:
 private:
     void sendBroadCast();
     ChatSocket * udpSocket;
+    QUdpSocket * broadCastSocket;
     MainWindow * mainWindow;
     QString userName;
     QHash<quint32, ChatRoomInfo*> chatRoomInfo;

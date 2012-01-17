@@ -5,6 +5,7 @@
 ChatRoom::ChatRoom(quint32 id, QString name) :
     AbstractChatRoom(id, name)
 {
+
 }
 
 

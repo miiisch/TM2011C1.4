@@ -12,11 +12,12 @@ Server::Server(QString debug, QObject *parent) :
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
-    socket->bind(13167);
+    socket->bind(10222);
     udpChatSocket = new ChatSocket(socket);
     connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16)));
     tcpServer->listen();
-    port = tcpServer->serverPort();
+    tcpPort = tcpServer->serverPort();
+    //qDebug() << " serverport " << tcpPort;
     connect(tcpServer,SIGNAL(newConnection()),SLOT(newConnection()));
 
     //every 2 seconds => keepalives
@@ -46,8 +47,11 @@ void Server::newUser(QTcpSocket *socket)
 
 void Server::readData(DataElement data, quint32 userId)
 {
-    if (userId != data.sender())
+    //before the handshake is completed, the user can't know his id
+    //sender = 0 in NULL Message
+    if (data.type() != 2 && data.type() != 1 && userId != data.sender())
     {
+        qDebug() << "server side" << "UserId: " << userId << " Sender: " << data.sender();
         errorSender();
         return;
     }
@@ -69,7 +73,7 @@ void Server::readData(DataElement data, quint32 userId)
             errorSubType();
         break;
     case 2:
-        if(data.subType() ==0)
+        if(data.subType() == 0)
             readHandshake(data, userId);
         else
             errorSubType();
@@ -88,7 +92,7 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16
         //send tcp port, and channellist to user
         DataElement newDataElement(0,0,1,0,0);
         QMap<quint32, QPair<QString, quint32> > informations = chatRooms->chatRoomsInfo();
-        newDataElement.writeInt16(port);
+        newDataElement.writeInt16(tcpPort);
         newDataElement.writeInt32(informations.count());
         foreach(quint32 id, informations.keys())
         {
@@ -142,7 +146,7 @@ void Server::readHandshake(DataElement data, quint32 userId)
 {
     (void)data;
     //user modules will be ignored
-    DataElement newDataElement(0,2,0,0,0);
+    DataElement newDataElement(0,2,1,0,0);
     newDataElement.writeInt32(userId);
     //empty modules list
     newDataElement.writeInt32(0);

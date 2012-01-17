@@ -6,11 +6,12 @@
 #include <QTimer>
 
 Client::Client(QString userName, QObject *parent) :
-    QObject(parent), userName(userName)
+    QObject(parent), userName(userName), server(0)
 {
-    QUdpSocket * socket = new QUdpSocket;
-    socket->bind(10222);
-    udpSocket = new ChatSocket(socket,0);
+    broadCastSocket = new QUdpSocket;
+    broadCastSocket->bind();
+    //qDebug() << "client udp port" << broadCastSocket->localPort();
+    udpSocket = new ChatSocket(broadCastSocket,0);
     connect(udpSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readUniCast(DataElement,QHostAddress*,quint16)));
     sendBroadCast();
 
@@ -30,21 +31,25 @@ void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
     (void*)address;
     (void)port;
     //readServerinformations
-    if(data.type() == 0 && data.chatRoomIdentifier() == 0 && data.subType() == 1)
+    if(data.type() == 0 && data.chatRoomIdentifier() == 0)
     {
-        quint16 tcpPort = data.readInt16();
-        quint32 listLength = data.readInt32();
-        QList<ChatRoomInfo*> chatRoomsInfo;
-        for(int i=0;i<listLength;++i)
-        {
-            quint32 id = data.readInt32();
-            QString name = data.readString();
-            quint32 numberOfUsers = data.readInt32();
-            ChatRoomInfo * info = new ChatRoomInfo(tcpPort, id, name, numberOfUsers, *address);
-            chatRoomsInfo << info;
-            chatRoomInfo[id] = info;
+        if(data.subType() == 1) {
+            quint16 tcpPort = data.readInt16();
+            quint32 listLength = data.readInt32();
+            QList<ChatRoomInfo*> chatRoomsInfo;
+            for(int i=0;i<listLength;++i)
+            {
+                quint32 id = data.readInt32();
+                QString name = data.readString();
+                quint32 numberOfUsers = data.readInt32();
+                ChatRoomInfo * info = new ChatRoomInfo(tcpPort, id, name, numberOfUsers, *address);
+                chatRoomsInfo << info;
+                chatRoomInfo[id] = info;
+            }
+            mainWindow->setChatRoomInfo(chatRoomsInfo);
+        } else if(data.subType() == 2) {
+            //do nothing
         }
-        mainWindow->setChatRoomInfo(chatRoomsInfo);
     } else {
         qDebug() << data;
         qDebug() << "Unknown DataElement";
@@ -53,9 +58,8 @@ void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
 
 void Client::sendBroadCast()
 {
-    QUdpSocket * socket = new QUdpSocket();
     DataElement data(0,0,0,0,0);
-    socket->writeDatagram(data.data(),QHostAddress::Broadcast,10222);
+    broadCastSocket->writeDatagram(data.data(), QHostAddress::Broadcast, 10222);
     //qDebug() << "BROADCAST DATAGRAM WRITTEN!";
 }
 
