@@ -17,7 +17,7 @@ public:
 signals:
 
 public slots:
-    void readUniCast(DataElement data, QHostAddress * address);
+    void readUniCast(DataElement data, QHostAddress * address, quint16 port);
     void readTcpData(DataElement data, quint32 uid);
     void enterChatRoom(quint32);
     void sendJoinRequest(ChatSocket* socket, quint32 id);

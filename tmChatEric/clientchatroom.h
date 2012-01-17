@@ -18,6 +18,7 @@ public:
 public slots:
     void sendMessage(QString text);
     void showChatMessage(DataElement data, quint32 userId);
+    void showDenyMessage(DataElement data, quint32 userId);
     void sendUserQuit();
 
 private:

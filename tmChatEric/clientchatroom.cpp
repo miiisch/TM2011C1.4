@@ -17,12 +17,15 @@ void ClientChatRoom::newData(DataElement data, quint32 userId)
     switch(data.type())
     {
     case 4:
-        if(data.subType() == 0)
+        if(data.subType() == 1)
         {
             showChatMessage(data, userId);
+        } else if (data.subType() == 2)
+        {
+            showDenyMessage(data, userId);
         }
         break;
-    case 5:
+    case 6:
         readStatusMessage(data);
         break;
     }
@@ -40,20 +43,18 @@ quint32 ClientChatRoom::userId()
 
 void ClientChatRoom::sendMessage(QString text)
 {
-    DataElement data(_id, 4, 0);
-    data.writeInt32(_userId);
+    DataElement data(_id, 4, 0, _userId, 0);
     data.writeString(text);
     socket()->send(data);
 }
 
 void ClientChatRoom::showChatMessage(DataElement data, quint32 userId)
 {
-    quint32 senderId = data.readInt32();
     //qDebug() << senderId;
     QString name = "";
     foreach(UserInfo info, userInfo)
     {
-        if(info.id == senderId)
+        if(info.id == data.sender())
         {
             name = info.name;
             break;
@@ -64,6 +65,24 @@ void ClientChatRoom::showChatMessage(DataElement data, quint32 userId)
     window->addLine("<b>" + name + ":</b> " + textMessage);
 }
 
+void ClientChatRoom::showDenyMessage(DataElement data, quint32 userId)
+{
+    //qDebug() << senderId;
+    QString name = "";
+    foreach(UserInfo info, userInfo)
+    {
+        if(info.id == data.sender())
+        {
+            name = info.name;
+            break;
+        }
+    }
+    QString textMessage = data.readString();
+    QString denyMessage = data.readString();
+
+    window->addLine("<b>Message sending denied:</b> " + textMessage + "<b>(" + denyMessage + ")</b>");
+}
+
 quint32 ClientChatRoom::id()
 {
     return _id;
@@ -71,16 +90,17 @@ quint32 ClientChatRoom::id()
 
 void ClientChatRoom::readStatusMessage(DataElement data)
 {
-    quint32 id = data.readInt32();
+    quint32 id = data.receiver();
     QString string = data.readString();
     switch(data.subType())
     {
-    case 0:
+    case 5:
         //qDebug() << "User joined id: " << id << " name: " << string;
         userInfo.append(UserInfo(id, string, Online));
         window->setUserList(userInfo);
         break;
-    case 5:
+    case 3:
+    case 4:
         //qDebug() << "User left id: " << id << " name: " << string;
         for(int i=0;i<userInfo.length(); ++i)
         {
@@ -97,8 +117,7 @@ void ClientChatRoom::readStatusMessage(DataElement data)
 
 void ClientChatRoom::sendUserQuit()
 {
-    DataElement data(_id,5,5);
-    data.writeInt32(_userId);
+    DataElement data(_id,5,3,_userId,0);
     data.writeString("Bye");
     _socket->send(data);
 }

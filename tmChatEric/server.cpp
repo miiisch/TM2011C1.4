@@ -14,7 +14,7 @@ Server::Server(QString debug, QObject *parent) :
     QUdpSocket * socket = new QUdpSocket;
     socket->bind(13167);
     udpChatSocket = new ChatSocket(socket);
-    connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*)),SLOT(readBroadCast(DataElement,QHostAddress*)));
+    connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16)));
     tcpServer->listen();
     port = tcpServer->serverPort();
     connect(tcpServer,SIGNAL(newConnection()),SLOT(newConnection()));
@@ -46,6 +46,12 @@ void Server::newUser(QTcpSocket *socket)
 
 void Server::readData(DataElement data, quint32 userId)
 {
+    if (userId != data.sender())
+    {
+        errorSender();
+        return;
+    }
+
     if(userId != 0)
         users.user(userId)->socket()->resetTimeOutCounter();
 
@@ -75,15 +81,12 @@ void Server::readData(DataElement data, quint32 userId)
 
 }
 
-void Server::readBroadCast(DataElement data, QHostAddress * peerAddress)
+void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16 port)
 {
     if(data.type() == 0 && data.subType() == 0 && data.chatRoomIdentifier() == 0)
     {
-        //read client port
-        quint16 clientPort = data.readInt16();
-
         //send tcp port, and channellist to user
-        DataElement newDataElement(0,0,1);
+        DataElement newDataElement(0,0,1,0,0);
         QMap<quint32, QPair<QString, quint32> > informations = chatRooms->chatRoomsInfo();
         newDataElement.writeInt16(port);
         newDataElement.writeInt32(informations.count());
@@ -95,7 +98,7 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress)
             newDataElement.writeInt32(pair.second);
         }
         QUdpSocket * udpSocket = new QUdpSocket();
-        udpSocket->writeDatagram(newDataElement.data(), *peerAddress, clientPort);
+        udpSocket->writeDatagram(newDataElement.data(), *peerAddress, port);
        //qDebug() << "UNICAST DATAGRAM WRITTEN";
     } else {
         qDebug() << "Unknown broadcast";
@@ -115,7 +118,7 @@ void Server::sendKeepAlives()
         else
         {
             user->socket()->incrementTimeOutCounter();
-            user->socket()->send(DataElement(0,1,0));
+            user->socket()->send(DataElement(0,1,0,0,0));
         }
     }
 }
@@ -130,11 +133,16 @@ void Server::errorType()
     qDebug() << "Unknown Type";
 }
 
+void Server::errorSender()
+{
+    qDebug() << "Sender not matching";
+}
+
 void Server::readHandshake(DataElement data, quint32 userId)
 {
     (void)data;
     //user modules will be ignored
-    DataElement newDataElement(0,2,0);
+    DataElement newDataElement(0,2,0,0,0);
     newDataElement.writeInt32(userId);
     //empty modules list
     newDataElement.writeInt32(0);

@@ -24,13 +24,13 @@ void ChatRoom::newData(ChatSocket* socket, DataElement data, quint32 userId)
             qDebug() << "Unknown SubType";
         break;
     case 4:
-        if(data.subType() <= 1)
+        if(data.subType() == 0)
             readChatMessage(data, userId);
         else
             qDebug() << "Unknown SubType";
         break;
     case 5:
-        if(data.subType() > 0 && data.subType() <= 5)
+        if(data.subType() <= 3)
             readStatusMessage(data, userId);
         else
             qDebug() << "Unknown SubType";
@@ -54,7 +54,7 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
     {
 
         //Join-Request answer
-        DataElement newDataElement(_id,3,0);
+        DataElement newDataElement(_id,3,1,uid,0);
         newDataElement.writeInt32(allUsers.length());
         foreach(ChatRoomUser* user, allUsers)
         {
@@ -71,9 +71,10 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
         //User joined message to others
         foreach (ChatRoomUser* user, allUsers) {
             if(user != newUser) {
-                DataElement newDataElement(_id,5,0);
-                newDataElement.writeInt32(newUser->uid());
+                DataElement newDataElement(_id,6,5,uid,0);
                 newDataElement.writeString(newUser->name());
+                //empty modules list
+                newDataElement.writeInt32(0);
                 user->socket()->send(newDataElement);
             }
         }
@@ -83,29 +84,21 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
 
 void ChatRoom::readChatMessage(DataElement data, quint32 uid)
 {
-    //read userid
-    quint32 userId = data.readInt32();
-    if(userId != uid) {
-        qDebug() << "corrupt chatmessage, user has send userId: " << userId << " but has id: " << uid;
-        return;
-    }
-
-    switch(data.subType())
+    switch(data.receiver())
     {
     case 0:
         sendChatMessage(data);
         break;
-    case 1:
+    default:
         sendPrivateMessage(data);
         break;
-    default:
-        qDebug() << "Unknown Subtype";
     }
 
 }
 
 void ChatRoom::sendChatMessage(DataElement data)
 {
+    data.setSubType(1);
     QList<ChatRoomUser*> allUsers = users.allUsers();
     foreach(ChatRoomUser* user, allUsers)
     {
@@ -115,8 +108,9 @@ void ChatRoom::sendChatMessage(DataElement data)
 
 void ChatRoom::sendPrivateMessage(DataElement data)
 {
-    quint32 receiver = data.readInt32();
-    users.user(receiver)->socket()->send(data);
+    data.setSubType(2);
+    users.user(data.receiver())->socket()->send(data);
+    users.user(data.sender())->socket()->send(data); // send message to sender (ack)
 }
 
 void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
@@ -125,24 +119,25 @@ void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
     //Update serverside
     switch(data.subType())
     {
-    case 1:
-        currentUser->setName(data.readString());
-        break;
-    case 2:
+//    case X:
+//        currentUser->setName(data.readString());
+//        break;
+    case 0:
         currentUser->setStatus(ChatRoomUser::Online);
         break;
-    case 3:
+    case 1:
         currentUser->setStatus(ChatRoomUser::Away);
         break;
-    case 4:
+    case 2:
         currentUser->setStatus(ChatRoomUser::Busy);
         break;
-    case 5:
+    case 3:
         users.remove(uid);
         break;
     }
 
     //send statusMessage to all
+    data.setType(6);
     QList<ChatRoomUser*> allUsers = users.allUsers();
     foreach(ChatRoomUser* user, allUsers)
     {

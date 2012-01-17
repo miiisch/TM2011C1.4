@@ -21,12 +21,13 @@ ChatSocket::ChatSocket(QUdpSocket *socket, QObject *parent) :
 void ChatSocket::readUdpData()
 {
     QHostAddress * senderAddress = new QHostAddress;
+    quint16 * senderPort = new quint16;
     if(udpSocket->hasPendingDatagrams())
     {
         everyThingRead = false;
         qint64 size = udpSocket->pendingDatagramSize();
         char data[size];
-        udpSocket->readDatagram(data,size,senderAddress);
+        udpSocket->readDatagram(data,size,senderAddress,senderPort);
         QByteArray ba(data, size);
         if(!checkMagicNumber(ba.left(8)))
         {
@@ -38,7 +39,7 @@ void ChatSocket::readUdpData()
         DataElement dataElement(ba);
 
         //new Data signal
-        emit newUdpData(dataElement, senderAddress);
+        emit newUdpData(dataElement, senderAddress, *senderPort);
 
         //check for next datagram
         QTimer::singleShot(0,this,SLOT(readUdpData()));
@@ -75,9 +76,9 @@ void ChatSocket::readTcpData()
             }
             break;
         case WaitingForContent:
-            if(tcpSocket->bytesAvailable() >= (contentLength + 12))
+            if(tcpSocket->bytesAvailable() >= (contentLength + 20))
             {
-                emit newTcpData(DataElement(tcpSocket->read(contentLength+12)), _userId);
+                emit newTcpData(DataElement(tcpSocket->read(contentLength+20)), _userId);
                 currentState = Idle;
             }
             break;

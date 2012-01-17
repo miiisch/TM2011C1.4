@@ -27,14 +27,15 @@ public slots:
     void newConnection();
     void readData(DataElement data, quint32 userId);
     void sendKeepAlives();
-    void readBroadCast(DataElement data, QHostAddress * peerAddress);
+    void readBroadCast(DataElement data, QHostAddress * peerAddress, quint16 port);
 
 private:
 
     void newUser(QTcpSocket * socket);
     void readHandshake(DataElement data, quint32 userId);
-    void errorSubType();
     void errorType();
+    void errorSubType();
+    void errorSender();
     QTcpServer * tcpServer;
     ChatSocket * udpChatSocket;
     quint16 port;

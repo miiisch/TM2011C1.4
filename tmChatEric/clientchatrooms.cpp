@@ -40,7 +40,7 @@ void ClientChatRooms::sendKeepAlives()
             chatRooms.remove(chatRoom->id());
         } else {
             chatRoom->socket()->incrementTimeOutCounter();
-            chatRoom->socket()->send(DataElement(0,1,0));
+            chatRoom->socket()->send(DataElement(0,1,0,0,0));
         }
     }
 }

@@ -4,8 +4,8 @@
 #include <QDebug>
 #include <QBuffer>
 
-DataElement::DataElement(quint32 chatRoomIdentifier, quint32 type, quint32 subType) :
-    _contentLength(0), _chatRoomIdentifier(chatRoomIdentifier), _type(type), _subType(subType), _message(QByteArray())
+DataElement::DataElement(quint32 chatRoomIdentifier, quint32 type, quint32 subType, quint32 sender, quint32 receiver) :
+    _contentLength(0), _chatRoomIdentifier(chatRoomIdentifier), _type(type), _subType(subType), _sender(sender), _receiver(receiver), _message(QByteArray())
 
 {
     QDataStream ds(&_data, QIODevice::WriteOnly);
@@ -14,6 +14,8 @@ DataElement::DataElement(quint32 chatRoomIdentifier, quint32 type, quint32 subTy
     ds << _chatRoomIdentifier;
     ds << _type;
     ds << _subType;
+    ds << _sender;
+    ds << _receiver;
     messageDataStream = new QDataStream(&_message,QIODevice::ReadWrite);
 }
 
@@ -29,6 +31,8 @@ DataElement::DataElement(QByteArray ba)
     ds >> _chatRoomIdentifier;
     ds >> _type;
     ds >> _subType;
+    ds >> _sender;
+    ds >> _receiver;
     quint64 pos = ds.device()->pos();
     _message = _data.right(_data.length() - pos);
     messageDataStream = new QDataStream(&_message,QIODevice::ReadWrite);
@@ -40,15 +44,36 @@ quint32 DataElement::type()
     return _type;
 }
 
+void DataElement::setType(quint32 type)
+{
+    _type = type;
+}
+
 quint32 DataElement::subType()
 {
     return _subType;
+}
+
+void DataElement::setSubType(quint32 subType)
+{
+    _subType = subType;
 }
 
 quint32 DataElement::chatRoomIdentifier()
 {
     return _chatRoomIdentifier;
 }
+
+quint32 DataElement::sender()
+{
+    return _sender;
+}
+
+quint32 DataElement::receiver()
+{
+    return _receiver;
+}
+
 
 QByteArray DataElement::message()
 {
@@ -155,4 +180,3 @@ void DataElement::updateLength()
     ds.device()->seek(8);
     ds << length;
 }
-

@@ -8,7 +8,7 @@ typedef quint32 userId;
 class DataElement
 {
 public:
-    DataElement(quint32 chatRoomIdentifier, quint32 type, quint32 subType);
+    DataElement(quint32 chatRoomIdentifier, quint32 type, quint32 subType, quint32 sender, quint32 receiver);
     DataElement(QByteArray ba);
     QString readString();
     quint32 readInt32();
@@ -20,8 +20,12 @@ public:
     void writeInt8(quint8 value);
     void append(QByteArray ba);
     quint32 type();
+    void setType(quint32 type);
     quint32 subType();
+    void setSubType(quint32 subType);
     quint32 chatRoomIdentifier();
+    quint32 sender();
+    quint32 receiver();
     QByteArray message();
     QByteArray data();
     operator QString() const;
@@ -32,6 +36,8 @@ private:
     quint32 _chatRoomIdentifier;
     quint32 _type;
     quint32 _subType;
+    quint32 _sender;
+    quint32 _receiver;
     QByteArray _message;
     QByteArray _data;
     QDataStream * messageDataStream;
