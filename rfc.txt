@@ -1,0 +1,1568 @@
+
+
+
+Project "Instant Messenger"                                     Gruppe 4
+                                                Institut fuer Telematik,
+                                                Karlsruher Institut fuer
+                                                       Technologie (KIT)
+                                                       December 23, 2011
+
+
+                          Instant Messenger #4
+
+Abstract
+
+   Dieses Protokoll realisiert einen Gruppen-Chat unter den Teilnehmern
+   eines lokalen Netzwerkes.  Jeder Teilnehmer kann eine Server-Instanz
+   starten, dabei fungiert er als zentraler Server fuer die jeweiligen
+   Teilnehmer.  Der Server hat die Aufgabe, einen oder mehrere
+   Chatraeume (sogenannte "Channels") zu verwalten, die von den
+   Teilnehmern erstellt werden koennen sowie dessen Rechtevergabe
+   innerhalb der Chatraeume zu handhaben.  Jeder Teilnehmer kann einen
+   Server spontan auffinden, mit anderen Teilnehmern ueber diesen Server
+   Textnachrichten austauschen, Steuerbefehle versenden und
+   Statusmeldungen verschicken.  Ein Teilnehmer kann darueber hinaus
+   einem oder mehrere Chatraeume beitreten oder einen Chatraum
+   verlassen.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                        [Page 1]
+
+                          Instant Messenger #4             December 2011
+
+
+Table of Contents
+
+   1.      Systembeschreibung . . . . . . . . . . . . . . . . . . . .  4
+   1.1.    Einleitung . . . . . . . . . . . . . . . . . . . . . . . .  4
+   1.2.    Begrifflichkeiten  . . . . . . . . . . . . . . . . . . . .  4
+   1.2.1.  Client . . . . . . . . . . . . . . . . . . . . . . . . . .  4
+   1.2.2.  Server . . . . . . . . . . . . . . . . . . . . . . . . . .  4
+   1.2.3.  Nachricht  . . . . . . . . . . . . . . . . . . . . . . . .  4
+   1.2.4.  Channel  . . . . . . . . . . . . . . . . . . . . . . . . .  4
+   1.2.5.  Channel-ID . . . . . . . . . . . . . . . . . . . . . . . .  4
+   1.2.6.  Username . . . . . . . . . . . . . . . . . . . . . . . . .  5
+   1.2.7.  User-ID  . . . . . . . . . . . . . . . . . . . . . . . . .  5
+   1.2.8.  Modul  . . . . . . . . . . . . . . . . . . . . . . . . . .  5
+   1.2.9.  Rechte . . . . . . . . . . . . . . . . . . . . . . . . . .  5
+   1.3.    Interaktionen  . . . . . . . . . . . . . . . . . . . . . .  5
+   2.      Nachrichten  . . . . . . . . . . . . . . . . . . . . . . .  6
+   2.1.    Datentypen . . . . . . . . . . . . . . . . . . . . . . . .  6
+   2.2.    Format aller Dateneinheiten  . . . . . . . . . . . . . . .  6
+   2.3.    Die verschiedenen Dateneinheiten nach ihrem Typ  . . . . .  7
+   2.3.1.  Type 0: Hello  . . . . . . . . . . . . . . . . . . . . . .  7
+   2.3.2.  Type 1: Null . . . . . . . . . . . . . . . . . . . . . . .  8
+   2.3.3.  Type 2: Handshake  . . . . . . . . . . . . . . . . . . . .  8
+   2.3.4.  Type 3: Join a Channel . . . . . . . . . . . . . . . . . .  9
+   2.3.5.  Type 4: Chat Message . . . . . . . . . . . . . . . . . . . 10
+   2.3.6.  Type 5: Status Change  . . . . . . . . . . . . . . . . . . 10
+   2.3.7.  Type 6: User List Changed  . . . . . . . . . . . . . . . . 11
+   2.3.8.  Type 7: Channel Closed . . . . . . . . . . . . . . . . . . 12
+   2.3.9.  Type 8: Performing an action on somebody . . . . . . . . . 13
+   2.3.10. Type 9: Action Notification  . . . . . . . . . . . . . . . 14
+   2.3.11. Type 10: Action Rejected . . . . . . . . . . . . . . . . . 14
+   2.3.12. Type 1023: Protocol Error  . . . . . . . . . . . . . . . . 14
+   3.      Zustaende  . . . . . . . . . . . . . . . . . . . . . . . . 16
+   3.1.    Zustandsdiagramm 1: Verbindungsaufbau eines Clients zu
+           einem Server . . . . . . . . . . . . . . . . . . . . . . . 16
+   3.1.1.  Zustand 'Not Connected'  . . . . . . . . . . . . . . . . . 16
+   3.1.2.  Zustand 'Unidentified' . . . . . . . . . . . . . . . . . . 17
+   3.1.3.  Zustand 'Identified' . . . . . . . . . . . . . . . . . . . 17
+   3.1.4.  Anmerkung  . . . . . . . . . . . . . . . . . . . . . . . . 17
+   3.2.    Zustandsdiagramm 2: Beitreten eines Channels . . . . . . . 18
+   3.2.1.  Zustand 'Join Wait'  . . . . . . . . . . . . . . . . . . . 19
+   3.2.2.  Zustand 'Channel Joined' . . . . . . . . . . . . . . . . . 19
+   3.2.3.  Anmerkung  . . . . . . . . . . . . . . . . . . . . . . . . 20
+   3.3.    Definierte Verhaltensweisen  . . . . . . . . . . . . . . . 20
+   3.3.1.  Server . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+   3.3.2.  Client . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+   3.4.    Anhang . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+   3.4.1.  Zustandsdiagramm 1: Verbindungsaufbau eines Clients zu
+           einem Server (Client-Sicht)  . . . . . . . . . . . . . . . 24
+
+
+
+Gruppe 4                                                        [Page 2]
+
+                          Instant Messenger #4             December 2011
+
+
+   3.4.2.  Zustandsdiagramm 1: Verbindungsaufbau eines Clients zu
+           einem Server (Server-Sicht)  . . . . . . . . . . . . . . . 25
+   3.4.3.  Zustandsdiagramm 2: Einem Channel beitreten
+           (Client-Sicht) . . . . . . . . . . . . . . . . . . . . . . 26
+   3.4.4.  Zustandsdiagramm 2: Einem Channel beitreten
+           (Server-Sicht) . . . . . . . . . . . . . . . . . . . . . . 27
+           Author's Address . . . . . . . . . . . . . . . . . . . . . 28
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                        [Page 3]
+
+                          Instant Messenger #4             December 2011
+
+
+1.  Systembeschreibung
+
+1.1.  Einleitung
+
+   Dieses Protokoll definiert eine Grundmenge von Funktionalitaet, die
+   zum Austausch von Textnachrichten zwischen mehreren Clients ueber
+   einen Server benoetigt wird.  Das Protokoll ist auf den Einsatz
+   innerhalb eines IP-Subnetzes beschraenkt.
+
+1.2.  Begrifflichkeiten
+
+1.2.1.  Client
+
+   Der Client ist in der Lage, Nachrichten an den Server oder an andere
+   Clients zu uebermitteln.  Des weiteren kann ein Client
+   Textnachrichten empfangen und diese dem Benutzer darstellen.  Ein
+   Client kann Rechte haben und vergeben (siehe Rechte (Section 1.2.9)).
+   Auf einem Rechner koennen mehrere Instanzen eines Clients gestartet
+   werden.
+
+1.2.2.  Server
+
+   Der Server ermoeglicht durch das Verwalten von Channeln
+   (Section 1.2.4) den Nachrichtenaustausch zwischen Clients.  Der
+   Server empfaengt Nachrichten von Clients.  Abhaengig von der Art der
+   empfangenen Nachricht fuehrt der Server eine Aktion aus, wie in den
+   Zustandsdiagrammen (Section 3) definiert.  Auf einem Rechner kann nur
+   eine Instanz eines Servers gestartet werden.
+
+1.2.3.  Nachricht
+
+   Eine Nachricht ist eine Menge zusammengehoerender Daten, die zwischen
+   je zwei Teilnehmern (Client oder Server) versandt wird.  Eine
+   Nachricht ist immer genau einem Zweck zugeordnet.  Sie ist nicht zu
+   verwechseln mit einer "Chat-Nachricht".
+
+1.2.4.  Channel
+
+   Ein Channel entspricht einem Chat-Room oder Chat-Kanal.  Einem
+   Channel gehoert eine Gruppe von Clients an.  Es koennen nur Clients
+   miteinander kommunizieren, die sich im gleichen Channel befinden.
+   Auf einem Server koennen mehrere Channels gleichzeitig existieren.
+
+1.2.5.  Channel-ID
+
+   Die Channel-ID (oder Channel Identifier) dient zur eindeutigen
+   Identifikation eines Channels auf einem Server.  Diese hat einen echt
+   positiven Wert, d.h. groesser oder gleich 1.
+
+
+
+Gruppe 4                                                        [Page 4]
+
+                          Instant Messenger #4             December 2011
+
+
+1.2.6.  Username
+
+   Der Username dient zur eindeutigen Identifikation eines Clients in
+   einem Channel.
+
+1.2.7.  User-ID
+
+   Die User-ID dient zur eindeutigen Identifikation eines Clients auf
+   einem Server.  Diese hat einen echt positiven Wert, d.h. groesser
+   oder gleich 1.
+
+1.2.8.  Modul
+
+   Ein Modul ist eine optionale Erweiterung des Protokolls.  Ein Modul
+   wird durch eine eindeutige ID identifiziert und muss eindeutig (etwa
+   im Anhang dieses RFCs) spezifiziert sein.
+
+1.2.9.  Rechte
+
+   Einem Client werden Rechte vom Server oder einem anderen Client
+   zugewiesen.
+
+   Es gibt folgende Rechte:
+
+   o  Rechte vergeben: Ein Client darf einem anderen Client Rechte geben
+      (siehe Rechte (Section 1.2.9)).
+
+   o  Kick: Ein Client wird zwangsweise aus einem Channel entfernt.
+
+1.3.  Interaktionen
+
+   Das Protokoll spezifiziert folgendes:
+
+   o  Das Auffinden eines Servers durch einen Client
+
+   o  Die Kontaktaufnahme eines Clients mit einem Server
+
+   o  Den Nachrichtenaustausch zwischen allen Beteiligten
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                        [Page 5]
+
+                          Instant Messenger #4             December 2011
+
+
+2.  Nachrichten
+
+2.1.  Datentypen
+
+   Wir definieren folgende Typen und ihre binaere Kodierung, welche in
+   den Nachrichten zum Einsatz kommen:
+
+   INT     ::= 32-bit unsigned big-endian Integer
+
+   INT16   ::= 16-bit unsigned big-endian Integer
+
+   LIST<T> ::= Anzahl Eintraege [INT],
+               pro Eintrag: Eintrag [T]
+
+   STRING  ::= Laenge der Daten in Bytes [INT],
+               String, UTF-8 kodiert, nicht 0-terminiert
+
+   MODULE  ::= Module Identifier [INT],
+               Laenge der Daten in Bytes [INT],
+               Daten [Typ wird im jeweiligen Modul spezifiziert]
+
+   CHANNEL ::= Channel Identifier [INT],
+               Channel Name [STRING],
+               Anzahl User im Channel [INT]
+
+   USER    ::= User ID [INT],
+               Momentaner Status [INT],
+               Username [STRING],
+               Liste verwendeter Module [LIST<MODULE>]
+
+2.2.  Format aller Dateneinheiten
+
+   Jede Nachricht hat das folgende Format:
+
+       +---------------+-------+-------+-------+-------+
+       | Magic number  |Length | Ch-ID | Type  |Subtype| ...
+       +---------------+-------+-------+-------+-------+
+        0             7 8    11 12   15 16   19 20   23
+
+       +-------+-------+-----------------/ /---+
+   ... |Sender |Receiv.|        Content  \ \   |
+       +-------+-------+-----------------/ /---+
+        24   27 28   31 32  ...                   bytes
+
+   Dabei haben die einzelnen Felder die folgenden Bedeutungen:
+
+
+
+
+
+
+Gruppe 4                                                        [Page 6]
+
+                          Instant Messenger #4             December 2011
+
+
+   Magic number [8 bytes]: Konstant "TM2011C1"
+   Length [INT]:           Laenge des Feldes "Content"
+   Ch-ID [INT]:            Channel Identifier
+   Type [INT]:             Nachrichten-Typ
+   Subtype [INT]:          Nachrichten-Untertyp
+   Sender [INT]:           UserID des Absenders der Nachricht
+   Receiver [INT]:         UserID des Empfaengers der Nachricht
+   Content [...]:          (abhaengig vom Nachrichten-Typ und -Untertyp)
+
+   Wenn die Channel-ID nicht relevant ist, wird diese auf 0 gesetzt.
+   Dies ist der Fall bei Nachrichten vom Typ 0 - 2.
+
+   Wenn ein User eine Nachricht an einen Server verschickt, setzt er
+   seine eigene UserID in das Senderfeld.  Der Server darf nur
+   Nachrichten akzeptieren, bei welchen das Senderfeld die korrekte
+   UserID traegt.  Wenn der Server eine Nachricht eines Benutzers
+   weiterleitet laesst er die UserID des Senders stehen.  Wenn der
+   Server eine eigene Nachricht verschickt, setzt er den Absender auf 0.
+   Solange dem Benutzer noch keine UserID zugewiesen wurde, ist das
+   Senderfeld auf 0 gesetzt.  Eine Nullnachricht darf in diesem Zeitraum
+   nicht verschickt werden.  Bei Nachrichtentypen, wo der Empfaenger
+   nicht relevant ist, wird das Feld Empfaenger auf 0 gesetzt.  Das
+   Empfaengerfeld ist nur bei Nachrichtentypen 4, 8, 9 und 10 relevant.
+
+2.3.  Die verschiedenen Dateneinheiten nach ihrem Typ
+
+2.3.1.  Type 0: Hello
+
+   Diese Nachrichteneinheiten dienen zur Auffindung der Server.
+
+   Protocol: UDP
+
+   Subtype (0|0): Hello Request (Broadcast)
+
+      DIRECTION    Client -> BROADCAST
+      PORT         10222
+      DESCRIPTION  Client fordert alle Server auf, Hallo zu sagen
+      SENDER       0
+      RECEIVER     0
+      CONTENT      (empty)
+
+   Subtype (0|1): Hello Response
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                        [Page 7]
+
+                          Instant Messenger #4             December 2011
+
+
+      DIRECTION    Server -> Client
+      PORT         (from Hello Request message)
+      DESCRIPTION  Server sagt Hallo zu einem Client
+      SENDER       0
+      RECEIVER     0
+      CONTENT      Server port number for TCP connection [INT16],
+                   List of hosted channels [LIST<CHANNEL>]
+
+2.3.2.  Type 1: Null
+
+   Da regelmaessig Nachrichten gesendet werden muessen, dient dieser Typ
+   dazu, bedeutungslose Nachrichten zu versenden.
+
+   Protocol: TCP
+
+   Subtype (1|0): Null
+
+      DIRECTION    Server -> Client / Client -> Server
+      DESCRIPTION  Keine Bedeutung, haelt TCP-Verbindung aufrecht
+      SENDER       0
+      RECEIVER     0
+      CONTENT      (empty)
+
+2.3.3.  Type 2: Handshake
+
+   Nachdem eine TCP-Verbindung geoeffnet wird, muss als erstes ein
+   Handshake durchgefuehrt werden, bevor andere Nachrichten verschickt
+   werden duerfen.
+
+   Protocol: TCP
+
+   Subtype (2|0): Connection Request
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Client baut Verb. zu Server auf, Modulbekanntgabe
+      SENDER       0
+      RECEIVER     0
+      CONTENT      Module, die der Client beherrscht [LIST<MODULE>]
+
+   Subtype (2|1): Connection Response
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server bestaetigt Verbindung, Modulbekanntgabe
+      SENDER       0
+      RECEIVER     0
+      CONTENT      UserID des Benutzers [INT],
+                   Module, die genutzt werden koennen [LIST<MODULE>]
+
+
+
+
+Gruppe 4                                                        [Page 8]
+
+                          Instant Messenger #4             December 2011
+
+
+2.3.4.  Type 3: Join a Channel
+
+   Protocol: TCP
+
+   Subtype (3|0): Join Request
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Client moechte Channel betreten
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Username [STRING]
+                   Join Message (darf leer sein) [STRING]
+
+   Subtype (3|1): Join Granted
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server erlaubt Beitritt in Channel
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Userliste [LIST<USER>]
+
+   Subtype (3|2): Join Denied (No Reason)
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server erlaubt Beitritt in Channel nicht
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Grund in Textform [STRING]
+
+   Subtype (3|3): Join Denied (Username taken)
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server erlaubt Beitritt in Channel nicht,
+                   da der Benutzername schon vergeben ist
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Grund in Textform [STRING]
+
+   Subtype (3|4): Join Denied (Chatroom full)
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server erlaubt Beitritt in Channel nicht,
+                   da das Benutzerlimit im Chatraum erreicht ist
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Grund in Textform [STRING]
+
+   Subtype (3|5): Join Denied (Not in Whitelist)
+
+
+
+Gruppe 4                                                        [Page 9]
+
+                          Instant Messenger #4             December 2011
+
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server erlaubt Beitritt in Channel nicht,
+                   da der Benutzername nicht auf der Liste
+                   erlaubter Benutzernamen steht
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Grund in Textform [STRING]
+
+2.3.5.  Type 4: Chat Message
+
+   Wenn sich ein Benutzer in einem Channel befindet, kann er in diesem
+   eine Nachricht an einen oder mehrere Benutzer senden.
+
+   Protocol: TCP
+
+   Subtype (4|0): Chat Message
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Client schreibt Chatnachricht
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     Benutzer-ID des Empfaengers (0 = an alle)
+      CONTENT      Nachricht in reiner Textform [STRING]
+
+   Subtype (4|1): Chat Message Distribution
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server erlaubt und verteilt Chatnachricht
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     Benutzer-ID des Empfaengers (0 = an alle)
+      CONTENT      Nachricht in reiner Textform [STRING]
+
+   Subtype (4|2): Chat Message Rejected
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Client darf diese Nachricht nicht schreiben
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     Benutzer-ID des Empfaengers (0 = an alle)
+      CONTENT      Nachricht in reiner Textform [STRING],
+                   Grund in Textform (darf leer sein) [STRING]
+
+2.3.6.  Type 5: Status Change
+
+   Ein Benutzer kann Statusaenderungen bekannt geben; darunter faellt
+   auch das Abmelden aus einem Channel.
+
+   Protocol: TCP
+
+   Subtype (5|0): User Available
+
+
+
+Gruppe 4                                                       [Page 10]
+
+                          Instant Messenger #4             December 2011
+
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Client gibt bekannt, dass er wieder verfuegbar ist
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Statusmeldung in Textform (darf leer sein) [STRING]
+
+   Subtype (5|1): User Away
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Client gibt bekannt, dass er temporaer nicht
+                   verfuegbar ist
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Statusmeldung in Textform (darf leer sein) [STRING]
+
+   Subtype (5|2): User Busy
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Client gibt bekannt, dass er beschaeftigt ist
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Statusmeldung in Textform (darf leer sein) [STRING]
+
+   Subtype (5|3): User Quit
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Client gibt bekannt, dass er den Channel verlaesst
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     0
+      CONTENT      Quitmeldung in Textform (darf leer sein) [STRING]
+
+2.3.7.  Type 6: User List Changed
+
+   Der Server gibt Aenderungen an der Benutzerliste eines Channels allen
+   Clients in diesem bekannt.
+
+   Protocol: TCP
+
+   Subtype (6|0): User Available
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server gibt bekannt, dass Benutzer verfuegbar ist
+      SENDER       ID des Benutzers, dessen Status sich geaendert hat
+      RECEIVER     0
+      CONTENT      Statusmeldung in Textform (darf leer sein) [STRING]
+
+   Subtype (6|1): User Away
+
+
+
+
+Gruppe 4                                                       [Page 11]
+
+                          Instant Messenger #4             December 2011
+
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server gibt bekannt, dass Benutzer temporaer nicht
+                   verfuegbar ist
+      SENDER       ID des Benutzers, dessen Status sich geaendert hat
+      RECEIVER     0
+      CONTENT      Statusmeldung in Textform (darf leer sein) [STRING]
+
+   Subtype (6|2): User Busy
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server gibt bekannt, dass Benutzer beschaeftigt ist
+      SENDER       ID des Benutzers, dessen Status sich geaendert hat
+      RECEIVER     0
+      CONTENT      Statusmeldung in Textform (darf leer sein) [STRING]
+
+   Subtype (6|3): User Quit
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server gibt bekannt, dass sich Benutzer nicht mehr
+                   im Channel befindet, da er ihn verlassen hat
+      SENDER       ID des Benutzers, welcher den Channel verlassen hat
+      RECEIVER     0
+      CONTENT      Quitmeldung in Textform (darf leer sein) [STRING]
+
+   Subtype (6|4): User Lost Connection
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server gibt bekannt, dass sich Benutzer nicht mehr
+                   im Channel befindet, da seine Verbindung abbrach
+      SENDER       ID des Benutzers, dessen Verbindung abbrach
+      RECEIVER     0
+      CONTENT      (Empty)
+
+   Subtype (6|5): User Joined
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server gibt neuen Benutzer im Channel bekannt
+      SENDER       ID des neuen Benutzers
+      RECEIVER     0
+      CONTENT      Username [STRING],
+                   Liste verwendeter Module [LIST<MODULE>]
+
+2.3.8.  Type 7: Channel Closed
+
+   Der Server gibt das Schliessen eines Channels bekannt.
+
+   Protocol: TCP
+
+
+
+
+Gruppe 4                                                       [Page 12]
+
+                          Instant Messenger #4             December 2011
+
+
+   Subtype (7|0):
+
+      DIRECTION    Server -> Client
+      DESCRIPTION  Server gibt bekannt, dass der Chatraum geschlossen
+                   wird
+      SENDER       0
+      RECEIVER     0
+      CONTENT      Nachricht (darf leer sein) [STRING]
+
+2.3.9.  Type 8: Performing an action on somebody
+
+   Ein Benutzer fuehrt eine Aktion mit einem anderen Benutzer innerhalb
+   eines Channels durch, darunter auch Rechtevergabe zur Ausfuehrung von
+   Aktionen.  Grundsaetzlich ist fuer die Rechtevergabe die
+   Implementierung des Servers verantwortlich.
+
+   Protocol: TCP
+
+   Subtype (8|0): Grant Kick Right
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Sender gibt Empfaenger Kick-Rechte
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     Benutzer-ID des Empfaengers
+      CONTENT      Grund / Nachricht (darf leer sein) [STRING]
+
+   Subtype (8|1): Revoke Kick Right
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Sender entzieht Empfaenger Kick-Rechte
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     Benutzer-ID des Empfaengers
+      CONTENT      Grund / Nachricht (darf leer sein) [STRING]
+
+   Subtype (8|2): Kick
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Sender kickt Empfaenger
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     Benutzer-ID des Empfaengers
+      CONTENT      Grund / Nachricht (darf leer sein) [STRING]
+
+   Subtype (8|3): Grant Mod Right
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Sender gibt Empfaenger das Recht, Rechte zu verteilen
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     Benutzer-ID des Empfaengers
+
+
+
+Gruppe 4                                                       [Page 13]
+
+                          Instant Messenger #4             December 2011
+
+
+      CONTENT      Grund / Nachricht (darf leer sein) [STRING]
+
+   Subtype (8|4): Revoke Mod Right
+
+      DIRECTION    Client -> Server
+      DESCRIPTION  Sender entzieht Empfaenger das Recht, Rechte zu
+                   verteilen
+      SENDER       Benutzer-ID des Senders
+      RECEIVER     Benutzer-ID des Empfaengers
+      CONTENT      Grund / Nachricht (darf leer sein) [STRING]
+
+2.3.10.  Type 9: Action Notification
+
+   Der Server bestaetigt eine Aktion und gibt dies allen Benutzern im
+   Channel bekannt.
+
+   Protocol: TCP
+
+   Die Subtypes in Type 9 entsprechen den Subtypes aus Type 8.  Die
+   Richtung ist dabei umgekehrt, alle Nachrichten gehen von Server zu
+   Client.  Die Bedeutung einer Nachricht von Type 9 ist es, eine
+   Nachricht von Type 8 zu bestaetigen und an alle anderen Benutzern im
+   Channel zu verteilen.
+
+2.3.11.  Type 10: Action Rejected
+
+   Der Server verbietet eine Aktion.
+
+   Protocol: TCP
+
+   Die Subtypes in Type 10 entsprechen den Subtypes aus Type 8.  Die
+   Richtung dabei umgekehrt, alle Nachrichten gehen von Server zu
+   Client.  Die Bedeutung einer Nachricht von Type 10 ist es, eine
+   Nachricht von Type 8 abzulehnen, wobei diese nur an den
+   urspruenglichen Sender geschickt wird.
+
+2.3.12.  Type 1023: Protocol Error
+
+   Diese Nachricht dient lediglich zum Debuggen.  Wenn alle Clients so
+   programmiert sind wie sie es sein muessten, duerfte diese Nachricht
+   nicht verschickt werden.  Sie sollen nur verschickt werden, wenn
+   etwas geschieht, was nach dieser Protokollspezifikation nicht erlaubt
+   ist.
+
+   Protocol: TCP
+
+   Subtype (1023|0): Protocol Misuse Notification
+
+
+
+
+Gruppe 4                                                       [Page 14]
+
+                          Instant Messenger #4             December 2011
+
+
+      DIRECTION    Server -> Client / Client -> Server
+      DESCRIPTION  Protokoll wurde falsch benutzt, melde Fehler
+      SENDER       0
+      RECEIVER     0
+      CONTENT      Fehlernachricht [STRING]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                       [Page 15]
+
+                          Instant Messenger #4             December 2011
+
+
+3.  Zustaende
+
+   In diesem Abschnitt wird das Verhalten von Client und Server
+   spezifiziert.  Dabei wird stets genau ein Client-Server-Paar
+   betrachtet.
+
+3.1.  Zustandsdiagramm 1: Verbindungsaufbau eines Clients zu einem
+      Server
+
+   Dieses Diagramm zeigt den Verbindungsaufbau zwischen Client und
+   Server.  Sobald man sich im Zustand "Identified" befindet, kann man
+   (wie im zweiten Diagramm gezeigt) den Channeln beitreten.
+
+   (Das genaue Format der versendeten Nachrichten wird in Abschnitt 2
+   spezifiziert)
+
+                +-----------+ Client sendet Hello Request (0|0),
+                |           | Server antwortet mit Hello Response (0|1)
+                |           V
+              +---------------+
+     +------->| Not Connected |-------+
+     |        +---------------+       | Client baut TCP-Verbindung
+     |                   ^            | zum Server auf
+     |  TCP-Verbindung   |            V
+     |  abgebaut oder    |   +--------------+
+     |  keine Nachricht  +---| Unidentified |
+     |  fuer 10 Sekunden     +--------------+
+     |                                | Client sendet
+     |                                |    Connection Request (2|0),
+     |                                | Server antwortet mit
+     |                                V    Connection Response (2|1)
+    +------------------------------------------------------------+
+    |                 +----> Identified ------+                  |
+    |                 |        |     ^        |                  |
+    |                 |        |     |        |                  |
+    |                 |        |     |        |                  |
+    |                 |        |     |        V                  |
+    | +------------------+     |     |     +------------------+  |
+    | | Join Channel (1) |<----+     +-----| Join Channel (n) |  |
+    | +------------------+       ...       +------------------+  |
+    |                                                            |
+    +------------------------------------------------------------+
+
+3.1.1.  Zustand 'Not Connected'
+
+   Bevor ein Client eine Verbindung zu einem Server herstellen kann,
+   muss er in Erfahrung bringen, welche Server im lokalen Netz vorhanden
+   sind.  Hierzu sendet der Client eine Hello Request-Nachricht vom Typ
+
+
+
+Gruppe 4                                                       [Page 16]
+
+                          Instant Messenger #4             December 2011
+
+
+   0|0 per UDP-Broadcast an Port 10222.  Auf diesen Port lauschen alle
+   Server.  Erhaelt ein Server eine Hello Request-Nachricht, schickt er
+   per UDP-Unicast eine Hello Response-Nachricht vom Typ 0|1 an den
+   Client, der die Hello Request-Nachricht gesendet hatte, zurueck.
+   Diese Nachricht enthaelt die Nummer des Ports, zu dem der Client eine
+   TCP-Verbindung aufbauen soll, sowie eine Liste aller Channels, die es
+   auf diesem Server gibt.  Der Client entscheidet sich daraufhin fuer
+   einen Server, mit dem er sich verbinden will, und baut eine TCP-
+   Verbindung zu diesem auf.  Das Client-Server-Paar befindet sich nun
+   im Zustand "Unidentified".  Von nun an werden Nachrichten zwischen
+   Client und Server stets per TCP ueber die TCP-Verbindung geschickt.
+
+3.1.2.  Zustand 'Unidentified'
+
+   Nun muss ein "Handshake" zwischen Client und Server durchgefuehrt
+   werden, mit dem die aufgebaute Verbindung bestaetigt wird.
+   Gleichzeitig wird dabei ausgehandelt, welche Module in der weiteren
+   Kommunikation zwischen Client und Server genutzt werden.  Hierfuer
+   sendet der Client eine Connection Request-Nachricht vom Typ 2|0 an
+   den Server.  Darin gibt er die Module an, die er beherrscht.  Der
+   Server antwortet mit einer Connection Response-Nachricht vom Typ 2|1.
+   Er teilt dem Client eine eindeutige User-ID zu und schickt diese in
+   der Connection Response-Nachricht mit.  In der Nachricht gibt er
+   ausserdem die Module an, die zukuenftig genutzt werden duerfen.  Dies
+   muessen ausnahmslos Module sein, die auch der Client beherrscht.  Das
+   Client-Server-Paar befindet sich nun im Zustand "Identified".
+
+3.1.3.  Zustand 'Identified'
+
+   In diesem Zustand kann der Client einem oder mehreren Channel
+   beitreten.  Pro Channel i, dem beigetreten werden soll, gibt es
+   dafuer einen Zustand "Join Channel (i)".  Ein solcher Zustand wird
+   "erstellt", sobald der Client die Anfrage verschickt, dem Channel
+   beizutreten, und "geloescht", sobald der Client den Channel wieder
+   verlaesst.  Dies wird in Diagramm 2 noch genauer erlaeutert.
+
+3.1.4.  Anmerkung
+
+   In den Zustaenden "Unidentified" und "Identified" gilt: Wenn die
+   Verbindung aufrecht erhalten werden soll, muessen Client und Server
+   mindestens alle 10 Sekunden ein Nachricht schicken.  Sobald dem
+   Client eine User-ID zugewiesen wurde, kann dies auch eine Null-
+   Nachricht vom Typ 1|0 sein, die ansonsten keine Information enthaelt.
+   Wird die TCP-Verbindung abgebaut oder laenger als 10 Sekunden keine
+   Nachricht verschickt, so landet das Client-Server-Paar wieder im
+   Zustand "Not Connected".  Befindet sich das Client-Server-Paar im
+   Zustand "Identified" und ist der Client bereits ein oder mehreren
+   Channel beigetreten, so muss der Server die anderen User in diesen
+
+
+
+Gruppe 4                                                       [Page 17]
+
+                          Instant Messenger #4             December 2011
+
+
+   Channeln ueber das Ausscheiden des Clients informieren, indem er eine
+   User Lost Connection-Nachricht vom Typ 6|4 an diese schickt.
+
+3.2.  Zustandsdiagramm 2: Beitreten eines Channels
+
+   Dieses Diagramm beschreibt genauer, wie sich ein Client-Server-Paar
+   im Zustand "Identified" verhaelt, nachdem eine Verbindung zwischen
+   Client und Server erfolgreich aufgebaut wurde.
+
+   (Das genaue Format der versendeten Nachrichten wird in Abschnitt 2
+   spezifiziert)
+
+ +---------------------------------------------------------------------+
+ |           +---------------------> Identified                        |
+ |           |                           ^ |                           |
+ |           |        Server sendet      | | Client sendet             |
+ |           |        Join Denied (3|2-6)| | Join Request (3|0)        |
+ |           |                           | |                           |
+ |           |      +--------------------+-+-------------------------+ |
+ |           |      | Join Channel (i)   | |                         | |
+ |           |      |                    | |                         | |
+ |           |      |                    | V                         | |
+ | User sendet      |             +---------------+                  | |
+ |    User Quit (5|3);            | Join Wait (i) |                  | |
+ | Server sendet    |             +---------------+                  | |
+ |    Channel Closed (7|0) oder           | Server sendet            | |
+ |    Kick (9|2)    |                     | Join Granted (3|1)       | |
+ |           |      |                     V                          | |
+ |           |      |             +--------------------+             | |
+ |           +------+-------------| Channel Joined (i) |             | |
+ |                  |             +--------------------+             | |
+ |                  |                ^               |               | |
+ |                  |                |               |               | |
+ |                  |                +---------------+               | |
+ |                  |           sende und empfange Chat- und         | |
+ |                  |           Statusnachrichten (4|x - 6|x),       | |
+ |                  |           sowie Nachrichten zur                | |
+ |                  |           Rechteverwaltung (8|x - 10|x)        | |
+ |                  +------------------------------------------------+ |
+ +---------------------------------------------------------------------+
+
+   Will der Client im Zustand "Identified" auf dem Server einem Channel
+   beitreten, so sendet er eine Join Request-Nachricht vom Typ 3|0 an
+   den Server.  Diese enthaelt die Channel-ID des gewuenschten Channels
+   sowie den Username, unter dem der Client den anderen Usern im Channel
+   bekannt gemacht werden will.  Ein Username muss in einem Channel
+   eindeutig sein.  Sobald die Join Request-Nachricht gesendet wurde,
+   wird ein "Join Channel"-Zustand erstellt und das Client-Server-Paar
+
+
+
+Gruppe 4                                                       [Page 18]
+
+                          Instant Messenger #4             December 2011
+
+
+   befindet sich (unter anderem, siehe Anmerkung weiter unten) im
+   Unterzustand "Join Wait".
+
+3.2.1.  Zustand 'Join Wait'
+
+   Falls der Server dem Client das Beitreten zum Channel nicht gestatten
+   will, antwortet er unter Angabe von Gruenden mit einer Join Denied-
+   Nachricht vom Typ 3|2-6.  Der "Join Channel"-Zustand wird daraufhin
+   wieder geloescht.  Ansonsten antwortet er mit einer Join Granted-
+   Nachricht vom Typ 3|1.  Darin schickt er eine Liste der anderen User
+   mit, die in diesem Channel sind.  Ausserdem informiert der Server die
+   anderen User im Channel ueber den neuen User mit einer User Joined-
+   Nachricht vom Typ 6|5.  Das Client-Server-Paar befindet sich nun im
+   Zustand "Channel Joined".
+
+3.2.2.  Zustand 'Channel Joined'
+
+   Der Client kann nun Chatnachrichten an einen bestimmten oder alle
+   User im Channel verschicken.  Dafuer schickt er eine Chat Message-
+   Nachricht vom Typ 4|0 an den Server.  Falls der Server das
+   Verschicken der Chatnachricht nicht erlaubt, antwortet er mit einer
+   Chat Message Rejected-Nachricht vom Typ 4|2.  Anderenfalls leitet er
+   die Nachricht an den einen oder an alle User weiter, indem er Chat
+   Message Distribution-Nachrichten vom Typ 4|1 verschickt.
+
+   Ausserdem kann der Client Statusnachrichten ("Available", "Away",
+   "Busy") an die anderen User im Channel senden.  Dafuer sendet er eine
+   entsprechende Status Change-Nachricht vom Typ 5|0-2 an den Server,
+   der diese als User List Changed-Nachricht vom Typ 6|0-2 an die
+   anderen User im Channel weitergibt.  Will der User den Channel
+   verlassen, so sendet er eine User Quit-Nachricht vom Typ 5|3 an den
+   Server.  Dieser informiert die anderen User im Channel ueber das
+   Ausscheiden des Users mit einer User List Changed-Nachricht vom Typ
+   6|3.  Der "Join Channel"-Zustand wird daraufhin geloescht.
+
+   Der Client kann einem anderen User im Channel Kick- oder Mod-Rechte
+   zusprechen oder entziehen, indem er eine entsprechende Nachricht vom
+   Typ 8|0-1,3-4 an den Server schickt.  Erlaubt der Server die Aktion
+   nicht, so antwortet er mit einer entsprechenden Action Rejected-
+   Nachricht vom Typ 10|0-1,3-4.  Andernfalls informiert der Server alle
+   User im Channel durch das Versenden von Action Notification-
+   Nachrichten vom Typ 9|0-1,3-4 ueber die Veraenderung des Rechtestatus
+   des jeweiligen Clients.
+
+   Der Client kann einen anderen User kicken, indem er eine
+   entsprechende Nachricht vom Typ 8|2 an den Server schickt.  Erlaubt
+   der Server die Aktion nicht, so antwortet er mit einer entsprechenden
+   Action Rejected-Nachricht vom Typ 10|2.  Ansonsten informiert er alle
+
+
+
+Gruppe 4                                                       [Page 19]
+
+                          Instant Messenger #4             December 2011
+
+
+   User im Channel durch das Versenden von Action Notification-
+   Nachrichten vom Typ 9|2.  Wird der Client selbst gekickt, so muss er
+   den Channel verlassen und der Server nimmt fortan keine
+   Chatnachrichten des Clients fuer den jeweiligen Channel mehr
+   entgegen.  Der entsprechende "Join Channel"-Zustand wird dann
+   geloescht.
+
+   Will der Server den Channel schliessen, so schickt er eine Channel
+   Closed-Nachricht vom Typ 7|0 an alle User im Channel.  Die
+   entsprechenden "Join Channel"-Zustaende werden geloescht.
+
+3.2.3.  Anmerkung
+
+   Ein Client-Server-Paar kann in ein oder mehreren "Join Channel"-
+   Zustaenden gleichzeitig sein.  Dabei befindet es sich gleichzeitig
+   immer noch im Zustand "Identified" (das heisst die "alle 10s ein
+   Nachricht"-Regel gilt immer noch!).  Ein "Join Channel (i)"-Zustand
+   hat die Unterzustaende "Join Wait (i)" und "Channel Joined (i)".
+
+3.3.  Definierte Verhaltensweisen
+
+   Der folgende Abschnitt definiert im Detail, welche Verhaltensweisen
+   dem Protokoll gemaess von Server/Client nach Empfang einer bestimmten
+   Nachricht in einem bestimmten Zustand erwartet werden.  Die hier
+   angegebenen Zustaende beziehen sich auf die im Anhang beiliegenden
+   Zustandsdiagramme aus Server- und Clientsicht.  Desweiteren ist zu
+   beachten, dass hier Reaktionen auf eintretende Ereignisse definiert
+   werden und nicht etwa das volle Spektrum moeglicher Aktionen z.B. des
+   Clients.  Um Aufschluss darueber zu erhalten, welche Aktionen z.B.
+   der Client in einem Zustand "aus eigener Initiative" heraus einleiten
+   und darauf eine durch das Protokoll spezifizierte Reaktion des
+   Servers erwarten kann, koennen im passenden Serverzustand die
+   moeglichen Nachrichten des Clients abgelesen werden.  Auf alle
+   Nachrichten, auf die hier vom Server keine Reaktion spezifiziert
+   wird, antwortet der Server mit einer Protocol Error-Nachricht und
+   einer aussagekraeftigen Fehlermeldung.  (Anmerkung: Die Trennung von
+   Zustaenden durch "/" weist hier auf einen Unterzustand hin.)
+
+3.3.1.  Server
+
+   1.  Not connected
+
+       *  Hello Request (0|0) --> Antworte dem Client mit Hello Response
+          (0|1).
+
+       *  TCP-Verbindung aufgebaut --> Wechsle zu Zustand Unidentified.
+
+
+
+
+
+Gruppe 4                                                       [Page 20]
+
+                          Instant Messenger #4             December 2011
+
+
+   2.  Unidentified
+
+       *  Hello Request (0|0) --> Antworte dem Client mit Hello Response
+          (0|1).
+
+       *  Connection Request (2|0) --> Antworte dem Client mit
+          Connection Response (2|1), wechsle zu Zustand Identified.
+
+       *  TCP-Verbindung abgebaut --> Wechsle zu Zustand Not Connected.
+
+   3.  Identified
+
+       *  Hello Request (0|0) --> Antworte dem Client mit Hello Response
+          (0|1).
+
+       *  Channel Join Request (3|0) --> "Erstelle" neuen Identified/
+          Join Channel(i)-Zustand und wechsle in Identified/Join
+          Channel(i)/Join Wait(i).
+
+       *  TCP-Verbindung abgebaut oder Timeout von 10s erreicht -->
+          Wechsle zu Zustand Not Connected, sende an alle User, die
+          einem gleichen Channel wie der Client beigetreten sind, eine
+          User List Changed - User Lost Connection-Nachricht (6|4),
+          "loesche" alle zu diesem Client gehoerenden Identified/Join
+          Channel(i)-Zustaende.
+
+   4.  Identified/Join Channel(i)/Join Wait(i)
+
+       *  Hello Request (0|0) --> Antworte dem Client mit Hello Response
+          (0|1).
+
+       *  Join wird zugelassen --> Antworte mit Join Granted (3|1),
+          "erstelle" neuen Identified/Join Channel(i)-Zustand und
+          wechsle in Identified/Join Channel(i)/Channel Joined(i), sende
+          User List Changed - User Joined (6|5) an alle User in diesem
+          Channel.
+
+       *  Join wird nicht zugelassen --> Antworte mit Join Denied
+          (3|2-6), "loesche" Identified/Join Channel(i)-Zustand,
+          verbleibe jedoch in Identified.
+
+       *  TCP-Verbindung abgebaut oder Timeout von 10s erreicht -->
+          Wechsle zu Zustand Not Connected, sende an alle User, die
+          einem gleichen Channel wie der Client beigetreten sind, eine
+          User List Changed - User Lost Connection-Nachricht (6|4),
+          "loesche" alle zu diesem Client gehoerenden Identified/Join
+          Channel(i)-Zustaende.
+
+
+
+
+Gruppe 4                                                       [Page 21]
+
+                          Instant Messenger #4             December 2011
+
+
+   5.  Identified/Join Channel(i)/Channel Joined(i)
+
+       *  Hello Request (0|0) --> Antworte dem Client mit Hello Response
+          (0|1).
+
+       *  Chat Message (4|0) --> Leite per Chat Message Distribution
+          (4|1) an einen bestimmten oder alle User im Channel weiter
+          oder lehne per Chat Message Rejected (4|2) ab.
+
+       *  Status Change (5|0-2) --> Leite per User List Changed (6|0-2)
+          an alle User im Channel weiter.
+
+       *  Status Change - User Quit(5|3) --> Leite per User List Changed
+          - User Quit (6|3) an alle User im Channel weiter, "loesche"
+          den entsprechenden Identified/Join Channel(i)-Zustand.
+
+       *  Grant/Revoke Kick/Mod Right (8|0, 1, 3, 4) --> Benachrichtige
+          alle User im Channel per Action Notification (9|0, 1, 3, 4)
+          oder lehne per Action Rejected (10|0, 1, 3, 4) ab.
+
+       *  Kick (8|2) --> Falls der Kick erlaubt ist, benachrichtige alle
+          User im Channel per Action Notification (9|2) und "loesche"
+          den Identified/Join Channel(i)/Channel-Joined(i)-Zustand des
+          gekickten Clients.  Lehne anderenfalls mit Action Rejected
+          (10|2) ab.
+
+       *  TCP-Verbindung abgebaut oder Timeout von 10s erreicht -->
+          Wechsle zu Zustand Not Connected, sende an alle User, die
+          einem gleichen Channel wie der Client beigetreten sind, eine
+          User List Changed - User Lost Connection-Nachricht (6|4),
+          "loesche" alle zu diesem Client gehoerenden Identified/Join
+          Channel(i)-Zustaende.
+
+   Anmerkung: Wie man sieht, ist hier sowohl im Zustand Unidentified als
+   auch im Zustand Identified und seinen Unterzustaenden eine Reaktion
+   auf den Erhalt der Nachricht Hello Request (0|0) definiert.
+   Hierdurch hat der Client die Moeglichkeit, zu einem beliebigen
+   Zeitpunkt seine Liste der aktuellen Channels auf dem verbundenen
+   Server zu aktualisieren.
+
+3.3.2.  Client
+
+   1.  Not Connected
+
+       *  TCP-Verbindung aufgebaut --> Wechsle zu Unidentified.
+
+
+
+
+
+
+Gruppe 4                                                       [Page 22]
+
+                          Instant Messenger #4             December 2011
+
+
+   2.  Unidentified
+
+       *  Connection Response (3|1) --> Wechsle zu Identified.
+
+       *  TCP-Verbindung abgebaut oder Timeout von 10s erreicht -->
+          Wechsle zu Not Connected.
+
+   3.  Identified
+
+       *  Join-Request (3|0) gesendet --> "Erstelle" neuen Identified/
+          Join Channel(i)-Zustand und wechsle zu Identified/Join
+          Channel(i)/Join Wait(i).
+
+       *  TCP-Verbindung abgebaut oder Timeout von 10s erreicht -->
+          Wechsle zu Not Connected, "loesche" (gegebenenfalls) alle zu
+          Channeln auf diesem Server gehoerenden Identified/Join
+          Channel(i)-Zustaende.
+
+   4.  Identified/Join Channel(i)/Join Wait(i)
+
+       *  Join Granted (3|1) --> Wechsle zu Identified/Join Channel(i)/
+          Channel Joined(i).
+
+       *  Join Denied (3|2-6) --> "Loesche" den entsprechenden
+          Identified/Join Channel(i)-Zustand.
+
+       *  TCP-Verbindung abgebaut oder Timeout von 10s erreicht -->
+          Wechsle zu Not Connected, "loesche" (gegebenenfalls) alle zu
+          Channeln auf diesem Server gehoerenden Identified/Join
+          Channel(i)-Zustaende.
+
+   5.  Identified/Join Channel(i)/Channel Joined(i)
+
+       *  Channel Closed (7|0) --> "Loesche" diesen Identified/Join
+          Channel(i)-Zustand, verbleibe jedoch in Identified.
+
+       *  Actiobn Notification - Kick(9|2) --> Falls die User-ID des
+          Receivers die eigene ist, "loesche" diesen Identified/Join
+          Channel(i)-Zustand, verbleibe jedoch in Identified.
+
+       *  TCP-Verbindung abgebaut oder Timeout von 10s erreicht -->
+          Wechsle zu Not Connected, "loesche" alle zu Channeln auf
+          diesem Server gehoerenden Identified/Join Channel(i)-
+          Zustaende.
+
+
+
+
+
+
+
+Gruppe 4                                                       [Page 23]
+
+                          Instant Messenger #4             December 2011
+
+
+3.4.  Anhang
+
+   Im folgenden Anhang befinden sich zur weiteren Verdeutlichung die
+   Zustandsdiagramme 1 und 2 aus Client- und aus Serversicht.
+
+3.4.1.  Zustandsdiagramm 1: Verbindungsaufbau eines Clients zu einem
+        Server (Client-Sicht)
+
+
+              +-----------+ sende Hello Request (0|0),
+              |           | empfange Hello Response (0|1)
+              |           V
+            +---------------+
+   +------->| Not Connected |-------+
+   |        +---------------+       | baue TCP-Verbindung
+   |                   ^            | zu Server auf
+   |  TCP-Verbindung   |            V
+   |  abgebaut;        |   +--------------+
+   |  keine Nachricht  +---| Unidentified |
+   |  fuer 10 sec          +--------------+
+   |                                | sende Connection Request (2|0),
+   |                                | empfange Connection Response (2|1)
+   |                                V
+  +------------------------------------------------------------+
+  |                 +----> Identified ------+                  |
+  |                 |        |     ^        |                  |
+  |                 |        |     |        |                  |
+  |                 |        |     |        V                  |
+  | +------------------+     |     |     +------------------+  |
+  | | Join Channel (1) |<----+     +-----| Join Channel (n) |  |
+  | +------------------+       ...       +------------------+  |
+  |                                                            |
+  +------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                       [Page 24]
+
+                          Instant Messenger #4             December 2011
+
+
+3.4.2.  Zustandsdiagramm 1: Verbindungsaufbau eines Clients zu einem
+        Server (Server-Sicht)
+
+
+                +-----------+ empfange Hello Request (0|0),
+                |           | sende Hello Response (0|1)
+                |           V
+              +---------------+
+     +------->| Not Connected |----+
+     |        +----- ---------+    | TCP-Verbindung zum Server
+     | TCP-Verbindung    ^         | wurde aufgebaut
+     | abgebaut oder     |         V
+     | keine Nachricht   |   +--------------+
+     | fuer 10 sec,      +---| Unidentified |
+     | sende ggf. User Lost  +--------------+
+     | Connection (6|4) an alle    | empfange Connection Request (2|0),
+     | User in allen Channeln      | sende Connection Response (2|1)
+     |                             V
+    +------------------------------------------------------------+
+    |                 +----> Identified ------+                  |
+    |                 |        |     ^        |                  |
+    |                 |        |     |        |                  |
+    |                 |        |     |        V                  |
+    | +------------------+     |     |     +------------------+  |
+    | | Join Channel (1) |<----+     +-----| Join Channel (n) |  |
+    | +------------------+       ...       +------------------+  |
+    |                                                            |
+    +------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                       [Page 25]
+
+                          Instant Messenger #4             December 2011
+
+
+3.4.3.  Zustandsdiagramm 2: Einem Channel beitreten (Client-Sicht)
+
+
+ +---------------------------------------------------------------------+
+ |           +---------------------> Identified                        |
+ |           |                           ^ |                           |
+ |           |        empfange           | | sende                     |
+ |           |        Join Denied (3|2-6)| | Join Request (3|0)        |
+ |           |                           | |                           |
+ |           |      +--------------------+-+-------------------------+ |
+ |           |      | Join Channel (i)   | |                         | |
+ |           |      |                    | |                         | |
+ |           |      |                    | V                         | |
+ |           |      |             +---------------+                  | |
+ | sende User Quit (5|3);         | Join Wait (i) |                  | |
+ | empfange Channel Closed (7|0); +---------------+                  | |
+ | empfange Kick (9|2)                    |                          | |
+ |           |      |                     | empfange Join            | |
+ |           |      |                     V    Granted (3|1)         | |
+ |           |      |             +--------------------+             | |
+ |           +------+-------------| Channel Joined (i) |             | |
+ |                  |             +--------------------+             | |
+ |                  |                ^               |               | |
+ |                  |                |               |               | |
+ |                  |                +---------------+               | |
+ |                  |           sende und empfange Chat- und         | |
+ |                  |           Statusnachrichten (4|x - 6|x),       | |
+ |                  |           sowie Nachrichten zur                | |
+ |                  |           Rechteverwaltung (8|x - 10|x)        | |
+ |                  +------------------------------------------------+ |
+ +---------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                       [Page 26]
+
+                          Instant Messenger #4             December 2011
+
+
+3.4.4.  Zustandsdiagramm 2: Einem Channel beitreten (Server-Sicht)
+
+
+ +---------------------------------------------------------------------+
+ |           +---------------------> Identified                        |
+ |           |                           ^ |                           |
+ |           |        sende              | | empfange                  |
+ |           |        Join Denied (3|2-6)| | Join Request (3|0)        |
+ |           |                           | |                           |
+ |           |      +--------------------+-+-------------------------+ |
+ |           |      | Join Channel (i)   | |                         | |
+ |           |      |                    | |                         | |
+ |           |      |                    | V                         | |
+ | empfange User Quit (5|3)       +---------------+                  | |
+ | und sende User Quit (6|3) an   | Join Wait (i) |                  | |
+ |    alle User im Channel;       +---------------+                  | |
+ | sende Kick (9|2)                       | sende Join Granted (3|1),| |
+ |    (an alle User im Channel);          | sende User Joined (6|5)  | |
+ | sende Channel Closed (7|0);            V   an alle User im Channel| |
+ |           |      |             +--------------------+             | |
+ |           +------+-------------| Channel Joined (i) |             | |
+ |                  |             +--------------------+             | |
+ |                  |                ^               |               | |
+ |                  |                |               |               | |
+ |                  |                +---------------+               | |
+ |                  | empfange Chat- und Statusnachrichten           | |
+ |                  |    und leite diese ggf. weiter (4|x - 6|x),    | |
+ |                  | empfange Nachrichten zur Rechteverwaltung      | |
+ |                  |    und reagiere entsprechend (8|x - 10|x)      | |
+ |                  +------------------------------------------------+ |
+ +---------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                       [Page 27]
+
+                          Instant Messenger #4             December 2011
+
+
+Author's Address
+
+   Instant Messenger-Gruppe 4
+   Institut fuer Telematik, Karlsruher Institut fuer Technologie (KIT)
+   Zirkel 2
+   Karlsruhe, Baden-Wuerttemberg  76131
+   Germany
+
+   Email: tm-projekt4@ira.uka.de
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gruppe 4                                                       [Page 28]
+
