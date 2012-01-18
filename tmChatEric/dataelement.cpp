@@ -39,7 +39,7 @@ DataElement::DataElement(QByteArray ba)
     _data.prepend(prefix);
 }
 
-quint32 DataElement::type()
+quint32 DataElement::type() const
 {
     return _type;
 }
@@ -52,7 +52,7 @@ void DataElement::setType(quint32 type)
     ds << _type;
 }
 
-quint32 DataElement::subType()
+quint32 DataElement::subType() const
 {
     return _subType;
 }
@@ -65,23 +65,23 @@ void DataElement::setSubType(quint32 subType)
     ds << _subType;
 }
 
-quint32 DataElement::chatRoomIdentifier()
+quint32 DataElement::chatRoomIdentifier() const
 {
     return _chatRoomIdentifier;
 }
 
-quint32 DataElement::sender()
+quint32 DataElement::sender() const
 {
     return _sender;
 }
 
-quint32 DataElement::receiver()
+quint32 DataElement::receiver() const
 {
     return _receiver;
 }
 
 
-QByteArray DataElement::message()
+QByteArray DataElement::message() const
 {
     return _message;
 }

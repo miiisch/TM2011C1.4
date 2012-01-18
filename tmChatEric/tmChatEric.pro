@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     clientchatrooms.cpp \
     clientchatroom.cpp \
     chatroomwindow.cpp \
-    createchatroomdialog.cpp
+    createchatroomdialog.cpp \
+    dataelementviewer.cpp
 
 HEADERS  += mainwindow.h \
     server.h \
@@ -48,53 +49,10 @@ HEADERS  += mainwindow.h \
     clientchatroom.h \
     chatroomwindow.h \
     types.h \
-    createchatroomdialog.h
+    createchatroomdialog.h \
+    dataelementviewer.h
 
 FORMS    += mainwindow.ui \
     chatroomwindow.ui \
-    createchatroomdialog.ui
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    createchatroomdialog.ui \
+    dataelementviewer.ui

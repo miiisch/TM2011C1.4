@@ -4,6 +4,7 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include <QTimer>
+#include "dataelementviewer.h"
 
 Client::Client(QString userName, QObject *parent) :
     QObject(parent), userName(userName), server(0)
@@ -60,7 +61,11 @@ void Client::sendBroadCast()
 {
     DataElement data(0,0,0,0,0);
     broadCastSocket->writeDatagram(data.data(), QHostAddress::Broadcast, 10222);
-    qDebug() << "BROADCAST DATAGRAM WRITTEN!";
+    DataElementViewer::getInstance()->addMessage(DataElementViewer::Client,
+                                                 DataElementViewer::Out,
+                                                 DataElementViewer::UdpBroadcast,
+                                                 QHostAddress::Broadcast,
+                                                 &data);
 }
 
 void Client::enterChatRoom(quint32 id)

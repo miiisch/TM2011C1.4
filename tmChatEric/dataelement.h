@@ -19,14 +19,14 @@ public:
     void writeInt16(quint16 value);
     void writeInt8(quint8 value);
     void append(QByteArray ba);
-    quint32 type();
+    quint32 type() const;
     void setType(quint32 type);
-    quint32 subType();
+    quint32 subType() const;
     void setSubType(quint32 subType);
-    quint32 chatRoomIdentifier();
-    quint32 sender();
-    quint32 receiver();
-    QByteArray message();
+    quint32 chatRoomIdentifier() const;
+    quint32 sender() const;
+    quint32 receiver() const;
+    QByteArray message() const;
     QByteArray data();
     operator QString() const;
 
