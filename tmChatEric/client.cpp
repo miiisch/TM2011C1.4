@@ -60,7 +60,7 @@ void Client::sendBroadCast()
 {
     DataElement data(0,0,0,0,0);
     broadCastSocket->writeDatagram(data.data(), QHostAddress::Broadcast, 10222);
-    //qDebug() << "BROADCAST DATAGRAM WRITTEN!";
+    qDebug() << "BROADCAST DATAGRAM WRITTEN!";
 }
 
 void Client::enterChatRoom(quint32 id)

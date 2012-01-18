@@ -12,7 +12,7 @@ Server::Server(QString debug, QObject *parent) :
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
-    socket->bind(10222);
+    qDebug() << socket->bind(10222);
     udpChatSocket = new ChatSocket(socket);
     connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16)));
     tcpServer->listen();
@@ -103,7 +103,7 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16
         }
         QUdpSocket * udpSocket = new QUdpSocket();
         udpSocket->writeDatagram(newDataElement.data(), *peerAddress, port);
-       //qDebug() << "UNICAST DATAGRAM WRITTEN";
+       qDebug() << "UNICAST DATAGRAM WRITTEN";
     } else {
         qDebug() << "Unknown broadcast";
     }
