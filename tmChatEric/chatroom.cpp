@@ -16,6 +16,7 @@ quint32 ChatRoom::chatRoomUsersCount()
 
 void ChatRoom::newData(ChatSocket* socket, DataElement data, quint32 userId)
 {
+    qDebug() << "ChatRoom::newData " << data;
     switch(data.type())
     {
     case 3:
@@ -72,6 +73,7 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
         //User joined message to others
         foreach (ChatRoomUser* user, allUsers) {
             if(user != newUser) {
+                qDebug() << "notify users of new user, id = " << uid;
                 DataElement newDataElement(_id,6,5,uid,0);
                 newDataElement.writeString(newUser->name());
                 //empty modules list
@@ -104,6 +106,7 @@ void ChatRoom::sendChatMessage(DataElement data)
     foreach(ChatRoomUser* user, allUsers)
     {
         user->socket()->send(data);
+        qDebug() << "returning ack" << data;
     }
 }
 

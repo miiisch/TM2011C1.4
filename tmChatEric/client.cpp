@@ -84,6 +84,7 @@ void Client::enterChatRoom(quint32 id)
 
 void Client::readTcpData(DataElement data, quint32 uid)
 {
+    qDebug() << "Client::readTcpData " << data;
     ChatSocket* socket = (ChatSocket*)sender();
     socket->resetTimeOutCounter();
     switch(data.type())
@@ -112,7 +113,8 @@ void Client::readTcpData(DataElement data, quint32 uid)
     case 6:
         chatRooms.newData(data, uid);
         break;
-
+    default:
+        qDebug() << "Client::newData unknown type" << data.type();
     }
 }
 

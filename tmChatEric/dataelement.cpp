@@ -47,6 +47,9 @@ quint32 DataElement::type()
 void DataElement::setType(quint32 type)
 {
     _type = type;
+    QDataStream ds(&_data,QIODevice::WriteOnly);
+    ds.device()->seek(16);
+    ds << _type;
 }
 
 quint32 DataElement::subType()
@@ -57,6 +60,9 @@ quint32 DataElement::subType()
 void DataElement::setSubType(quint32 subType)
 {
     _subType = subType;
+    QDataStream ds(&_data,QIODevice::WriteOnly);
+    ds.device()->seek(20);
+    ds << _subType;
 }
 
 quint32 DataElement::chatRoomIdentifier()
@@ -91,7 +97,7 @@ QByteArray DataElement::data()
 
 DataElement::operator QString() const
 {
-    return QString("ChatroomId: %1, Type: %2, SubType: %3").arg(_chatRoomIdentifier).arg(_type).arg(_subType);
+    return QString("ChatroomId: %1, Type: %2, SubType: %3, S: %4, R: %5").arg(_chatRoomIdentifier).arg(_type).arg(_subType).arg(_sender).arg(_receiver);
 }
 
 QString DataElement::readString()

@@ -19,6 +19,7 @@ void ClientChatRoom::newData(DataElement data, quint32 userId)
     case 4:
         if(data.subType() == 1)
         {
+            qDebug() << "recieved ack";
             showChatMessage(data, userId);
         } else if (data.subType() == 2)
         {
@@ -28,6 +29,8 @@ void ClientChatRoom::newData(DataElement data, quint32 userId)
     case 6:
         readStatusMessage(data);
         break;
+    default:
+        qDebug() << "ClientChatRoom::newData unknown type: " << data.type();
     }
 }
 
@@ -90,7 +93,7 @@ quint32 ClientChatRoom::id()
 
 void ClientChatRoom::readStatusMessage(DataElement data)
 {
-    quint32 id = data.receiver();
+    quint32 id = data.sender();
     QString string = data.readString();
     switch(data.subType())
     {
