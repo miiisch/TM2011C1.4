@@ -48,7 +48,7 @@ void ClientChatRoom::sendMessage(QString text)
 {
     DataElement data(_id, 4, 0, _userId, 0);
     data.writeString(text);
-    socket()->send(data);
+    socket()->send(data, false);
 }
 
 void ClientChatRoom::showChatMessage(DataElement data, quint32 userId)
@@ -122,5 +122,5 @@ void ClientChatRoom::sendUserQuit()
 {
     DataElement data(_id,5,3,_userId,0);
     data.writeString("Bye");
-    _socket->send(data);
+    _socket->send(data, false);
 }

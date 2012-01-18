@@ -42,7 +42,7 @@ private:
     Ui::DataUnitViewer *ui;
     struct Message {
         Message (ClientServer clientServer, Direction direction, Protocol protocol, const QHostAddress & address, DataElement * data) :
-            _rawData(data->data()),
+            _rawData(data->rawData()),
             _serverClient(clientServer == Client ? "Client" : "Server"),
             _direction(direction == In ? "In" : "Out"),
             _protocol(protocol == Tcp ? "Tcp" : (protocol == UdpUnicast ? "UdpUnicast" : "Broadcast")),

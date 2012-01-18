@@ -9,7 +9,6 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::DataUnitViewer)
 {
-    qDebug() << "constructing Viewer";
     ui->setupUi(this);
 
 //    connect(ui->inCheckbox, SIGNAL(toggled(bool)), SLOT(update()));
@@ -33,7 +32,10 @@ DataElementViewer::~DataElementViewer()
 DataElementViewer * DataElementViewer::getInstance()
 {
     if (instance == 0)
+    {
         instance = new DataElementViewer;
+        instance->show();
+    }
     return instance;
 }
 

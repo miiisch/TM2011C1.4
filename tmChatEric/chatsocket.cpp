@@ -4,6 +4,7 @@
 #include <QUdpSocket>
 #include <QTcpSocket>
 #include <QTimer>
+#include "dataelementviewer.h"
 
 ChatSocket::ChatSocket(QTcpSocket *socket, quint32 userId, QObject *parent) :
     QObject(parent), tcpSocket(socket), type(TCP), currentState(Idle), _userId(userId)
@@ -80,7 +81,7 @@ void ChatSocket::readTcpData()
         case WaitingForContent:
             if(tcpSocket->bytesAvailable() >= (contentLength + 20))
             {
-                emit newTcpData(DataElement(tcpSocket->read(contentLength+20)), _userId);
+                emit newTcpData(DataElement(tcpSocket->read(contentLength+20)), _userId, tcpSocket->peerAddress());
                 currentState = Idle;
             }
             break;
@@ -118,11 +119,16 @@ quint32 ChatSocket::readLength(QByteArray length)
 
 }
 
-bool ChatSocket::send(DataElement data)
+bool ChatSocket::send(DataElement data, bool server)
 {
     if(type == TCP)
     {
         if(tcpSocket->isOpen()) {
+            DataElementViewer::getInstance()->addMessage(server ? DataElementViewer::Server : DataElementViewer::Client,
+                                                         DataElementViewer::Out,
+                                                         DataElementViewer::Tcp,
+                                                         tcpSocket->peerAddress(),
+                                                         &data);
             tcpSocket->write(data.data());
             return true;
         } else {
@@ -147,7 +153,7 @@ quint32 ChatSocket::userId()
     return _userId;
 }
 
-quint32 ChatSocket::setUserId(quint32 userId)
+void ChatSocket::setUserId(quint32 userId)
 {
     _userId = userId;
 }

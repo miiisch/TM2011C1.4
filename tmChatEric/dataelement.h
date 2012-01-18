@@ -30,6 +30,8 @@ public:
     QByteArray data();
     operator QString() const;
 
+    QString rawData() const;
+
 private:
     void updateLength();
     quint32 _contentLength;

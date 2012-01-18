@@ -66,7 +66,7 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
             //empty modules list
             newDataElement.writeInt32(0);
         }
-        newUser->socket()->send(newDataElement);
+        newUser->socket()->send(newDataElement, true);
     }
 
     {
@@ -78,7 +78,7 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
                 newDataElement.writeString(newUser->name());
                 //empty modules list
                 newDataElement.writeInt32(0);
-                user->socket()->send(newDataElement);
+                user->socket()->send(newDataElement, true);
             }
         }
     }
@@ -105,7 +105,7 @@ void ChatRoom::sendChatMessage(DataElement data)
     QList<ChatRoomUser*> allUsers = users.allUsers();
     foreach(ChatRoomUser* user, allUsers)
     {
-        user->socket()->send(data);
+        user->socket()->send(data, true);
         qDebug() << "returning ack" << data;
     }
 }
@@ -113,8 +113,8 @@ void ChatRoom::sendChatMessage(DataElement data)
 void ChatRoom::sendPrivateMessage(DataElement data)
 {
     data.setSubType(2);
-    users.user(data.receiver())->socket()->send(data);
-    users.user(data.sender())->socket()->send(data); // send message to sender (ack)
+    users.user(data.receiver())->socket()->send(data, true);
+    users.user(data.sender())->socket()->send(data, true); // send message to sender (ack)
 }
 
 void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
@@ -145,6 +145,6 @@ void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
     QList<ChatRoomUser*> allUsers = users.allUsers();
     foreach(ChatRoomUser* user, allUsers)
     {
-        user->socket()->send(data);
+        user->socket()->send(data, true);
     }
 }

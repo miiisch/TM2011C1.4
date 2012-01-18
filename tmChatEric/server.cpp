@@ -6,6 +6,7 @@
 #include <QDebug>
 #include "dataelement.h"
 #include <QTimer>
+#include "dataelementviewer.h"
 
 Server::Server(QString debug, QObject *parent) :
     QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1)
@@ -41,12 +42,17 @@ void Server::newUser(QTcpSocket *socket)
 {
     quint32 uid = userIdCounter++;
     ChatSocket * chatSocket = new ChatSocket(socket, uid);
-    connect(chatSocket,SIGNAL(newTcpData(DataElement,quint32)),SLOT(readData(DataElement,quint32)));
+    connect(chatSocket,SIGNAL(newTcpData(DataElement,quint32,QHostAddress)),SLOT(readData(DataElement,quint32,QHostAddress)));
     users.createUser(chatSocket, uid);
 }
 
-void Server::readData(DataElement data, quint32 userId)
+void Server::readData(DataElement data, quint32 userId, QHostAddress address)
 {
+    DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
+                                                 DataElementViewer::In,
+                                                 DataElementViewer::Tcp,
+                                                 address,
+                                                 &data);
     //before the handshake is completed, the user can't know his id
     //sender = 0 in NULL Message
     if (data.type() != 2 && data.type() != 1 && userId != data.sender())
@@ -122,7 +128,7 @@ void Server::sendKeepAlives()
         else
         {
             user->socket()->incrementTimeOutCounter();
-            user->socket()->send(DataElement(0,1,0,0,0));
+            user->socket()->send(DataElement(0,1,0,0,0), true);
         }
     }
 }
@@ -150,7 +156,7 @@ void Server::readHandshake(DataElement data, quint32 userId)
     newDataElement.writeInt32(userId);
     //empty modules list
     newDataElement.writeInt32(0);
-    users.user(userId)->socket()->send(newDataElement);
+    users.user(userId)->socket()->send(newDataElement, true);
 }
 
 void Server::debugInitialisierung()

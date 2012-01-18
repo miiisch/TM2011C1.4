@@ -14,16 +14,16 @@ class ChatSocket : public QObject
 public:
     explicit ChatSocket(QTcpSocket * socket, quint32 userId, QObject *parent = 0);
     ChatSocket(QUdpSocket * socket, QObject *parent = 0);
-    bool send(DataElement data);
+    bool send(DataElement data, bool server);
     QHostAddress ip();
     quint32 userId();
-    quint32 setUserId(quint32 userId);
+    void setUserId(quint32 userId);
     int timeOutCounter();
     void incrementTimeOutCounter();
     void resetTimeOutCounter();
 
 signals:
-    void newTcpData(DataElement data, quint32 userId);
+    void newTcpData(DataElement data, quint32 userId, QHostAddress);
     void newUdpData(DataElement data, QHostAddress * senderAddress, quint16 port);
 
 public slots:

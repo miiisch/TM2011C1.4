@@ -29,6 +29,11 @@ Client::Client(QString userName, QObject *parent) :
 
 void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
 {
+    DataElementViewer::getInstance()->addMessage(DataElementViewer::Client,
+                                                 DataElementViewer::In,
+                                                 DataElementViewer::UdpUnicast,
+                                                 *address,
+                                                 &data);
     (void*)address;
     (void)port;
     //readServerinformations
@@ -60,12 +65,12 @@ void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
 void Client::sendBroadCast()
 {
     DataElement data(0,0,0,0,0);
-    broadCastSocket->writeDatagram(data.data(), QHostAddress::Broadcast, 10222);
     DataElementViewer::getInstance()->addMessage(DataElementViewer::Client,
                                                  DataElementViewer::Out,
                                                  DataElementViewer::UdpBroadcast,
                                                  QHostAddress::Broadcast,
                                                  &data);
+    broadCastSocket->writeDatagram(data.data(), QHostAddress::Broadcast, 10222);
 }
 
 void Client::enterChatRoom(quint32 id)
@@ -77,18 +82,24 @@ void Client::enterChatRoom(quint32 id)
     if(socket->userId() == 0)
     {
         // request user id with handshake
-        connect(socket,SIGNAL(newTcpData(DataElement,quint32)),SLOT(readTcpData(DataElement,quint32)));
+        connect(socket,SIGNAL(newTcpData(DataElement,quint32,QHostAddress)),SLOT(readTcpData(DataElement,quint32,QHostAddress)));
         DataElement data(0,2,0,0,0);
         data.writeInt32(0);
-        socket->send(data);
+        socket->send(data, false);
         joinQueues[ip].append(id);
     } else {
         sendJoinRequest(socket, id);
     }
 }
 
-void Client::readTcpData(DataElement data, quint32 uid)
+void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
 {
+    DataElementViewer::getInstance()->addMessage(DataElementViewer::Client,
+                                                 DataElementViewer::In,
+                                                 DataElementViewer::Tcp,
+                                                 address,
+                                                 &data);
+
     qDebug() << "Client::readTcpData " << data;
     ChatSocket* socket = (ChatSocket*)sender();
     socket->resetTimeOutCounter();
@@ -128,7 +139,7 @@ void Client::sendJoinRequest(ChatSocket *socket, quint32 id)
     DataElement data(id, 3, 0, socket->userId(), 0);
     data.writeString(userName);
     data.writeString("Ich will rein");
-    socket->send(data);
+    socket->send(data, false);
 }
 
 void Client::showChatRoom(ChatSocket * socket, DataElement data, quint32 uid)

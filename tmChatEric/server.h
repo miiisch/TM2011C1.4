@@ -25,7 +25,7 @@ signals:
 
 public slots:
     void newConnection();
-    void readData(DataElement data, quint32 userId);
+    void readData(DataElement data, quint32 userId, QHostAddress address);
     void sendKeepAlives();
     void readBroadCast(DataElement data, QHostAddress * peerAddress, quint16 port);
 
