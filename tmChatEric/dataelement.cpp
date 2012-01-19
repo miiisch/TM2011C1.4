@@ -100,10 +100,22 @@ DataElement::operator QString() const
     return QString("ChatroomId: %1, Type: %2, SubType: %3, S: %4, R: %5").arg(_chatRoomIdentifier).arg(_type).arg(_subType).arg(_sender).arg(_receiver);
 }
 
-QString DataElement::readString()
+QString DataElement::readString(bool * valid)
 {
+    if (valid != 0 && messageDataStream->device()->bytesAvailable() < 4)
+    {
+        *valid = false;
+        return "";
+    }
+
     quint32 length;
     *messageDataStream >> length;
+
+    if (valid != 0 && messageDataStream->device()->bytesAvailable() < length)
+    {
+        *valid = false;
+        return "";
+    }
 
     char c[length+1];
     messageDataStream->readRawData(c,length);
@@ -113,22 +125,40 @@ QString DataElement::readString()
     return str;
 }
 
-quint32 DataElement::readInt32()
+quint32 DataElement::readInt32(bool * valid)
 {
+    if (valid != 0 && messageDataStream->device()->bytesAvailable() < 4)
+    {
+        *valid = false;
+        return 0;
+    }
+
     quint32 value;
     *messageDataStream >> value;
     return value;
 }
 
-quint16 DataElement::readInt16()
+quint16 DataElement::readInt16(bool * valid)
 {
+    if (valid != 0 && messageDataStream->device()->bytesAvailable() < 2)
+    {
+        *valid = false;
+        return 0;
+    }
+
     quint16 value;
     *messageDataStream >> value;
     return value;
 }
 
-quint8 DataElement::readInt8()
+quint8 DataElement::readInt8(bool * valid)
 {
+    if (valid != 0 && messageDataStream->device()->bytesAvailable() < 1)
+    {
+        *valid = false;
+        return 0;
+    }
+
     quint8 value;
     *messageDataStream >> value;
     return value;
@@ -206,5 +236,12 @@ QString DataElement::rawData() const
         }
         result += " ";
     }
+    return result;
+}
+
+bool DataElement::rewind() const
+{
+    bool result = messageDataStream->atEnd();
+    messageDataStream->device()->seek(0);
     return result;
 }

@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>880</width>
-    <height>600</height>
+    <width>1024</width>
+    <height>598</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>DataElementViewer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_5">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <widget class="QTableWidget" name="outputTable">
       <column>
@@ -54,6 +54,16 @@
       </column>
       <column>
        <property name="text">
+        <string>sender</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>receiver</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
         <string>valid type</string>
        </property>
       </column>
@@ -75,11 +85,14 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QCheckBox" name="inCheckbox">
+         <widget class="QCheckBox" name="filterIn">
           <property name="text">
            <string>In</string>
           </property>
@@ -89,7 +102,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="outCheckbox">
+         <widget class="QCheckBox" name="filterOut">
           <property name="text">
            <string>Out</string>
           </property>
@@ -98,14 +111,34 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QCheckBox" name="filterServer">
+          <property name="text">
+           <string>Server</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="filterClient">
+          <property name="text">
+           <string>Client</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
-      </item>
-      <item>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QCheckBox" name="channelIndependantMessages">
+         <widget class="QCheckBox" name="filterTcp">
           <property name="text">
-           <string>Channel-Independent Messages</string>
+           <string>TCP</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -113,22 +146,19 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="keepAlives">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
+         <widget class="QCheckBox" name="filterUdpUnicast">
           <property name="text">
-           <string>Keep Alives</string>
+           <string>UDP Unicast</string>
           </property>
           <property name="checked">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="otherChannelIndependant">
+         <widget class="QCheckBox" name="filterUdpBroadcast">
           <property name="text">
-           <string>Other Channel-Independant</string>
+           <string>UDP Broadcast</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -136,13 +166,84 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Channel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="filterChannel"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="filterType"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>SubType</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="filterSubType"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Sender</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="filterSender"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Receiver</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="filterReceiver"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Host</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="filterHost"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QCheckBox" name="channelDependantMessages">
+         <widget class="QCheckBox" name="filterNullMessage">
+          <property name="acceptDrops">
+           <bool>false</bool>
+          </property>
           <property name="text">
-           <string>Channel-Dependant Messages</string>
+           <string>Always hide null messages</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -150,9 +251,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="userTextMessages">
+         <widget class="QCheckBox" name="filterInvalidType">
           <property name="text">
-           <string>User Text Messages</string>
+           <string>Always show invalid type</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -160,19 +261,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="userStatusMessages">
+         <widget class="QCheckBox" name="filterInvalidMessage">
           <property name="text">
-           <string>User Status Messages</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="otherChannelDependant">
-          <property name="text">
-           <string>Other Channel-Dependant Messages</string>
+           <string>Always show invalid message</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -180,32 +271,13 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <widget class="QCheckBox" name="unknownMessages">
-          <property name="text">
-           <string>Unknown Messages</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="illegalEncodedMessages">
-          <property name="text">
-           <string>Illegal Encoded Messages</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
+      </widget>
+      <widget class="QPushButton" name="applyButton">
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -214,7 +286,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>880</width>
+     <width>1024</width>
      <height>26</height>
     </rect>
    </property>
@@ -222,86 +294,5 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>channelIndependantMessages</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>keepAlives</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>262</x>
-     <y>481</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>251</x>
-     <y>506</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>channelDependantMessages</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>userTextMessages</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>462</x>
-     <y>470</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>468</x>
-     <y>508</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>channelDependantMessages</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>userStatusMessages</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>495</x>
-     <y>475</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>495</x>
-     <y>528</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>channelIndependantMessages</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>otherChannelIndependant</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>313</x>
-     <y>482</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>315</x>
-     <y>550</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>channelDependantMessages</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>otherChannelDependant</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>541</x>
-     <y>474</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>534</x>
-     <y>559</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

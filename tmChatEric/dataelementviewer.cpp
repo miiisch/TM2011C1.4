@@ -7,9 +7,17 @@ DataElementViewer* DataElementViewer::instance = 0;
 
 DataElementViewer::DataElementViewer(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::DataUnitViewer)
+    ui(new Ui::DataUnitViewer),
+    channelMatcher(".*"),
+    typeMatcher(".*"),
+    subTypeMatcher(".*"),
+    senderMatcher(".*"),
+    receiverMatcher(".*"),
+    addressMatcher(".*")
 {
     ui->setupUi(this);
+
+    connect(ui->applyButton, SIGNAL(clicked()), SLOT(update()));
 
 //    connect(ui->inCheckbox, SIGNAL(toggled(bool)), SLOT(update()));
 //    connect(ui->outCheckbox, SIGNAL(toggled(bool)), SLOT(update()));
@@ -48,7 +56,14 @@ void DataElementViewer::addMessage(ClientServer clientServer, Direction directio
 
 void DataElementViewer::update()
 {
-//    ui->outputTable->clear();
+    channelMatcher = QRegExp(ui->filterChannel->text() == "" ? ".*" : ui->filterChannel->text());
+    typeMatcher = QRegExp(ui->filterType->text() == "" ? ".*" : ui->filterType->text());
+    subTypeMatcher = QRegExp(ui->filterSubType->text() == "" ? ".*" : ui->filterSubType->text());
+    senderMatcher = QRegExp(ui->filterSender->text() == "" ? ".*" : ui->filterSender->text());
+    receiverMatcher = QRegExp(ui->filterReceiver->text() == "" ? ".*" : ui->filterReceiver->text());
+    addressMatcher = QRegExp(ui->filterHost->text() == "" ? ".*" : ui->filterHost->text());
+
+
    while(ui->outputTable->rowCount() != 0)
         ui->outputTable->removeRow(0);
     foreach (Message m, messages)
@@ -58,6 +73,27 @@ void DataElementViewer::update()
 void DataElementViewer::append(const Message & m)
 {
     bool filter = true;
+    filter &= ui->filterIn->isChecked()             || m.direction != In;
+    filter &= ui->filterOut->isChecked()            || m.direction != Out;
+
+    filter &= ui->filterTcp->isChecked()            || m.protocol != Tcp;
+    filter &= ui->filterUdpUnicast->isChecked()     || m.protocol != UdpUnicast;
+    filter &= ui->filterUdpBroadcast->isChecked()   || m.protocol != UdpBroadcast;
+
+    filter &= ui->filterClient->isChecked()         || m.protocol != Client;
+    filter &= ui->filterServer->isChecked()         || m.protocol != Server;
+
+    filter &= channelMatcher.exactMatch(m.channel);
+    filter &= typeMatcher.exactMatch(m.type);
+    filter &= subTypeMatcher.exactMatch(m.subType);
+    filter &= senderMatcher.exactMatch(m.sender);
+    filter &= receiverMatcher.exactMatch(m.receiver);
+    filter &= addressMatcher.exactMatch(m.address);
+
+    filter &= !ui->filterNullMessage->isChecked()   || !m.null;
+    filter |= ui->filterInvalidType->isChecked()    && !m.validType;
+    filter |= ui->filterInvalidMessage->isChecked() && !m.validMessage;
+
 //    filter &= ui->inCheckbox->isChecked() || !m.in;
 //    filter &= ui->outCheckbox->isChecked() || !m.out;
 //    filter &= ui->channelIndependantMessages->isChecked() || !m.channelIndependant;
@@ -84,6 +120,8 @@ void DataElementViewer::append(const Message & m)
         t->setItem(row, col++, new QTableWidgetItem(m._channel));
         t->setItem(row, col++, new QTableWidgetItem(m._type));
         t->setItem(row, col++, new QTableWidgetItem(m._subType));
+        t->setItem(row, col++, new QTableWidgetItem(m._sender));
+        t->setItem(row, col++, new QTableWidgetItem(m._receiver));
         t->setItem(row, col++, new QTableWidgetItem(m._validType));
         t->setItem(row, col++, new QTableWidgetItem(m._message));
         t->setItem(row, col++, new QTableWidgetItem(m._validMessage));

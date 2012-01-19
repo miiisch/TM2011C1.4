@@ -10,10 +10,10 @@ class DataElement
 public:
     DataElement(quint32 chatRoomIdentifier, quint32 type, quint32 subType, quint32 sender, quint32 receiver);
     DataElement(QByteArray ba);
-    QString readString();
-    quint32 readInt32();
-    quint16 readInt16();
-    quint8 readInt8();
+    QString readString(bool * valid = 0);
+    quint32 readInt32(bool * valid = 0);
+    quint16 readInt16(bool * valid = 0);
+    quint8 readInt8(bool * valid = 0);
     void writeString(QString string);
     void writeInt32(quint32 value);
     void writeInt16(quint16 value);
@@ -31,6 +31,7 @@ public:
     operator QString() const;
 
     QString rawData() const;
+    bool rewind() const;
 
 private:
     void updateLength();
