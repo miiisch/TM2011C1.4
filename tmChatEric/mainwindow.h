@@ -14,7 +14,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(Client * client, QWidget *parent = 0);
     ~MainWindow();
     void setChatRoomInfo(QList<ChatRoomInfo*> chatRoomsInfo);
 

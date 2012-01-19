@@ -16,7 +16,7 @@ Client::Client(QString userName, QObject *parent) :
     connect(udpSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readUniCast(DataElement,QHostAddress*,quint16)));
     sendBroadCast();
 
-    mainWindow = new MainWindow;
+    mainWindow = new MainWindow(this);
     mainWindow->show();
     connect(mainWindow,SIGNAL(chatRoomSelected(quint32)),SLOT(enterChatRoom(quint32)));
     connect(mainWindow,SIGNAL(createChatRoom(QString)),SLOT(createChatRoom(QString)));

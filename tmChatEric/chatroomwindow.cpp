@@ -43,5 +43,6 @@ void ChatRoomWindow::closeEvent(QCloseEvent * e)
 
 void ChatRoomWindow::setTitle(QString name)
 {
+    setWindowTitle(name);
     ui->chatRoomName->setText(name);
 }

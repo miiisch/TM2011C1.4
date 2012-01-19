@@ -2,12 +2,13 @@
 #include "ui_mainwindow.h"
 #include "createchatroomdialog.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(Client *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     connect(ui->chatRoomTable,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(cellSelected(int,int)));
+    connect(ui->refreshButton, SIGNAL(clicked()), client, SLOT(sendBroadCast()));
 }
 
 MainWindow::~MainWindow()

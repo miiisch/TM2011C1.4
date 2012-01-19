@@ -23,9 +23,9 @@ public slots:
     void sendJoinRequest(ChatSocket* socket, quint32 id);
     void showChatRoom(ChatSocket* socket, DataElement data, quint32 uid);
     void createChatRoom(QString name);
+    void sendBroadCast();
 
 private:
-    void sendBroadCast();
     ChatSocket * udpSocket;
     QUdpSocket * broadCastSocket;
     MainWindow * mainWindow;
