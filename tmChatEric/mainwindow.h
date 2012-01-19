@@ -24,9 +24,11 @@ public slots:
 signals:
     void chatRoomSelected(quint32);
     void createChatRoom(QString);
+    void addIp(QHostAddress);
 
 private slots:
     void on_actionCreate_ChatRoom_triggered();
+    void commandLineSlot();
 
 private:
     Ui::MainWindow *ui;

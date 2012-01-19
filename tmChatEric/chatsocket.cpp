@@ -21,7 +21,6 @@ ChatSocket::ChatSocket(QUdpSocket *socket, QObject *parent) :
 
 void ChatSocket::readUdpData()
 {
-    qDebug() << "received UDP data";
     QHostAddress * senderAddress = new QHostAddress;
     quint16 * senderPort = new quint16;
     if(udpSocket->hasPendingDatagrams())

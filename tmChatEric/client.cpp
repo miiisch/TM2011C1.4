@@ -6,8 +6,8 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 
-Client::Client(QString userName, QObject *parent) :
-    QObject(parent), userName(userName), server(0)
+Client::Client(QString userName, quint16 serverPort, QObject *parent) :
+    QObject(parent), userName(userName), server(0), serverPort(serverPort)
 {
     broadCastSocket = new QUdpSocket;
     broadCastSocket->bind();
@@ -25,6 +25,8 @@ Client::Client(QString userName, QObject *parent) :
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), &chatRooms, SLOT(sendKeepAlives()));
     timer->start(2000);
+
+    connect(mainWindow, SIGNAL(addIp(QHostAddress)), SLOT(addIp(QHostAddress)));
 }
 
 void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
@@ -71,6 +73,16 @@ void Client::sendBroadCast()
                                                  QHostAddress::Broadcast,
                                                  &data);
     broadCastSocket->writeDatagram(data.data(), QHostAddress::Broadcast, 10222);
+    QUdpSocket socket;
+    foreach (QHostAddress address, addresses)
+    {
+        socket.writeDatagram(data.data(), address, 10222);
+        DataElementViewer::getInstance()->addMessage(DataElementViewer::Client,
+                                                     DataElementViewer::Out,
+                                                     DataElementViewer::UdpUnicast,
+                                                     address,
+                                                     &data);
+    }
 }
 
 void Client::enterChatRoom(quint32 id)
@@ -163,8 +175,14 @@ void Client::createChatRoom(QString name)
 {
     if(server == 0)
     {
-        server = new Server(0);
+        server = new Server(serverPort);
     }
     server->createChatRoom(name);
+    sendBroadCast();
+}
+
+void Client::addIp(QHostAddress address)
+{
+    addresses += address;
     sendBroadCast();
 }

@@ -18,7 +18,7 @@ class Server : public QObject
 {
     Q_OBJECT
 public:
-    explicit Server(QString debug, QObject *parent = 0);
+    explicit Server(quint16 serverPort, QObject *parent = 0);
     void createChatRoom(QString name);
 
 signals:

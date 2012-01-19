@@ -12,7 +12,7 @@ class Client : public QObject
 {
     Q_OBJECT
 public:
-    explicit Client(QString userName, QObject *parent = 0);
+    explicit Client(QString userName, quint16 serverPort, QObject *parent = 0);
 
 signals:
 
@@ -25,6 +25,9 @@ public slots:
     void createChatRoom(QString name);
     void sendBroadCast();
 
+private slots:
+    void addIp(QHostAddress);
+
 private:
     ChatSocket * udpSocket;
     QUdpSocket * broadCastSocket;
@@ -34,6 +37,9 @@ private:
     ClientChatRooms chatRooms;
     QHash<QHostAddress,QList<quint32> > joinQueues;
     Server * server;
+
+    QList<QHostAddress> addresses;
+    quint16 serverPort;
 };
 
 #endif // CLIENT_H

@@ -9,6 +9,7 @@ MainWindow::MainWindow(Client *client, QWidget *parent) :
     ui->setupUi(this);
     connect(ui->chatRoomTable,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(cellSelected(int,int)));
     connect(ui->refreshButton, SIGNAL(clicked()), client, SLOT(sendBroadCast()));
+    connect(ui->commandLine, SIGNAL(returnPressed()), SLOT(commandLineSlot()));
 }
 
 MainWindow::~MainWindow()
@@ -41,4 +42,15 @@ void MainWindow::on_actionCreate_ChatRoom_triggered()
     CreateChatRoomDialog * dialog = new CreateChatRoomDialog();
     connect(dialog,SIGNAL(createChatRoom(QString)),SIGNAL(createChatRoom(QString)));
     dialog->exec();
+}
+
+void MainWindow::commandLineSlot()
+{
+    QString command = ui->commandLine->text();
+    ui->commandLine->clear();
+    if (command.startsWith("add ip"))
+    {
+        QHostAddress add(command.right(command.length() - QString("add ip ").length()));
+        emit addIp(add);
+    }
 }

@@ -8,7 +8,7 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 
-Server::Server(QString debug, QObject *parent) :
+Server::Server(quint16 serverPort, QObject *parent) :
     QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1)
 {
     chatRooms = new ChatRooms();
@@ -16,7 +16,7 @@ Server::Server(QString debug, QObject *parent) :
     qDebug() << socket->bind(10222);
     udpChatSocket = new ChatSocket(socket);
     connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16)));
-    tcpServer->listen();
+    tcpServer->listen(QHostAddress::Any, serverPort);
     tcpPort = tcpServer->serverPort();
     //qDebug() << " serverport " << tcpPort;
     connect(tcpServer,SIGNAL(newConnection()),SLOT(newConnection()));
@@ -26,8 +26,8 @@ Server::Server(QString debug, QObject *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(sendKeepAlives()));
     timer->start(2000);
 
-    if(debug == "1")
-        debugInitialisierung();
+//    if(debug == "1")
+//        debugInitialisierung();
     //qDebug() << "SERVER STARTED";
 }
 
@@ -109,7 +109,11 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16
         }
         QUdpSocket * udpSocket = new QUdpSocket();
         udpSocket->writeDatagram(newDataElement.data(), *peerAddress, port);
-       qDebug() << "UNICAST DATAGRAM WRITTEN";
+        DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
+                                                     DataElementViewer::Out,
+                                                     DataElementViewer::UdpUnicast,
+                                                     *peerAddress,
+                                                     &data);
     } else {
         qDebug() << "Unknown broadcast";
     }
