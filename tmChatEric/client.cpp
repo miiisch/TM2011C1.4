@@ -14,12 +14,13 @@ Client::Client(QString userName, quint16 serverPort, QObject *parent) :
     //qDebug() << "client udp port" << broadCastSocket->localPort();
     udpSocket = new ChatSocket(broadCastSocket,0);
     connect(udpSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readUniCast(DataElement,QHostAddress*,quint16)));
-    sendBroadCast();
 
     mainWindow = new MainWindow(this);
     mainWindow->show();
     connect(mainWindow,SIGNAL(chatRoomSelected(quint32)),SLOT(enterChatRoom(quint32)));
     connect(mainWindow,SIGNAL(createChatRoom(QString)),SLOT(createChatRoom(QString)));
+
+    sendBroadCast();
 
     //every 2 seconds => keepalives
     QTimer *timer = new QTimer(this);
@@ -36,7 +37,6 @@ void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
                                                  DataElementViewer::UdpUnicast,
                                                  *address,
                                                  &data);
-    (void*)address;
     (void)port;
     //readServerinformations
     if(data.type() == 0 && data.chatRoomIdentifier() == 0)
@@ -44,17 +44,15 @@ void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
         if(data.subType() == 1) {
             quint16 tcpPort = data.readInt16();
             quint32 listLength = data.readInt32();
-            QList<ChatRoomInfo*> chatRoomsInfo;
             for(int i=0;i<listLength;++i)
             {
                 quint32 id = data.readInt32();
                 QString name = data.readString();
                 quint32 numberOfUsers = data.readInt32();
                 ChatRoomInfo * info = new ChatRoomInfo(tcpPort, id, name, numberOfUsers, *address);
-                chatRoomsInfo << info;
-                chatRoomInfo[id] = info;
+                chatRoomInfo << info;
             }
-            mainWindow->setChatRoomInfo(chatRoomsInfo);
+            mainWindow->setChatRoomInfo(chatRoomInfo);
         } else if(data.subType() == 2) {
             //do nothing
         }
@@ -83,24 +81,30 @@ void Client::sendBroadCast()
                                                      address,
                                                      &data);
     }
+    mainWindow->clearChatRoomInfo();
+    chatRoomInfo.clear();
 }
 
-void Client::enterChatRoom(quint32 id)
+void Client::enterChatRoom(quint32 row)
 {
-    ChatRoomInfo * info = chatRoomInfo[id];
+    ChatRoomInfo * info = chatRoomInfo[row];
     QHostAddress ip = info->address;
     quint16 port = info->tcpPort;
     ChatSocket* socket = chatRooms.serverConnection(ip, port);
     if(socket->userId() == 0)
     {
-        // request user id with handshake
-        connect(socket,SIGNAL(newTcpData(DataElement,quint32,QHostAddress)),SLOT(readTcpData(DataElement,quint32,QHostAddress)));
-        DataElement data(0,2,0,0,0);
-        data.writeInt32(0);
-        socket->send(data, false);
-        joinQueues[ip].append(id);
+        if (!socket->handShakeDone())
+        {
+            // request user id with handshake
+            connect(socket,SIGNAL(newTcpData(DataElement,quint32,QHostAddress)),SLOT(readTcpData(DataElement,quint32,QHostAddress)));
+            DataElement data(0,2,0,0,0);
+            data.writeInt32(0);
+            socket->send(data, false);
+            socket->setHandShakeDone();
+        }
+        joinQueues[ip].append(info);
     } else {
-        sendJoinRequest(socket, id);
+        sendJoinRequest(socket, info);
     }
 }
 
@@ -120,9 +124,9 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
     case 2:
         if(data.subType() == 1)
         {
-            foreach(quint32 id, joinQueues[socket->ip()]) {
-                socket->setUserId(data.readInt32());
-                sendJoinRequest(socket, id);
+            socket->setUserId(data.readInt32());
+            foreach(ChatRoomInfo* info, joinQueues[socket->ip()]) {
+                sendJoinRequest(socket, info);
             }
         } else {
             qDebug() << "Unknown subType";
@@ -139,16 +143,16 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
         break;
     case 4:
     case 6:
-        chatRooms.newData(data, uid);
+        chatRooms.newData(data, socket->ip(), uid);
         break;
     default:
         qDebug() << "Client::newData unknown type" << data.type();
     }
 }
 
-void Client::sendJoinRequest(ChatSocket *socket, quint32 id)
+void Client::sendJoinRequest(ChatSocket *socket, ChatRoomInfo *info)
 {
-    DataElement data(id, 3, 0, socket->userId(), 0);
+    DataElement data(info->id, 3, 0, socket->userId(), 0);
     data.writeString(userName);
     data.writeString("Ich will rein");
     socket->send(data, false);

@@ -21,6 +21,8 @@ public:
     int timeOutCounter();
     void incrementTimeOutCounter();
     void resetTimeOutCounter();
+    bool handShakeDone();
+    void setHandShakeDone();
 
 signals:
     void newTcpData(DataElement data, quint32 userId, QHostAddress);
@@ -51,6 +53,7 @@ private:
     quint32 _userId;
     bool everyThingRead;
     int _timeOutCounter;
+    bool _handshakeDone;
 };
 
 #endif // CHATSOCKET_H

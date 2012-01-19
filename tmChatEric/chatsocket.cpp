@@ -7,13 +7,13 @@
 #include "dataelementviewer.h"
 
 ChatSocket::ChatSocket(QTcpSocket *socket, quint32 userId, QObject *parent) :
-    QObject(parent), tcpSocket(socket), type(TCP), currentState(Idle), _userId(userId)
+    QObject(parent), tcpSocket(socket), type(TCP), currentState(Idle), _userId(userId), _handshakeDone(false)
 {
     connect(this->tcpSocket,SIGNAL(readyRead()),SLOT(readTcpData()));
 }
 
 ChatSocket::ChatSocket(QUdpSocket *socket, QObject *parent) :
-    QObject(parent), udpSocket(socket), type(UDP), currentState(Idle)
+    QObject(parent), udpSocket(socket), type(UDP), currentState(Idle), _handshakeDone(false)
 {
 
     connect(this->udpSocket,SIGNAL(readyRead()),SLOT(readUdpData()));
@@ -170,4 +170,14 @@ void ChatSocket::incrementTimeOutCounter()
 void ChatSocket::resetTimeOutCounter()
 {
     _timeOutCounter = 0;
+}
+
+bool ChatSocket::handShakeDone()
+{
+    return _handshakeDone;
+}
+
+void ChatSocket::setHandShakeDone()
+{
+    _handshakeDone = true;
 }

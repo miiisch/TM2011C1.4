@@ -17,6 +17,7 @@ public:
     explicit MainWindow(Client * client, QWidget *parent = 0);
     ~MainWindow();
     void setChatRoomInfo(QList<ChatRoomInfo*> chatRoomsInfo);
+    void clearChatRoomInfo();
 
 public slots:
     void cellSelected(int row, int col);

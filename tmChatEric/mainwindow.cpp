@@ -34,7 +34,7 @@ void MainWindow::setChatRoomInfo(QList<ChatRoomInfo*> chatRoomsInfo)
 void MainWindow::cellSelected(int row, int col)
 {
     (void)col;
-    emit chatRoomSelected(chatRoomIds[row]);
+    emit chatRoomSelected(row);
 }
 
 void MainWindow::on_actionCreate_ChatRoom_triggered()
@@ -53,4 +53,10 @@ void MainWindow::commandLineSlot()
         QHostAddress add(command.right(command.length() - QString("add ip ").length()));
         emit addIp(add);
     }
+}
+
+void MainWindow::clearChatRoomInfo()
+{
+    qDebug() << "cleared";
+    ui->chatRoomTable->model()->removeRows(0,ui->chatRoomTable->rowCount());
 }
