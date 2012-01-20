@@ -57,6 +57,5 @@ void MainWindow::commandLineSlot()
 
 void MainWindow::clearChatRoomInfo()
 {
-    qDebug() << "cleared";
     ui->chatRoomTable->model()->removeRows(0,ui->chatRoomTable->rowCount());
 }

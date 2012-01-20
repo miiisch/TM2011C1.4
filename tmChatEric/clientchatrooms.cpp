@@ -37,22 +37,23 @@ void ClientChatRooms::addChatRoom(ChatSocket* socket, quint32 id, quint32 userId
 void ClientChatRooms::sendKeepAlives()
 {
     QHash<QHostAddress, QHash<quint32, ClientChatRoom*> >::iterator it1;
-    for (it1 = chatRooms.begin(); it1 != chatRooms.begin(); ++it1)
+
+    for (it1 = chatRooms.begin(); it1 != chatRooms.end(); ++it1)
     {
-        QHostAddress k1 = it1.key();
+        QHostAddress address = it1.key();
         QHash<quint32, ClientChatRoom*> v1 = it1.value();
-        QHash<quint32, ClientChatRoom*>::iterator it2;
-        for (it2 = v1.begin(); it2 != v1.end(); ++it2)
+
+        if (!v1.isEmpty())
         {
-            quint32 k2 = it2.key();
-            ClientChatRoom * chatRoom = it2.value();
-            if(chatRoom->socket()->timeOutCounter() > 5)
+            ChatSocket * socket = v1[v1.keys()[0]]->socket();
+            if(socket->timeOutCounter() > 5)
             {
-                chatRooms[k1][k2]->serverQuit();
-                chatRooms[k1].remove(k2);
+                foreach(ClientChatRoom * c, chatRooms[address])
+                    c->serverQuit();
+                chatRooms.remove(address);
             } else {
-                chatRoom->socket()->incrementTimeOutCounter();
-                chatRoom->socket()->send(DataElement(0,1,0,0,0), false);
+                socket->incrementTimeOutCounter();
+                socket->send(DataElement(0,1,0,0,0), false);
             }
         }
     }
