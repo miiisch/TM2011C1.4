@@ -38,10 +38,11 @@ void ClientChatRooms::sendKeepAlives()
 {
     QHash<QHostAddress, QHash<quint32, ClientChatRoom*> >::iterator it1;
 
-    for (it1 = chatRooms.begin(); it1 != chatRooms.end(); ++it1)
+    QList<QHostAddress> keys = chatRooms.keys();
+
+    foreach (QHostAddress address, keys)
     {
-        QHostAddress address = it1.key();
-        QHash<quint32, ClientChatRoom*> v1 = it1.value();
+        QHash<quint32, ClientChatRoom*> v1 = chatRooms[address];
 
         if (!v1.isEmpty())
         {
