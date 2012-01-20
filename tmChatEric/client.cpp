@@ -135,9 +135,10 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
     case 3:
         if(data.subType() == 1)
         {
-            showChatRoom(socket, data, uid);
+            activateChatRoom(socket, data, uid);
         } else if(data.subType() <=5)
         {
+            chatRooms.denyJoin(address, data.chatRoomIdentifier(), data);
             qDebug() << "ChatRoom access denied: " << data.readString();
         }
         break;
@@ -156,9 +157,10 @@ void Client::sendJoinRequest(ChatSocket *socket, ChatRoomInfo *info)
     data.writeString(userName);
     data.writeString("Ich will rein");
     socket->send(data, false);
+    chatRooms.addChatRoom(socket, info->id, socket->userId(), info->name);
 }
 
-void Client::showChatRoom(ChatSocket * socket, DataElement data, quint32 uid)
+void Client::activateChatRoom(ChatSocket * socket, DataElement data, quint32 uid)
 {
     quint32 id = data.chatRoomIdentifier();
     quint32 listLength = data.readInt32();
@@ -172,7 +174,7 @@ void Client::showChatRoom(ChatSocket * socket, DataElement data, quint32 uid)
         (void)numberOfModules;
         userInfo.append(UserInfo(id, name, (Status)status));
     }
-    chatRooms.addChatRoom(socket, id, uid, chatRoomInfo[id]->name, userInfo);
+    chatRooms.activateChatRoom(socket->ip(),id,userInfo);
 }
 
 void Client::createChatRoom(QString name)

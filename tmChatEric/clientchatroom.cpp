@@ -1,13 +1,12 @@
 #include "clientchatroom.h"
 #include "chatroomwindow.h"
 
-ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, quint32 userId, QList<UserInfo> userInfo) :
-    AbstractChatRoom(id, name), _socket(socket), _userId(userId), userInfo(userInfo)
+ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, quint32 userId) :
+    AbstractChatRoom(id, name), _socket(socket), _userId(userId)
 {
     window = new ChatRoomWindow();
     connect(window,SIGNAL(textEntered(QString)),this,SLOT(sendMessage(QString)));
     connect(window,SIGNAL(windowClosed()),this,SLOT(sendUserQuit()));
-    window->setUserList(userInfo);
     window->setTitle(_name);
     window->show();
 }
@@ -123,4 +122,18 @@ void ClientChatRoom::sendUserQuit()
     DataElement data(_id,5,3,_userId,0);
     data.writeString("Bye");
     _socket->send(data, false);
+}
+
+void ClientChatRoom::activate(QList<UserInfo> userInfo)
+{
+    this->userInfo = userInfo;
+    window->setUserList(userInfo);
+    window->activate();
+}
+
+void ClientChatRoom::denyJoin(DataElement &data)
+{
+    int reason = data.subType();
+    QString text = data.readString();
+    window->joinDenied(reason, text);
 }

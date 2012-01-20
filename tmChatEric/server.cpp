@@ -93,6 +93,11 @@ void Server::readData(DataElement data, quint32 userId, QHostAddress address)
 
 void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16 port)
 {
+    DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
+                                                 DataElementViewer::In,
+                                                 DataElementViewer::UdpBroadcast,
+                                                 *peerAddress,
+                                                 &data);
     if(data.type() == 0 && data.subType() == 0 && data.chatRoomIdentifier() == 0)
     {
         //send tcp port, and channellist to user

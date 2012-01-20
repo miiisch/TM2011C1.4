@@ -18,9 +18,12 @@ public:
     void setUserList(QList<UserInfo>);
     void addLine(QString text);
     void setTitle(QString name);
+    void activate();
+    void joinDenied(int reason, QString additional);
 
 public slots:
         void returnPressed();
+        void removeStatusbar();
 
 signals:
     void textEntered(QString);

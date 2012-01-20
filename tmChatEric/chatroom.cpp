@@ -47,6 +47,22 @@ void ChatRoom::newData(ChatSocket* socket, DataElement data, quint32 userId)
 void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid)
 {
     QString userName = data.readString();
+    bool found = false;
+    foreach (ChatRoomUser * u, users.allUsers())
+    {
+        if (u->name() == userName)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (found) {
+        DataElement newDataElement(_id,3,3,uid,0);
+        socket->send(newDataElement, true);
+        return;
+    }
+
     QString joinMessage = data.readString();
     ///qDebug() << "User(" << userName <<  ") joined channel " << _id << " with Message: " << joinMessage;
     users.addUser(socket, uid, userName, ChatRoomUser::Online);

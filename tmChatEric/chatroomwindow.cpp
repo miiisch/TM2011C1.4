@@ -1,11 +1,14 @@
 #include "chatroomwindow.h"
 #include "ui_chatroomwindow.h"
+#include <QTimer>
 
 ChatRoomWindow::ChatRoomWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChatRoomWindow)
 {
     ui->setupUi(this);
+    ui->textInput->setEnabled(false);
+    ui->chatRoomStatus->setText("Waiting for server");
     connect(ui->textInput,SIGNAL(returnPressed()),SLOT(returnPressed()));
 }
 
@@ -20,7 +23,7 @@ void ChatRoomWindow::setUserList(QList<UserInfo> userInfo)
     foreach(UserInfo info, userInfo)
     {
         int row = ui->userList->count();
-        ui->userList->insertItem(row, new QListWidgetItem(QString::number(info.id) + info.name));
+        ui->userList->insertItem(row, new QListWidgetItem(QString::number(info.id) + " " + info.name));
     }
 }
 
@@ -44,5 +47,46 @@ void ChatRoomWindow::closeEvent(QCloseEvent * e)
 void ChatRoomWindow::setTitle(QString name)
 {
     setWindowTitle(name);
-    ui->chatRoomName->setText(name);
+}
+
+void ChatRoomWindow::activate()
+{
+    ui->chatRoomStatus->setText("Connection established");
+    ui->textInput->setEnabled(true);
+    QTimer::singleShot(2000, this, SLOT(removeStatusbar()));
+}
+
+void ChatRoomWindow::removeStatusbar()
+{
+    ui->chatRoomStatus->setVisible(false);
+}
+
+void ChatRoomWindow::joinDenied(int reason, QString additional)
+{
+    QString mainReason;
+    switch(reason)
+    {
+    case 2:
+        mainReason = "No specific Reason";
+        break;
+
+    case 3:
+        mainReason = "Username taken";
+        break;
+
+    case 4:
+        mainReason = "Chatroom full";
+        break;
+
+    case 5:
+        mainReason = "Not in whitelist";
+        break;
+
+    default:
+        mainReason = "ERROR";
+        break;
+    }
+
+    mainReason += additional.isEmpty() ? "" : " (" + additional + ")";
+    ui->chatRoomStatus->setText("Join Denied: " + mainReason);
 }

@@ -24,9 +24,9 @@ ChatSocket * ClientChatRooms::serverConnection(QHostAddress ip, quint16 port)
     return new ChatSocket(socket, 0);
 }
 
-void ClientChatRooms::addChatRoom(ChatSocket* socket, quint32 id, quint32 userId, QString name, QList<UserInfo> userInfo)
+void ClientChatRooms::addChatRoom(ChatSocket* socket, quint32 id, quint32 userId, QString name)
 {
-    chatRooms[socket->ip()][id] = new ClientChatRoom(socket, id, name, userId, userInfo);
+    chatRooms[socket->ip()][id] = new ClientChatRoom(socket, id, name, userId);
 }
 
 void ClientChatRooms::sendKeepAlives()
@@ -49,4 +49,14 @@ void ClientChatRooms::sendKeepAlives()
             }
         }
     }
+}
+
+void ClientChatRooms::activateChatRoom(QHostAddress address, quint32 id, QList<UserInfo> userInfo)
+{
+    chatRooms[address][id]->activate(userInfo);
+}
+
+void ClientChatRooms::denyJoin(QHostAddress address, quint32 id, DataElement &data)
+{
+    chatRooms[address][id]->denyJoin(data);
 }

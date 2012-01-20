@@ -21,7 +21,7 @@ public slots:
     void readTcpData(DataElement data, quint32 uid, QHostAddress address);
     void enterChatRoom(quint32);
     void sendJoinRequest(ChatSocket *socket, ChatRoomInfo *info);
-    void showChatRoom(ChatSocket* socket, DataElement data, quint32 uid);
+    void activateChatRoom(ChatSocket* socket, DataElement data, quint32 uid);
     void createChatRoom(QString name);
     void sendBroadCast();
 

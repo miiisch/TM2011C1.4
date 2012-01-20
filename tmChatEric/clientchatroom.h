@@ -9,11 +9,13 @@ class ClientChatRoom : public QObject, AbstractChatRoom
 {
     Q_OBJECT
 public:
-    ClientChatRoom(ChatSocket* socket, quint32 id, QString name, quint32 userId, QList<UserInfo> userInfo);
+    ClientChatRoom(ChatSocket* socket, quint32 id, QString name, quint32 userId);
     void newData(DataElement data, quint32 userId);
     ChatSocket * socket();
     quint32 userId();
     quint32 id();
+    void activate(QList<UserInfo> userInfo);
+    void denyJoin(DataElement & data);
 
 public slots:
     void sendMessage(QString text);
