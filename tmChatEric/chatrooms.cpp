@@ -11,6 +11,11 @@ ChatRooms::ChatRooms() :
 void ChatRooms::newData(ChatSocket* socket, DataElement data, quint32 userId)
 {
     quint32 chatRoomId = data.chatRoomIdentifier();
+    if (!chatRooms.contains(chatRoomId))
+    {
+        qDebug() << "Server received Message for unknown Channel" << chatRoomId;
+        return;
+    }
     chatRooms[chatRoomId]->newData(socket, data, userId);
 }
 

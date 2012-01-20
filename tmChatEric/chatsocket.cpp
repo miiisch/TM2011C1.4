@@ -15,7 +15,6 @@ ChatSocket::ChatSocket(QTcpSocket *socket, quint32 userId, QObject *parent) :
 ChatSocket::ChatSocket(QUdpSocket *socket, QObject *parent) :
     QObject(parent), udpSocket(socket), type(UDP), currentState(Idle), _handshakeDone(false)
 {
-
     connect(this->udpSocket,SIGNAL(readyRead()),SLOT(readUdpData()));
 }
 
@@ -29,7 +28,6 @@ void ChatSocket::readUdpData()
         qint64 size = udpSocket->pendingDatagramSize();
         char data[size];
         udpSocket->readDatagram(data,size,senderAddress,senderPort);
-        //qDebug() << "read from port: " << *senderPort << " and address " << *senderAddress;
         QByteArray ba(data, size);
         if(!checkMagicNumber(ba.left(8)))
         {

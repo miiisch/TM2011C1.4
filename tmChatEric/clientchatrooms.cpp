@@ -10,6 +10,11 @@ ClientChatRooms::ClientChatRooms()
 
 void ClientChatRooms::newData(DataElement data, QHostAddress address, quint32 userId)
 {
+    if (!chatRooms[address].contains(data.chatRoomIdentifier())) {
+        qDebug() << "Client received message for unknown Channel "
+                 << address << ", " << data.chatRoomIdentifier();
+        return;
+    }
     chatRooms[address][data.chatRoomIdentifier()]->newData(data, userId);
 }
 
@@ -39,10 +44,12 @@ void ClientChatRooms::sendKeepAlives()
         QHash<quint32, ClientChatRoom*>::iterator it2;
         for (it2 = v1.begin(); it2 != v1.end(); ++it2)
         {
+            quint32 k2 = it2.key();
             ClientChatRoom * chatRoom = it2.value();
             if(chatRoom->socket()->timeOutCounter() > 5)
             {
-                chatRooms[k1].remove(chatRoom->id());
+                chatRooms[k1][k2]->serverQuit();
+                chatRooms[k1].remove(k2);
             } else {
                 chatRoom->socket()->incrementTimeOutCounter();
                 chatRoom->socket()->send(DataElement(0,1,0,0,0), false);

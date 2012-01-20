@@ -90,3 +90,10 @@ void ChatRoomWindow::joinDenied(int reason, QString additional)
     mainReason += additional.isEmpty() ? "" : " (" + additional + ")";
     ui->chatRoomStatus->setText("Join Denied: " + mainReason);
 }
+
+void ChatRoomWindow::serverQuit()
+{
+    ui->chatRoomStatus->setVisible(true);
+    ui->chatRoomStatus->setText("Server connection closed");
+    ui->textInput->setEnabled(false);
+}

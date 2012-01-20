@@ -116,11 +116,12 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
                                                  address,
                                                  &data);
 
-    qDebug() << "Client::readTcpData " << data;
     ChatSocket* socket = (ChatSocket*)sender();
     socket->resetTimeOutCounter();
     switch(data.type())
     {
+    case 1:
+        break;
     case 2:
         if(data.subType() == 1)
         {

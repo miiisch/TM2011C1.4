@@ -18,18 +18,6 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->applyButton, SIGNAL(clicked()), SLOT(update()));
-
-//    connect(ui->inCheckbox, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->outCheckbox, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->channelIndependantMessages, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->keepAlives, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->otherChannelIndependant, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->channelDependantMessages, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->userTextMessages, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->userStatusMessages, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->otherChannelDependant, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->unknownMessages, SIGNAL(toggled(bool)), SLOT(update()));
-//    connect(ui->illegalEncodedMessages, SIGNAL(toggled(bool)), SLOT(update()));
 }
 
 DataElementViewer::~DataElementViewer()
@@ -93,18 +81,6 @@ void DataElementViewer::append(const Message & m)
     filter &= !ui->filterNullMessage->isChecked()   || !m.null;
     filter |= ui->filterInvalidType->isChecked()    && !m.validType;
     filter |= ui->filterInvalidMessage->isChecked() && !m.validMessage;
-
-//    filter &= ui->inCheckbox->isChecked() || !m.in;
-//    filter &= ui->outCheckbox->isChecked() || !m.out;
-//    filter &= ui->channelIndependantMessages->isChecked() || !m.channelIndependant;
-//    filter &= ui->keepAlives->isChecked() || !m.keepAlives;
-//    filter &= ui->otherChannelIndependant->isChecked() || !m.otherChannelIndependant;
-//    filter &= ui->channelDependantMessages->isChecked() || !m.channelDependant;
-//    filter &= ui->userTextMessages->isChecked() || !m.userTextMessage;
-//    filter &= ui->userStatusMessages->isChecked() || !m.userStatusMessage;
-//    filter &= ui->otherChannelDependant->isChecked() || !m.otherChannelDependant;
-//    filter &= ui->unknownMessages->isChecked() || !m.unknownMessage;
-//    filter &= ui->illegalEncodedMessages->isChecked() || !m.invalidEncodedMessage;
 
     if (filter)
     {

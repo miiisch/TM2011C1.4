@@ -20,6 +20,7 @@ public:
     void setTitle(QString name);
     void activate();
     void joinDenied(int reason, QString additional);
+    void serverQuit();
 
 public slots:
         void returnPressed();

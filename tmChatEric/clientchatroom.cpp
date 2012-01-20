@@ -137,3 +137,8 @@ void ClientChatRoom::denyJoin(DataElement &data)
     QString text = data.readString();
     window->joinDenied(reason, text);
 }
+
+void ClientChatRoom::serverQuit()
+{
+    window->serverQuit();
+}

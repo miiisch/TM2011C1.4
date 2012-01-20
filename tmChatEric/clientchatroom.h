@@ -16,6 +16,7 @@ public:
     quint32 id();
     void activate(QList<UserInfo> userInfo);
     void denyJoin(DataElement & data);
+    void serverQuit();
 
 public slots:
     void sendMessage(QString text);
