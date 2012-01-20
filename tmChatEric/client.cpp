@@ -131,6 +131,7 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
             foreach(ChatRoomInfo* info, joinQueues[socket->ip()]) {
                 sendJoinRequest(socket, info);
             }
+            joinQueues.clear();
         } else {
             qDebug() << "Unknown subType";
         }
