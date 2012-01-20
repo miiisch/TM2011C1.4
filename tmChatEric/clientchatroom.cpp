@@ -18,7 +18,6 @@ void ClientChatRoom::newData(DataElement data, quint32 userId)
     case 4:
         if(data.subType() == 1)
         {
-            qDebug() << "recieved ack";
             showChatMessage(data, userId);
         } else if (data.subType() == 2)
         {
@@ -119,6 +118,7 @@ void ClientChatRoom::readStatusMessage(DataElement data)
 
 void ClientChatRoom::sendUserQuit()
 {
+    emit closed(socket()->ip(), id());
     DataElement data(_id,5,3,_userId,0);
     data.writeString("Bye");
     _socket->send(data, false);

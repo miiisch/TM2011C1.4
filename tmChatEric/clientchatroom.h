@@ -24,6 +24,9 @@ public slots:
     void showDenyMessage(DataElement data, quint32 userId);
     void sendUserQuit();
 
+signals:
+    void closed(QHostAddress address, quint32 id);
+
 private:
    void  readStatusMessage(DataElement data);
     ChatSocket * _socket;

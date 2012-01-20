@@ -31,8 +31,9 @@ ChatSocket * ClientChatRooms::serverConnection(QHostAddress ip, quint16 port)
 
 void ClientChatRooms::addChatRoom(ChatSocket* socket, quint32 id, quint32 userId, QString name)
 {
-    qDebug() << "new channel id " << id;
-    chatRooms[socket->ip()][id] = new ClientChatRoom(socket, id, name, userId);
+    ClientChatRoom * room = new ClientChatRoom(socket, id, name, userId);
+    connect(room, SIGNAL(closed(QHostAddress,quint32)), SLOT(roomClosed(QHostAddress,quint32)));
+    chatRooms[socket->ip()][id] = room;
 }
 
 void ClientChatRooms::sendKeepAlives()
@@ -74,4 +75,9 @@ void ClientChatRooms::denyJoin(QHostAddress address, quint32 id, DataElement &da
 bool ClientChatRooms::containsRoom(QHostAddress address, quint32 id)
 {
     return chatRooms[address].contains(id);
+}
+
+void ClientChatRooms::roomClosed(QHostAddress address, quint32 id)
+{
+    chatRooms[address].remove(id);
 }

@@ -19,6 +19,9 @@ public:
 public slots:
     void sendKeepAlives();
 
+private slots:
+    void roomClosed(QHostAddress address, quint32 id);
+
 private:
     QHash<QHostAddress, QHash<quint32, ClientChatRoom*> > chatRooms;
 };
