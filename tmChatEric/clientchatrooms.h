@@ -14,6 +14,7 @@ public:
     void addChatRoom(ChatSocket* socket, quint32 id, quint32 userId, QString name);
     void activateChatRoom(QHostAddress address, quint32 id, QList<UserInfo> userInfo);
     void denyJoin(QHostAddress address, quint32 id, DataElement & data);
+    bool containsRoom(QHostAddress address, quint32 id);
 
 public slots:
     void sendKeepAlives();

@@ -89,6 +89,8 @@ void Client::enterChatRoom(quint32 row)
 {
     ChatRoomInfo * info = chatRoomInfo[row];
     QHostAddress ip = info->address;
+    if (chatRooms.containsRoom(ip, info->id))
+        return;
     quint16 port = info->tcpPort;
     ChatSocket* socket = chatRooms.serverConnection(ip, port);
     if(socket->userId() == 0)
