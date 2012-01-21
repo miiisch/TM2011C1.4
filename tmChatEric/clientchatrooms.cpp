@@ -2,9 +2,8 @@
 #include <QTcpSocket>
 #include "client.h"
 
-typedef QHash<quint32,ClientChatRoom*> ClientChatRoomHash;
-
-ClientChatRooms::ClientChatRooms()
+ClientChatRooms::ClientChatRooms() :
+    _sendKeepalives(true)
 {
 }
 
@@ -56,7 +55,8 @@ void ClientChatRooms::sendKeepAlives()
                 chatRooms.remove(address);
             } else {
                 socket->incrementTimeOutCounter();
-                socket->send(DataElement(0,1,0,0,0), false);
+                if (_sendKeepalives)
+                    socket->send(DataElement(0,1,0,0,0), false);
             }
         }
     }
@@ -80,4 +80,9 @@ bool ClientChatRooms::containsRoom(QHostAddress address, quint32 id)
 void ClientChatRooms::roomClosed(QHostAddress address, quint32 id)
 {
     chatRooms[address].remove(id);
+}
+
+void ClientChatRooms::activateKeepalives(bool x)
+{
+    _sendKeepalives = x;
 }

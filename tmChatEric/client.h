@@ -27,6 +27,8 @@ public slots:
 
 private slots:
     void addIp(QHostAddress);
+    void enableKeepalivesServer(bool);
+    void enableKeepalivesClient(bool);
 
 private:
     ChatSocket * udpSocket;
@@ -41,6 +43,7 @@ private:
 
     QList<QHostAddress> addresses;
     quint16 serverPort;
+    bool _serverSendKeepalives; // if server not yet open, client has to remember decision
 };
 
 #endif // CLIENT_H

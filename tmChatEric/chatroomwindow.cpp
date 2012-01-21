@@ -8,6 +8,7 @@ ChatRoomWindow::ChatRoomWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->textInput->setEnabled(false);
+    ui->chatRoomStatus->setStyleSheet("background-color: yellow;");
     ui->chatRoomStatus->setText("Waiting for server");
     connect(ui->textInput,SIGNAL(returnPressed()),SLOT(returnPressed()));
 }
@@ -52,6 +53,7 @@ void ChatRoomWindow::setTitle(QString name)
 void ChatRoomWindow::activate()
 {
     ui->chatRoomStatus->setText("Connection established");
+    ui->chatRoomStatus->setStyleSheet("background-color: #7fff00;");
     ui->textInput->setEnabled(true);
     QTimer::singleShot(2000, this, SLOT(removeStatusbar()));
 }
@@ -89,11 +91,13 @@ void ChatRoomWindow::joinDenied(int reason, QString additional)
 
     mainReason += additional.isEmpty() ? "" : " (" + additional + ")";
     ui->chatRoomStatus->setText("Join Denied: " + mainReason);
+    ui->chatRoomStatus->setStyleSheet("background-color: red;");
 }
 
 void ChatRoomWindow::serverQuit()
 {
     ui->chatRoomStatus->setVisible(true);
     ui->chatRoomStatus->setText("Server connection closed");
+    ui->chatRoomStatus->setStyleSheet("background-color: red;");
     ui->textInput->setEnabled(false);
 }

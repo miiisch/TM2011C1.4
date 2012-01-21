@@ -8,8 +8,8 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 
-Server::Server(quint16 serverPort, QObject *parent) :
-    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1)
+Server::Server(quint16 serverPort, bool enableKeepalives, QObject *parent) :
+    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives)
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
@@ -137,7 +137,8 @@ void Server::sendKeepAlives()
         else
         {
             user->socket()->incrementTimeOutCounter();
-            user->socket()->send(DataElement(0,1,0,0,0), true);
+            if (_sendKeepalives)
+                user->socket()->send(DataElement(0,1,0,0,0), true);
         }
     }
 }
@@ -175,4 +176,9 @@ void Server::debugInitialisierung()
 void Server::createChatRoom(QString name)
 {
     chatRooms->addChatRoom(name);
+}
+
+void Server::activateKeepalives(bool x)
+{
+    _sendKeepalives = x;
 }

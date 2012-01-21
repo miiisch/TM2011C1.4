@@ -20,6 +20,9 @@ Client::Client(QString userName, quint16 serverPort, QObject *parent) :
     connect(mainWindow,SIGNAL(chatRoomSelected(quint32)),SLOT(enterChatRoom(quint32)));
     connect(mainWindow,SIGNAL(createChatRoom(QString)),SLOT(createChatRoom(QString)));
 
+    connect(mainWindow, SIGNAL(enableClientKeepalive(bool)), SLOT(enableKeepalivesClient(bool)));
+    connect(mainWindow, SIGNAL(enableServerKeepalive(bool)), SLOT(enableKeepalivesServer(bool)));
+
     sendBroadCast();
 
     //every 2 seconds => keepalives
@@ -143,7 +146,6 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
         } else if(data.subType() <=5)
         {
             chatRooms.denyJoin(address, data.chatRoomIdentifier(), data);
-            qDebug() << "ChatRoom access denied: " << data.readString();
         }
         break;
     case 4:
@@ -185,7 +187,7 @@ void Client::createChatRoom(QString name)
 {
     if(server == 0)
     {
-        server = new Server(serverPort);
+        server = new Server(serverPort, _serverSendKeepalives);
     }
     server->createChatRoom(name);
     sendBroadCast();
@@ -195,4 +197,16 @@ void Client::addIp(QHostAddress address)
 {
     addresses += address;
     sendBroadCast();
+}
+
+void Client::enableKeepalivesServer(bool activate)
+{
+    _serverSendKeepalives = activate;
+    if (server != 0)
+        server->activateKeepalives(activate);
+}
+
+void Client::enableKeepalivesClient(bool activate)
+{
+    chatRooms.activateKeepalives(activate);
 }

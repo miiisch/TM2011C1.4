@@ -18,8 +18,9 @@ class Server : public QObject
 {
     Q_OBJECT
 public:
-    explicit Server(quint16 serverPort, QObject *parent = 0);
+    explicit Server(quint16 serverPort, bool enableKeepalives, QObject *parent = 0);
     void createChatRoom(QString name);
+    void activateKeepalives(bool);
 
 signals:
 
@@ -42,6 +43,7 @@ private:
     ChatRooms * chatRooms;
     int userIdCounter;
     Users users;
+    bool _sendKeepalives;
 
 
 

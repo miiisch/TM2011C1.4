@@ -48,14 +48,61 @@ void MainWindow::commandLineSlot()
 {
     QString command = ui->commandLine->text();
     ui->commandLine->clear();
-    if (command.startsWith("add ip"))
+    if (command.startsWith("add ip "))
     {
-        QHostAddress add(command.right(command.length() - QString("add ip ").length()));
+        QHostAddress add(right(command, "add ip "));
         emit addIp(add);
+        ui->statusBar->showMessage("IP Address " + add.toString() + " added", 5000);
     }
+    else if (command.startsWith("set null "))
+    {
+        QString next = right(command, "set null ");
+        bool client = true;
+        bool server = true;
+        if (next.startsWith("client "))
+        {
+            next = right(next, "client ");
+            server = false;
+        }
+        else if (next.startsWith("server "))
+        {
+            next = right(next, "server ");
+            client = false;
+        }
+        bool enable;
+        if (next == "0")
+            enable = false;
+        else if (next == "1")
+            enable = true;
+        else
+            ui->statusBar->showMessage("Unknown command: " + command, 5000);
+
+        if (client)
+            emit enableClientKeepalive(enable);
+        if (server)
+            emit enableServerKeepalive(enable);
+
+        QString message = "Keepalives ";
+        message += enable ? "enabled " : "disabled ";
+        message += "for ";
+        if (client && server)
+            message += "Client and Server";
+        else
+            message += client ? "Client" : "Server";
+
+        ui->statusBar->showMessage(message, 5000);
+
+    }
+    else
+        ui->statusBar->showMessage("Unknown command: " + command, 5000);
 }
 
 void MainWindow::clearChatRoomInfo()
 {
     ui->chatRoomTable->model()->removeRows(0,ui->chatRoomTable->rowCount());
+}
+
+QString MainWindow::right(QString &input, const char cutoffLeft[])
+{
+    return input.right(input.length() - QString(cutoffLeft).length());
 }

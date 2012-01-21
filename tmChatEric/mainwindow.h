@@ -26,6 +26,8 @@ signals:
     void chatRoomSelected(quint32);
     void createChatRoom(QString);
     void addIp(QHostAddress);
+    void enableClientKeepalive(bool);
+    void enableServerKeepalive(bool);
 
 private slots:
     void on_actionCreate_ChatRoom_triggered();
@@ -34,6 +36,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QHash<int, quint32> chatRoomIds;
+
+    QString right(QString & input, const char cutoffLeft[]);
 };
 
 #endif // MAINWINDOW_H
