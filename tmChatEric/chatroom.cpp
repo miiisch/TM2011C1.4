@@ -3,9 +3,8 @@
 #include <QDebug>
 
 ChatRoom::ChatRoom(quint32 id, QString name) :
-    AbstractChatRoom(id, name)
+    _id(id), _name(name)
 {
-
 }
 
 
@@ -160,4 +159,28 @@ void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
     {
         user->socket()->send(data, true);
     }
+}
+
+void ChatRoom::userConnectionLost(quint32 uid)
+{
+    if (users.contains(uid))
+    {
+        users.remove(uid);
+        DataElement data(id(), 6, 4, uid, 0);
+        QList<ChatRoomUser*> allUsers = users.allUsers();
+        foreach(ChatRoomUser* user, allUsers)
+        {
+            user->socket()->send(data, true);
+        }
+    }
+}
+
+quint32 ChatRoom::id()
+{
+    return _id;
+}
+
+QString ChatRoom::name()
+{
+    return _name;
 }

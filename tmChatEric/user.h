@@ -2,7 +2,6 @@
 #define USER_H
 
 #include <QTypeInfo>
-#include "abstractuser.h"
 
 class ChatSocket;
 

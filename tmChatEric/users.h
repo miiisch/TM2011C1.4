@@ -3,9 +3,8 @@
 
 #include <QHash>
 #include "user.h"
-#include "abstractusers.h"
 
-class Users : public AbstractUsers
+class Users
 {
 public:
     Users();
@@ -13,9 +12,13 @@ public:
     User* user(ChatSocket * socket);
     User* user(quint32 uid);
     void remove(quint32 uid);
+    bool contains(quint32 uid);
+    quint32 length();
+    QList<User*> allUsers();
 
 private:
 
+    QHash<quint32, User*> users;
     QHash<ChatSocket*,quint32> uids;
 };
 

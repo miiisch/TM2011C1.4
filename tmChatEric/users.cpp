@@ -6,18 +6,18 @@ Users::Users()
 
 void Users::createUser(ChatSocket *socket, quint32 uid)
 {
-    users[uid] =  (AbstractUser*)new User(uid, socket);
+    users[uid] = new User(uid, socket);
     uids[socket] = uid;
 }
 
 User* Users::user(ChatSocket *socket)
 {
-    return (User*)users[uids[socket]];
+    return users[uids[socket]];
 }
 
 User* Users::user(quint32 uid)
 {
-    return  (User*)AbstractUsers::user(uid);
+    return users[uid];
 }
 
 void Users::remove(quint32 uid)
@@ -26,5 +26,15 @@ void Users::remove(quint32 uid)
     uids.remove(currentUser->socket());
     users.remove(uid);
     delete currentUser;
+}
+
+quint32 Users::length()
+{
+    return users.size();
+}
+
+QList<User *> Users::allUsers()
+{
+    return users.values();
 }
 

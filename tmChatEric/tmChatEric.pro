@@ -22,9 +22,6 @@ SOURCES += main.cpp\
     client.cpp \
     dataelement.cpp \
     chatsocket.cpp \
-    abstractuser.cpp \
-    abstractusers.cpp \
-    abstractchatroom.cpp \
     clientchatrooms.cpp \
     clientchatroom.cpp \
     chatroomwindow.cpp \
@@ -42,9 +39,6 @@ HEADERS  += mainwindow.h \
     client.h \
     dataelement.h \
     chatsocket.h \
-    abstractuser.h \
-    abstractusers.h \
-    abstractchatroom.h \
     clientchatrooms.h \
     clientchatroom.h \
     chatroomwindow.h \

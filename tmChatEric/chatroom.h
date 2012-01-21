@@ -3,16 +3,18 @@
 
 #include <QString>
 #include "chatroomusers.h"
-#include "abstractchatroom.h"
 
 class DataElement;
 
-class ChatRoom : public AbstractChatRoom
+class ChatRoom
 {
 public:
     ChatRoom(quint32 id, QString name);
     quint32 chatRoomUsersCount();
     void newData(ChatSocket* socket, DataElement data, quint32 userId);
+    void userConnectionLost(quint32 uid);
+    quint32 id();
+    QString name();
 
 signals:
 
@@ -25,6 +27,9 @@ private:
     void sendPrivateMessage(DataElement data);
     void readStatusMessage(DataElement data, quint32 uid);
     ChatRoomUsers users;
+
+    quint32 _id;
+    QString _name;
 };
 
 #endif // CHATROOM_H

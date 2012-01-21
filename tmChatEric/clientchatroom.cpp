@@ -2,7 +2,7 @@
 #include "chatroomwindow.h"
 
 ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, quint32 userId) :
-    AbstractChatRoom(id, name), _socket(socket), _userId(userId)
+    _id(id), _name(name), _socket(socket), _userId(userId)
 {
     window = new ChatRoomWindow();
     connect(window,SIGNAL(textEntered(QString)),this,SLOT(sendMessage(QString)));
@@ -141,4 +141,9 @@ void ClientChatRoom::denyJoin(DataElement &data)
 void ClientChatRoom::serverQuit()
 {
     window->serverQuit();
+}
+
+QString ClientChatRoom::name()
+{
+    return _name;
 }

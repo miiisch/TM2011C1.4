@@ -34,7 +34,7 @@ Server::Server(quint16 serverPort, bool enableKeepalives, QObject *parent) :
 void Server::newConnection()
 {
     QTcpSocket * newSocket = tcpServer->nextPendingConnection();
-    qDebug() << "NEW CONNECTION WITH: " << newSocket->peerAddress() << ":" << newSocket->peerPort();
+//    qDebug() << "NEW CONNECTION WITH: " << newSocket->peerAddress() << ":" << newSocket->peerPort();
     newUser(newSocket);
 }
 
@@ -126,12 +126,12 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16
 
 void Server::sendKeepAlives()
 {
-    QList<AbstractUser*> currentUsers = users.allUsers();
-    foreach(AbstractUser* abstractUser, currentUsers)
+    QList<User*> currentUsers = users.allUsers();
+    foreach(User* user, currentUsers)
     {
-        User* user = (User*)abstractUser;
         if(user->socket()->timeOutCounter() == 5)
         {
+            chatRooms->userConnectionLost(user->uid());
             users.remove(user->uid());
         }
         else

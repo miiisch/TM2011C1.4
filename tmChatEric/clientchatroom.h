@@ -1,11 +1,11 @@
 #ifndef CLIENTCHATROOM_H
 #define CLIENTCHATROOM_H
 
-#include "abstractchatroom.h"
 #include "chatroomwindow.h"
 #include "types.h"
+#include "chatsocket.h"
 
-class ClientChatRoom : public QObject, AbstractChatRoom
+class ClientChatRoom : public QObject
 {
     Q_OBJECT
 public:
@@ -17,6 +17,7 @@ public:
     void activate(QList<UserInfo> userInfo);
     void denyJoin(DataElement & data);
     void serverQuit();
+    QString name();
 
 public slots:
     void sendMessage(QString text);
@@ -28,6 +29,8 @@ signals:
     void closed(QHostAddress address, quint32 id);
 
 private:
+    quint32 _id;
+    QString _name;
    void  readStatusMessage(DataElement data);
     ChatSocket * _socket;
     quint32 _userId;

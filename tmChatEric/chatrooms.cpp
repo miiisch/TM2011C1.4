@@ -24,7 +24,7 @@ QMap<quint32, QPair<QString, quint32> > ChatRooms::chatRoomsInfo()
     QMap<quint32, QPair<QString, quint32> > infos;
     foreach(ChatRoom* room, chatRooms)
     {
-        infos[room->id()] = QPair<QString, quint32>(room->name(), room->chatRoomUsersCount()); //TDOO replace 0 with number of users in channel
+        infos[room->id()] = QPair<QString, quint32>(room->name(), room->chatRoomUsersCount());
     }
     return infos;
 }
@@ -36,4 +36,10 @@ void ChatRooms::addChatRoom(QString name)
         chatRoomIdCounter++;
     }
     chatRooms.insert(chatRoomIdCounter, new ChatRoom(chatRoomIdCounter, name));
+}
+
+void ChatRooms::userConnectionLost(quint32 uid)
+{
+    foreach(ChatRoom* room, chatRooms)
+        room->userConnectionLost(uid);
 }

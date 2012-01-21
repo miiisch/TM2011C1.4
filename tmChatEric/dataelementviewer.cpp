@@ -68,8 +68,8 @@ void DataElementViewer::append(const Message & m)
     filter &= ui->filterUdpUnicast->isChecked()     || m.protocol != UdpUnicast;
     filter &= ui->filterUdpBroadcast->isChecked()   || m.protocol != UdpBroadcast;
 
-    filter &= ui->filterClient->isChecked()         || m.protocol != Client;
-    filter &= ui->filterServer->isChecked()         || m.protocol != Server;
+    filter &= ui->filterClient->isChecked()         || m.clientServer != Client;
+    filter &= ui->filterServer->isChecked()         || m.clientServer != Server;
 
     filter &= channelMatcher.exactMatch(m.channel);
     filter &= typeMatcher.exactMatch(m.type);

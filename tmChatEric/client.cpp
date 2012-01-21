@@ -7,7 +7,7 @@
 #include "dataelementviewer.h"
 
 Client::Client(QString userName, quint16 serverPort, QObject *parent) :
-    QObject(parent), userName(userName), server(0), serverPort(serverPort)
+    QObject(parent), userName(userName), server(0), serverPort(serverPort), _serverSendKeepalives(true)
 {
     broadCastSocket = new QUdpSocket;
     broadCastSocket->bind();

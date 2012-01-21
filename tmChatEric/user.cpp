@@ -15,7 +15,6 @@ User::User() :
 User::~User()
 {
     delete _socket;
-    qDebug() << "Bye UserObject";
 }
 
 ChatSocket * User::socket()

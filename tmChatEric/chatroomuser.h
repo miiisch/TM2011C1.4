@@ -3,7 +3,6 @@
 
 #include <QString>
 #include "chatsocket.h"
-#include "abstractuser.h"
 
 class ChatRoomUser
 {
