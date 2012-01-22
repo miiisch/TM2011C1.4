@@ -150,6 +150,9 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
         break;
     case 4:
     case 6:
+    case 7:
+    case 9:
+    case 10:
         chatRooms.newData(data, socket->ip(), uid);
         break;
     default:

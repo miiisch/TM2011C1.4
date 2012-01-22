@@ -53,13 +53,30 @@ void ClientChatRoom::showChatMessage(DataElement data, quint32 userId)
 {
     //qDebug() << senderId;
     QString name = "";
+    if (data.receiver() != 0)
+    {
+        name += "[";
+    }
     foreach(UserInfo info, userInfo)
     {
         if(info.id == data.sender())
         {
-            name = info.name;
+            name += info.name;
             break;
         }
+    }
+    if (data.receiver() != 0)
+    {
+        name += " -> ";
+        foreach(UserInfo info, userInfo)
+        {
+            if(info.id == data.sender())
+            {
+                name += info.name;
+                break;
+            }
+        }
+        name = "]";
     }
     QString textMessage = data.readString();
 
