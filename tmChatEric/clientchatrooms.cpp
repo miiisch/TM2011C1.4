@@ -62,7 +62,7 @@ void ClientChatRooms::sendKeepAlives()
     }
 }
 
-void ClientChatRooms::activateChatRoom(QHostAddress address, quint32 id, QList<UserInfo> userInfo)
+void ClientChatRooms::activateChatRoom(QHostAddress address, quint32 id, QMap<quint32, UserInfo> userInfo)
 {
     chatRooms[address][id]->activate(userInfo);
 }

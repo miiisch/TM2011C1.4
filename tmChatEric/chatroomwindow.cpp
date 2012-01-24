@@ -18,13 +18,14 @@ ChatRoomWindow::~ChatRoomWindow()
     delete ui;
 }
 
-void ChatRoomWindow::setUserList(QList<UserInfo> userInfo)
+void ChatRoomWindow::setUserList(QMap<quint32, UserInfo> userInfo)
 {
     ui->userList->clear();
     foreach(UserInfo info, userInfo)
     {
         int row = ui->userList->count();
-        ui->userList->insertItem(row, new QListWidgetItem(QString::number(info.id) + " " + info.name));
+        QString status = info.status == Online ? "+" : (info.status == Away ? "-" : "!");
+        ui->userList->insertItem(row, new QListWidgetItem(QString::number(info.id) + " " + status + " " + info.name));
     }
 }
 
@@ -101,4 +102,13 @@ void ChatRoomWindow::serverQuit()
     ui->chatRoomStatus->setText("Server connection closed");
     ui->chatRoomStatus->setStyleSheet("background-color: red;");
     ui->textInput->setEnabled(false);
+}
+
+void ChatRoomWindow::addErrorMessage(QString &message, QString bgColor, int timeOut)
+{
+    ui->chatRoomStatus->setVisible(true);
+    ui->chatRoomStatus->setText(message);
+    ui->chatRoomStatus->setStyleSheet(QString("background-color: %1;").arg(bgColor));
+    if (timeOut != 0)
+        QTimer::singleShot(timeOut, this, SLOT(removeStatusbar()));
 }

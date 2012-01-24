@@ -14,7 +14,7 @@ public:
     ChatSocket * socket();
     quint32 userId();
     quint32 id();
-    void activate(QList<UserInfo> userInfo);
+    void activate(QMap<quint32, UserInfo> userInfo);
     void denyJoin(DataElement & data);
     void serverQuit();
     QString name();
@@ -35,7 +35,7 @@ private:
     ChatSocket * _socket;
     quint32 _userId;
     ChatRoomWindow * window;
-    QList<UserInfo> userInfo;
+    QMap<quint32, UserInfo> userInfo;
 };
 
 #endif // CLIENTCHATROOM_H

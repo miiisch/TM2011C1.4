@@ -23,8 +23,9 @@ struct UserInfo{
     quint32 id;
     QString name;
     Status status;
+    UserInfo() :id(-1), name("UNINITIALIZED"), status(Online) {}
     UserInfo(quint32 id, QString name, Status status) : id(id), name(name), status(status) {}
-    bool operator==(UserInfo info) { return info.id == id && info.name == name; };
+    bool operator==(UserInfo info) { return info.id == id && info.name == name; }
 };
 
 #endif // TYPES_H
