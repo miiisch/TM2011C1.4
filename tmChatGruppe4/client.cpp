@@ -13,7 +13,7 @@ Client::Client(QString userName, quint16 serverPort, QObject *parent) :
     broadCastSocket->bind(serverPort);
     //qDebug() << "client udp port" << broadCastSocket->localPort();
     udpSocket = new ChatSocket(broadCastSocket,0);
-    connect(udpSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readUniCast(DataElement,QHostAddress*,quint16)));
+    connect(udpSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readUniCast(DataElement,QHostAddress*,quint16)));
 
     mainWindow = new MainWindow(this);
     mainWindow->show();
