@@ -12,7 +12,7 @@ public:
     void newData(DataElement data, QHostAddress address, quint32 userId);
     ChatSocket * serverConnection(QHostAddress ip, quint16 port);
     void addChatRoom(ChatSocket* socket, quint32 id, quint32 userId, QString name);
-    void activateChatRoom(QHostAddress address, quint32 id, QList<UserInfo> userInfo);
+    void activateChatRoom(QHostAddress address, quint32 id, QMap<quint32, UserInfo> userInfo);
     void denyJoin(QHostAddress address, quint32 id, DataElement & data);
     bool containsRoom(QHostAddress address, quint32 id);
     void activateKeepalives(bool);

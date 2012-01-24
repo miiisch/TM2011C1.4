@@ -15,12 +15,13 @@ class ChatRoomWindow : public QWidget
 public:
     explicit ChatRoomWindow(QWidget *parent = 0);
     ~ChatRoomWindow();
-    void setUserList(QList<UserInfo>);
+    void setUserList(QMap<quint32, UserInfo>);
     void addLine(QString text);
     void setTitle(QString name);
     void activate();
     void joinDenied(int reason, QString additional);
     void serverQuit();
+    void addErrorMessage(QString &message, QString bgColor = "red", int timeOut = 5000);
 
 public slots:
         void returnPressed();

@@ -173,7 +173,7 @@ void Client::activateChatRoom(ChatSocket * socket, DataElement data, quint32 uid
 {
     quint32 id = data.chatRoomIdentifier();
     quint32 listLength = data.readInt32();
-    QList<UserInfo> userInfo;
+    QMap<quint32, UserInfo> userInfo;
     for(int i=0;i<listLength;++i)
     {
         quint32 id = data.readInt32();
@@ -181,7 +181,7 @@ void Client::activateChatRoom(ChatSocket * socket, DataElement data, quint32 uid
         QString name = data.readString();
         quint32 numberOfModules = data.readInt32();
         (void)numberOfModules;
-        userInfo.append(UserInfo(id, name, (Status)status));
+        userInfo[id] = UserInfo(id, name, (Status)status);
     }
     chatRooms.activateChatRoom(socket->ip(),id,userInfo);
 }
