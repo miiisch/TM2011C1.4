@@ -17,13 +17,12 @@ int main(int argc, char *argv[])
         bool ok;
         serverPort = QString(argv[2]).toInt(&ok);
         if (!ok)
-            qFatal("Arguments: username [server port]");
+            qFatal("Usage: %s username [server port]", argv[0]);
     }
     else
-        qFatal("Arguments: username [server port]");
+         qFatal("Usage: %s username [server port]", argv[0]);
 
-
-    Client * client = new Client(argv[1], serverPort);
+    new Client(argv[1], serverPort);
 
     return a.exec();
 }

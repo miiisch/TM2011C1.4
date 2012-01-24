@@ -16,6 +16,7 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
     addressMatcher(".*")
 {
     ui->setupUi(this);
+    setWindowState(Qt::WindowMinimized);
 
     connect(ui->applyButton, SIGNAL(clicked()), SLOT(update()));
 }

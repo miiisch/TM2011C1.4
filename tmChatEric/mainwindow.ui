@@ -46,17 +46,22 @@
       </attribute>
       <column>
        <property name="text">
+        <string>IP</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
         <string>ID</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Name</string>
+        <string>#Users</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>#Users</string>
+        <string>Chat Room</string>
        </property>
       </column>
      </widget>

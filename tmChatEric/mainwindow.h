@@ -33,6 +33,9 @@ private slots:
     void on_actionCreate_ChatRoom_triggered();
     void commandLineSlot();
 
+protected:
+    void closeEvent(QCloseEvent *);
+
 private:
     Ui::MainWindow *ui;
     QHash<int, quint32> chatRoomIds;

@@ -41,7 +41,8 @@ void ChatRoomWindow::addLine(QString text)
 
 void ChatRoomWindow::closeEvent(QCloseEvent * e)
 {
-    emit windowClosed();
+    if (ui->textInput->isEnabled())
+        emit windowClosed();
     QWidget::closeEvent(e);
 }
 
