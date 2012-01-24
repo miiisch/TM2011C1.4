@@ -47,7 +47,7 @@ void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
         if(data.subType() == 1) {
             quint16 tcpPort = data.readInt16();
             quint32 listLength = data.readInt32();
-            for(int i=0;i<listLength;++i)
+            for(int i = 0; i < (int)listLength; ++i)
             {
                 quint32 id = data.readInt32();
                 QString name = data.readString();
@@ -169,12 +169,12 @@ void Client::sendJoinRequest(ChatSocket *socket, ChatRoomInfo *info)
     chatRooms.addChatRoom(socket, info->id, socket->userId(), info->name);
 }
 
-void Client::activateChatRoom(ChatSocket * socket, DataElement data, quint32 uid)
+void Client::activateChatRoom(ChatSocket * socket, DataElement data, quint32)
 {
     quint32 id = data.chatRoomIdentifier();
     quint32 listLength = data.readInt32();
     QMap<quint32, UserInfo> userInfo;
-    for(int i=0;i<listLength;++i)
+    for(int i = 0; i < (int)listLength; ++i)
     {
         quint32 id = data.readInt32();
         quint32 status = data.readInt32();
@@ -183,7 +183,7 @@ void Client::activateChatRoom(ChatSocket * socket, DataElement data, quint32 uid
         (void)numberOfModules;
         userInfo[id] = UserInfo(id, name, (Status)status);
     }
-    chatRooms.activateChatRoom(socket->ip(),id,userInfo);
+    chatRooms.activateChatRoom(socket->ip(), id, userInfo);
 }
 
 void Client::createChatRoom(QString name)

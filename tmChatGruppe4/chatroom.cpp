@@ -98,7 +98,7 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
 
 }
 
-void ChatRoom::readChatMessage(DataElement data, quint32 uid)
+void ChatRoom::readChatMessage(DataElement data, quint32)
 {
     switch(data.receiver())
     {

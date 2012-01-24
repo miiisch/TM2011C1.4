@@ -9,10 +9,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    quint16 serverPort;
-    if (argc == 2)
-        serverPort = 0;
-    else if (argc == 3)
+    quint16 serverPort = 0;
+    if (argc == 3)
     {
         bool ok;
         serverPort = QString(argv[2]).toInt(&ok);

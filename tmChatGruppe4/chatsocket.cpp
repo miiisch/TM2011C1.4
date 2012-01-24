@@ -143,6 +143,8 @@ QHostAddress ChatSocket::ip()
     {
         return tcpSocket->peerAddress();
     }
+    else
+        return QHostAddress();
 }
 
 quint32 ChatSocket::userId()

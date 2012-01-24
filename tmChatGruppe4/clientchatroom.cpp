@@ -88,7 +88,7 @@ void ClientChatRoom::sendMessage(QString text)
     socket()->send(data, false);
 }
 
-void ClientChatRoom::showChatMessage(DataElement data, quint32 userId)
+void ClientChatRoom::showChatMessage(DataElement data, quint32)
 {
     //qDebug() << senderId;
     QString name = "";
@@ -122,7 +122,7 @@ void ClientChatRoom::showChatMessage(DataElement data, quint32 userId)
     window->addLine("<b>" + name + ":</b> " + textMessage);
 }
 
-void ClientChatRoom::showDenyMessage(DataElement data, quint32 userId)
+void ClientChatRoom::showDenyMessage(DataElement data, quint32)
 {
     //qDebug() << senderId;
     QString name = "";

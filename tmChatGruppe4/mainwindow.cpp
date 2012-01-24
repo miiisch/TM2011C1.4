@@ -70,13 +70,13 @@ void MainWindow::commandLineSlot()
             next = right(next, "server ");
             client = false;
         }
-        bool enable;
-        if (next == "0")
-            enable = false;
-        else if (next == "1")
-            enable = true;
-        else
+
+        if (next != "0" && next != "1") {
             ui->statusBar->showMessage("Unknown command: " + command, 5000);
+            return;
+        }
+
+        bool enable = (next == "1");
 
         if (client)
             emit enableClientKeepalive(enable);
@@ -92,7 +92,6 @@ void MainWindow::commandLineSlot()
             message += client ? "Client" : "Server";
 
         ui->statusBar->showMessage(message, 5000);
-
     }
     else
         ui->statusBar->showMessage("Unknown command: " + command, 5000);
