@@ -76,9 +76,11 @@ private:
             clientServer(clientServer),
             direction(direction),
             protocol(protocol),
-            channel(data->chatRoomIdentifier()),
-            type(data->type()),
-            subType(data->subType()),
+            channel(QString::number(data->chatRoomIdentifier())),
+            type(QString::number(data->type())),
+            subType(QString::number(data->subType())),
+            sender(QString::number(data->sender())),
+            receiver(QString::number(data->receiver())),
             address(address.toString()),
             null(isNullMessage(data))
         {

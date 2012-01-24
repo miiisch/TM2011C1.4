@@ -52,8 +52,7 @@ void DataElementViewer::update()
     receiverMatcher = QRegExp(ui->filterReceiver->text() == "" ? ".*" : ui->filterReceiver->text());
     addressMatcher = QRegExp(ui->filterHost->text() == "" ? ".*" : ui->filterHost->text());
 
-
-   while(ui->outputTable->rowCount() != 0)
+    while(ui->outputTable->rowCount() != 0)
         ui->outputTable->removeRow(0);
     foreach (Message m, messages)
         append(m);
