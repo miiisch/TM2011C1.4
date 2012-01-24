@@ -39,7 +39,7 @@ void ChatSocket::readUdpData()
         DataElement dataElement(ba);
 
         //new Data signal
-        emit newUdpData(dataElement, senderAddress, *senderPort);
+        emit newUdpData(dataElement, senderAddress, *senderPort, udpSocket);
 
         //check for next datagram
         QTimer::singleShot(0,this,SLOT(readUdpData()));
