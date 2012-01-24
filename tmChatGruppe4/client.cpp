@@ -10,7 +10,7 @@ Client::Client(QString userName, quint16 serverPort, QObject *parent) :
     QObject(parent), userName(userName), server(0), serverPort(serverPort), _serverSendKeepalives(true)
 {
     broadCastSocket = new QUdpSocket;
-    broadCastSocket->bind();
+    broadCastSocket->bind(serverPort);
     //qDebug() << "client udp port" << broadCastSocket->localPort();
     udpSocket = new ChatSocket(broadCastSocket,0);
     connect(udpSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readUniCast(DataElement,QHostAddress*,quint16)));
@@ -74,10 +74,9 @@ void Client::sendBroadCast()
                                                  QHostAddress::Broadcast,
                                                  &data);
     broadCastSocket->writeDatagram(data.data(), QHostAddress::Broadcast, 10222);
-    QUdpSocket socket;
     foreach (QHostAddress address, addresses)
     {
-        socket.writeDatagram(data.data(), address, 10222);
+        broadCastSocket->writeDatagram(data.data(), address, 10222);
         DataElementViewer::getInstance()->addMessage(DataElementViewer::Client,
                                                      DataElementViewer::Out,
                                                      DataElementViewer::UdpUnicast,
