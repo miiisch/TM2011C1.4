@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
         if (!ok)
             qFatal("Usage: %s username [server port]", argv[0]);
     }
-    else
+    else if (argc != 2)
          qFatal("Usage: %s username [server port]", argv[0]);
 
     new Client(argv[1], serverPort);
