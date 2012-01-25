@@ -15,9 +15,6 @@ int main(int argc, char *argv[])
     if(notify_init("tmChatGruppe4"))
         qDebug("libnotify initialized!");
 
-    NotifyNotification * Hello = notify_notification_new ("tmChatGruppe4", "Application started", "dialog-information", NULL);
-    notify_notification_show (Hello, NULL);
-
     quint16 serverPort = 0;
     if (argc == 3)
     {
