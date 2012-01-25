@@ -15,7 +15,7 @@ Server::Server(quint16 serverPort, bool enableKeepalives, QObject *parent) :
     QUdpSocket * socket = new QUdpSocket;
     qDebug() << socket->bind(10222);
     udpChatSocket = new ChatSocket(socket);
-    connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16)));
+    connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
     tcpServer->listen(QHostAddress::Any, serverPort);
     tcpPort = tcpServer->serverPort();
     //qDebug() << " serverport " << tcpPort;
@@ -91,7 +91,7 @@ void Server::readData(DataElement data, quint32 userId, QHostAddress address)
 
 }
 
-void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16 port)
+void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16 port, QUdpSocket* udpSocket)
 {
     DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
                                                  DataElementViewer::In,
@@ -112,7 +112,6 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16
             newDataElement.writeString(pair.first);
             newDataElement.writeInt32(pair.second);
         }
-        QUdpSocket * udpSocket = new QUdpSocket();
         udpSocket->writeDatagram(newDataElement.data(), *peerAddress, port);
         DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
                                                      DataElementViewer::Out,

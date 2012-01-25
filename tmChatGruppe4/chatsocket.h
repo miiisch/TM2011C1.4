@@ -26,7 +26,7 @@ public:
 
 signals:
     void newTcpData(DataElement data, quint32 userId, QHostAddress);
-    void newUdpData(DataElement data, QHostAddress * senderAddress, quint16 port);
+    void newUdpData(DataElement data, QHostAddress * senderAddress, quint16 port, QUdpSocket* udpSocket);
 
 public slots:
     void readUdpData();
