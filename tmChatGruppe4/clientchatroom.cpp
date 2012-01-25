@@ -164,24 +164,41 @@ void ClientChatRoom::readStatusMessage(DataElement data)
         window->setUserList(userInfo);
         QString message = data.subType() == 3 ? "%1 quit" : "Connection with %1 lost";
         message = message.arg(name);
+        if (!string.isEmpty())
+            message += QString(" (%1)").arg(string);
         window->addLine(QString("<i>%1</i>").arg(message));
         break;
     }
     case 0:
-        window->addLine(QString("<i>%1 is available</i>").arg(name));
+    {
+        QString message = QString("<i>%1 is available</i>").arg(name);
+        if (!string.isEmpty())
+            message += QString(" (%1)").arg(string);
+        window->addLine(message);
         userInfo[id].status = Online;
         window->setUserList(userInfo);
         break;
+    }
     case 1:
-        window->addLine(QString("<i>%1 is away</i>").arg(name));
+    {
+        QString message = QString("<i>%1 is away</i>").arg(name);
+        if (!string.isEmpty())
+            message += QString(" (%1)").arg(string);
+        window->addLine(message);
         userInfo[id].status = Away;
         window->setUserList(userInfo);
         break;
+    }
     case 2:
-        window->addLine(QString("<i>%1 is busy</i>").arg(name));
+    {
+        QString message = QString("<i>%1 is busy</i>").arg(name);
+        if (!string.isEmpty())
+            message += QString(" (%1)").arg(string);
+        window->addLine(message);
         userInfo[id].status = Busy;
         window->setUserList(userInfo);
         break;
+    }
     }
 }
 
