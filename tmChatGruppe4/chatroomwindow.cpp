@@ -4,6 +4,7 @@
 
 ChatRoomWindow::ChatRoomWindow(QWidget *parent) :
     QWidget(parent),
+    statusbarTimerCounter(0),
     ui(new Ui::ChatRoomWindow)
 {
     ui->setupUi(this);
@@ -57,12 +58,14 @@ void ChatRoomWindow::activate()
     ui->chatRoomStatus->setText("Connection established");
     ui->chatRoomStatus->setStyleSheet("background-color: #7fff00;");
     ui->textInput->setEnabled(true);
-    QTimer::singleShot(2000, this, SLOT(removeStatusbar()));
+    setRemoveStatusbarTimer(5000);
 }
 
 void ChatRoomWindow::removeStatusbar()
 {
-    ui->chatRoomStatus->setVisible(false);
+    statusbarTimerCounter--;
+    if (statusbarTimerCounter == 0)
+        ui->chatRoomStatus->setVisible(false);
 }
 
 void ChatRoomWindow::joinDenied(int reason, QString additional)
@@ -109,6 +112,14 @@ void ChatRoomWindow::addErrorMessage(QString &message, QString bgColor, int time
     ui->chatRoomStatus->setVisible(true);
     ui->chatRoomStatus->setText(message);
     ui->chatRoomStatus->setStyleSheet(QString("background-color: %1;").arg(bgColor));
+    setRemoveStatusbarTimer(timeOut);
+}
+
+void ChatRoomWindow::setRemoveStatusbarTimer(int timeOut)
+{
     if (timeOut != 0)
+    {
+        statusbarTimerCounter++;
         QTimer::singleShot(timeOut, this, SLOT(removeStatusbar()));
+    }
 }

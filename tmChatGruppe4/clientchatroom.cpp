@@ -44,27 +44,45 @@ quint32 ClientChatRoom::userId()
 
 void ClientChatRoom::sendMessage(QString text)
 {
-    if (text.startsWith("/set status ")) {
-        QString arg = text.right(text.length() - QString("/set status ").length());
-        int subType;
-        QString message;
-        if (arg.startsWith("online"))
+    if (text == "")
+            return;
+    if (text.startsWith("//"))
+        text = text.right(text.length() - 1);
+    else if (text.startsWith("/"))
+    {
+        if (text.startsWith("/set status "))
         {
-            subType = 0;
-            if (arg.length() > QString("online").length())
-                message = arg.right(arg.length() - QString("online ").length());
-        }
-        else if (arg.startsWith("away"))
-        {
-            subType = 1;
-            if (arg.length() > QString("away").length())
-                message = arg.right(arg.length() - QString("away ").length());
-        }
-        else if (arg.startsWith("busy"))
-        {
-            subType = 2;
-            if (arg.length() > QString("busy").length())
-                message = arg.right(arg.length() - QString("busy ").length());
+            QString arg = text.right(text.length() - QString("/set status ").length());
+            int subType;
+            QString message;
+            if (arg.startsWith("online"))
+            {
+                subType = 0;
+                if (arg.length() > QString("online").length())
+                    message = arg.right(arg.length() - QString("online ").length());
+            }
+            else if (arg.startsWith("away"))
+            {
+                subType = 1;
+                if (arg.length() > QString("away").length())
+                    message = arg.right(arg.length() - QString("away ").length());
+            }
+            else if (arg.startsWith("busy"))
+            {
+                subType = 2;
+                if (arg.length() > QString("busy").length())
+                    message = arg.right(arg.length() - QString("busy ").length());
+            }
+            else
+            {
+                QString x = QString("unkown command: %1").arg(text);
+                window->addErrorMessage(x);
+                return;
+            }
+            DataElement data(_id, 5, subType, _userId, 0);
+            data.writeString(message);
+            socket()->send(data, false);
+            return;
         }
         else
         {
@@ -72,13 +90,8 @@ void ClientChatRoom::sendMessage(QString text)
             window->addErrorMessage(x);
             return;
         }
-        DataElement data(_id, 5, subType, _userId, 0);
-        data.writeString(message);
-        socket()->send(data, false);
-        return;
-    } else if (text.startsWith("//")) {
-        text = text.right(text.length() - 1);
     }
+
     DataElement data(_id, 4, 0, _userId, 0);
     data.writeString(text);
     socket()->send(data, false);

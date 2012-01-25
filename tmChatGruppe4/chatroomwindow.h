@@ -24,8 +24,8 @@ public:
     void addErrorMessage(QString &message, QString bgColor = "red", int timeOut = 5000);
 
 public slots:
-        void returnPressed();
-        void removeStatusbar();
+    void returnPressed();
+    void removeStatusbar();
 
 signals:
     void textEntered(QString);
@@ -35,6 +35,9 @@ protected:
     void closeEvent(QCloseEvent *);
 
 private:
+    int statusbarTimerCounter;
+
+    void setRemoveStatusbarTimer(int timeOut);
     Ui::ChatRoomWindow *ui;
 };
 
