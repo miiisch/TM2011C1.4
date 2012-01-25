@@ -138,7 +138,11 @@ void ClientChatRoom::showChatMessage(DataElement data, quint32)
     //show message using libnotify, but only when sender wasn't the user itself
 //    if(data.sender() != user && !window->hasFocus())
 //    {
+//<<<<<<< HEAD
 //        NotifyNotification *notification = notify_notification_new(name.toUtf8().constData(), textMessage.toUtf8().constData(), 0, 0);
+//=======
+//        NotifyNotification *notification = notify_notification_new(name.toUtf8().constData(), textMessage.toUtf8().constData(), 0);
+//>>>>>>> master
 //        notify_notification_show(notification, 0);
 //    }
 }
