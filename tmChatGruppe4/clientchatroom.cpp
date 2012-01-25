@@ -46,26 +46,22 @@ void ClientChatRoom::sendMessage(QString text)
 {
     if (text.startsWith("/set status ")) {
         QString arg = text.right(text.length() - QString("/set status ").length());
-        Status status;
         int subType;
         QString message;
         if (arg.startsWith("online"))
         {
-            status = Online;
             subType = 0;
             if (arg.length() > QString("online").length())
                 message = arg.right(arg.length() - QString("online ").length());
         }
         else if (arg.startsWith("away"))
         {
-            status = Away;
             subType = 1;
             if (arg.length() > QString("away").length())
                 message = arg.right(arg.length() - QString("away ").length());
         }
         else if (arg.startsWith("busy"))
         {
-            status = Busy;
             subType = 2;
             if (arg.length() > QString("busy").length())
                 message = arg.right(arg.length() - QString("busy ").length());
