@@ -1,8 +1,8 @@
 #include "clientchatroom.h"
 #include "chatroomwindow.h"
 
-#undef signals
-#include <libnotify/notification.h>
+//#undef signals
+//#include <libnotify/notification.h>
 
 ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, quint32 userId) :
     _id(id), _name(name), _socket(socket), _userId(userId)
@@ -100,7 +100,7 @@ void ClientChatRoom::sendMessage(QString text)
     socket()->send(data, false);
 }
 
-void ClientChatRoom::showChatMessage(DataElement data, quint32 user)
+void ClientChatRoom::showChatMessage(DataElement data, quint32)
 {
     //qDebug() << senderId;
     QString name = "";
@@ -134,11 +134,11 @@ void ClientChatRoom::showChatMessage(DataElement data, quint32 user)
     window->addPublicChatMessage(name, textMessage);
 
     //show message using libnotify, but only when sender wasn't the user itself
-    if(data.sender() != user && !window->hasFocus())
-    {
-        NotifyNotification *notification = notify_notification_new(name.toUtf8().constData(), textMessage.toUtf8().constData(), 0, 0);
-        notify_notification_show(notification, 0);
-    }
+//    if(data.sender() != user && !window->hasFocus())
+//    {
+//        NotifyNotification *notification = notify_notification_new(name.toUtf8().constData(), textMessage.toUtf8().constData(), 0);
+//        notify_notification_show(notification, 0);
+//    }
 }
 
 void ClientChatRoom::showDenyMessage(DataElement data, quint32)
