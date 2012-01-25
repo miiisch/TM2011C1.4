@@ -33,6 +33,7 @@ private:
     QString _name;
     void readStatusMessage(DataElement data);
     void readActionAceptedMessage(DataElement data);
+    void readActionDeniedMessage(DataElement data);
     ChatSocket * _socket;
     quint32 _userId;
     ChatRoomWindow * window;

@@ -16,6 +16,10 @@ ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, qui
 
 void ClientChatRoom::newData(DataElement data, quint32 userId)
 {
+    if (!userInfo.contains(data.sender()))
+    {
+        qDebug() << "received message from unknown sender";
+    }
     switch(data.type())
     {
     case 4:
@@ -31,7 +35,11 @@ void ClientChatRoom::newData(DataElement data, quint32 userId)
         readStatusMessage(data);
         break;
     case 9:
-
+        readActionAceptedMessage(data);
+        break;
+    case 10:
+        readActionDeniedMessage(data);
+        break;
     default:
         qDebug() << "ClientChatRoom::newData unknown type: " << data.type();
     }
@@ -101,6 +109,54 @@ void ClientChatRoom::sendMessage(QString text)
             }
 
             DataElement data(_id, 8, 2, _userId, uid);
+            data.writeString(next);
+            socket()->send(data, false);
+            return;
+        }
+        else if (text.startsWith("/set kick ") || text.startsWith("/set mod "))
+        {
+
+            QString next;
+            int subType;
+            if (text.startsWith("/set kick "))
+            {
+                next = text.right(text.length() - QString("/set kick ").length());
+                subType = 0;
+            }
+            else
+            {
+                next = text.right(text.length() - QString("/set mod ").length());
+                subType = 3;
+            }
+
+            int giveRights;
+            ok = splitInt(next, giveRights);
+            if (!ok)
+            {
+                QString x = QString("invalid arg: %1").arg(next);
+                window->setStatusMessage(x);
+                return;
+            }
+
+            int uid;
+            bool ok = splitInt(next, uid);
+            if (!ok)
+            {
+                QString x = QString("invalid arg: %1").arg(next);
+                window->setStatusMessage(x);
+                return;
+            }
+
+            if (giveRights == 0)
+                subType++;
+            else if (giveRights != 1)
+            {
+                QString x = QString("invalid arg: %1").arg(next);
+                window->setStatusMessage(x);
+                return;
+            }
+
+            DataElement data(_id, 8, subType, _userId, uid);
             data.writeString(next);
             socket()->send(data, false);
             return;
@@ -293,6 +349,29 @@ void ClientChatRoom::readActionAceptedMessage(DataElement data)
     }
 }
 
+void ClientChatRoom::readActionDeniedMessage(DataElement data)
+{
+    QString receiver = userInfo[data.receiver()].name;
+    switch(data.subType())
+    {
+    case 0:
+        window->addActionDeniedMessage("Server did not allow granting %1 kick rights", receiver, data.readString());
+        break;
+    case 1:
+        window->addActionDeniedMessage("Server did not allow revoking kick rights from %1", receiver, data.readString());
+        break;
+    case 2:
+        window->addActionDeniedMessage("Server did not allow kicking %1", receiver, data.readString());
+        break;
+    case 3:
+        window->addActionDeniedMessage("Server did not allow granting %1 kick rights", receiver, data.readString());
+        break;
+    case 4:
+        window->addActionDeniedMessage("Server did not allow revoking %1 mod rights", receiver, data.readString());
+        break;
+    }
+}
+
 void ClientChatRoom::disableChatroom(QString reason)
 {
     emit closed(socket()->ip(), userId());
@@ -312,6 +391,8 @@ bool ClientChatRoom::splitInt(QString &s, int &i)
         return false;
     }
 
-    s = s.right(s.length() - split[0].size());
+    if (split.size() > 0)
+        s = s.right(s.length() - split[0].size() - (split.size() > 1 ? 1 : 0));
+
     return true;
 }
