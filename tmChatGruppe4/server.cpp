@@ -117,7 +117,7 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16
                                                      DataElementViewer::Out,
                                                      DataElementViewer::UdpUnicast,
                                                      *peerAddress,
-                                                     &data);
+                                                     &newDataElement);
     } else {
         qDebug() << "Unknown broadcast";
     }

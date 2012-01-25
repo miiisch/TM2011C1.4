@@ -9,6 +9,18 @@ QT       += core gui network
 TARGET = tmChatEric
 TEMPLATE = app
 
+CONFIG += link_pkgconfig
+PKGCONFIG += libnotify
+
+#INCLUDEPATH += "/usr/include/glib-2.0"
+#INCLUDEPATH += "/usr/include/gtk-2.0"
+#INCLUDEPATH += "/usr/lib/gtk-2.0/include"
+#INCLUDEPATH += "/usr/include/cairo"
+#INCLUDEPATH += "/usr/include/pango-1.0"
+#INCLUDEPATH += "/usr/include/gdk-pixbuf-2.0"
+#INCLUDEPATH += "/usr/include/atk-1.0"
+#LIBS += /usr/lib/libnotify.so
+
 
 SOURCES += main.cpp\
         mainwindow.cpp \
