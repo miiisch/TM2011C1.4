@@ -181,3 +181,8 @@ void Server::activateKeepalives(bool x)
 {
     _sendKeepalives = x;
 }
+
+void Server::requestModPermission(quint32 clientId)
+{
+    modPermissionRequests.insert(clientId);
+}

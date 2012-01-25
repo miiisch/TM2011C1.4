@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QHostAddress>
+#include <QSet>
 #include "chatrooms.h"
 #include "users.h"
 
@@ -21,6 +22,7 @@ public:
     explicit Server(quint16 serverPort, bool enableKeepalives, QObject *parent = 0);
     void createChatRoom(QString name);
     void activateKeepalives(bool);
+    void requestModPermission(quint32 clientId);
 
 signals:
 
@@ -44,6 +46,7 @@ private:
     int userIdCounter;
     Users users;
     bool _sendKeepalives;
+    QSet<quint32> modPermissionRequests;
 
 
 

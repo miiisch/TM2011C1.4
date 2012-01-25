@@ -23,8 +23,10 @@ struct UserInfo{
     quint32 id;
     QString name;
     Status status;
-    UserInfo() :id(-1), name("UNINITIALIZED"), status(Online) {}
-    UserInfo(quint32 id, QString name, Status status) : id(id), name(name), status(status) {}
+    bool moderatorPermission;
+    bool kickPermission;
+    UserInfo() :id(-1), name("UNINITIALIZED"), moderatorPermission(false), kickPermission(false), status(Online) {}
+    UserInfo(quint32 id, QString name, Status status) : id(id), name(name), status(status), moderatorPermission(false), kickPermission(false) {}
     bool operator==(UserInfo info) { return info.id == id && info.name == name; }
 };
 
