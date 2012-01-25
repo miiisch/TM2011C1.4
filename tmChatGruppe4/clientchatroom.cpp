@@ -129,8 +129,9 @@ void ClientChatRoom::sendMessage(QString text)
                 subType = 3;
             }
 
+
             int giveRights;
-            ok = splitInt(next, giveRights);
+            bool ok = splitInt(next, giveRights);
             if (!ok)
             {
                 QString x = QString("invalid arg: %1").arg(next);
@@ -139,7 +140,7 @@ void ClientChatRoom::sendMessage(QString text)
             }
 
             int uid;
-            bool ok = splitInt(next, uid);
+            ok = splitInt(next, uid);
             if (!ok)
             {
                 QString x = QString("invalid arg: %1").arg(next);
