@@ -19,6 +19,9 @@ public:
     Status status();
     quint32 uid();
     ChatSocket * socket();
+    bool moderatorPermission;
+    bool kickPermission;
+
 
 private:
     quint32 _uid;

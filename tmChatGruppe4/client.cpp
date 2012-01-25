@@ -129,7 +129,9 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
     case 2:
         if(data.subType() == 1)
         {
-            socket->setUserId(data.readInt32());
+            quint32 id = data.readInt32();
+            socket->setUserId(id);
+            server->registerLocalClient(id);
             foreach(ChatRoomInfo* info, joinQueues[socket->ip()]) {
                 sendJoinRequest(socket, info);
             }
