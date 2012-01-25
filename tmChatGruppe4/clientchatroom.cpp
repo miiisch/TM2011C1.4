@@ -89,6 +89,22 @@ void ClientChatRoom::sendMessage(QString text)
             socket()->send(data, false);
             return;
         }
+        else if (text.startsWith("/kick ")) {
+            QString next = text.right(text.length() - QString("/kick ").length());
+            int uid;
+            bool ok = splitInt(next, uid);
+            if (!ok)
+            {
+                QString x = QString("invalid arg: %1").arg(next);
+                window->setStatusMessage(x);
+                return;
+            }
+
+            DataElement data(_id, 8, 2, _userId, uid);
+            data.writeString(next);
+            socket()->send(data, false);
+            return;
+        }
         else
         {
             QString x = QString("unkown command: %1").arg(text);
@@ -282,4 +298,20 @@ void ClientChatRoom::disableChatroom(QString reason)
     emit closed(socket()->ip(), userId());
     window->setStatusMessage(reason);
     window->disableInput();
+}
+
+bool ClientChatRoom::splitInt(QString &s, int &i)
+{
+    QList<QString> split = s.split(" ");
+    if (split.isEmpty())
+        return false;
+
+    bool ok;
+    i = split[0].toInt(&ok);
+    if (!ok) {
+        return false;
+    }
+
+    s = s.right(s.length() - split[0].size());
+    return true;
 }
