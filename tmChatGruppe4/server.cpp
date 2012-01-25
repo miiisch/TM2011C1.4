@@ -182,7 +182,3 @@ void Server::activateKeepalives(bool x)
     _sendKeepalives = x;
 }
 
-void Server::registerLocalClient(quint32 clientId)
-{
-    localClientId = clientId;
-}
