@@ -4,16 +4,16 @@
 #include "server.h"
 
 #include <QTcpSocket>
-#undef signals
-#include <libnotify/notify.h>
-#include <libnotify/notification.h>
+//#undef signals
+//#include <libnotify/notify.h>
+//#include <libnotify/notification.h>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    if(notify_init("tmChatGruppe4"))
-        qDebug("libnotify initialized!");
+//    if(notify_init("tmChatGruppe4"))
+//        qDebug("libnotify initialized!");
 
     quint16 serverPort = 0;
     if (argc == 3)

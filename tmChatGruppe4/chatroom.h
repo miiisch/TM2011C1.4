@@ -26,6 +26,7 @@ private:
     void sendChatMessage(DataElement data);
     void sendPrivateMessage(DataElement data);
     void readStatusMessage(DataElement data, quint32 uid);
+    void readActionMessage(DataElement data, quint32 uid);
     ChatRoomUsers users;
 
     quint32 _id;

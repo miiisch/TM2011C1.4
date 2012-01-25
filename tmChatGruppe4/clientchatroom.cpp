@@ -1,8 +1,8 @@
 #include "clientchatroom.h"
 #include "chatroomwindow.h"
 
-#undef signals
-#include <libnotify/notification.h>
+//#undef signals
+//#include <libnotify/notification.h>
 
 ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, quint32 userId) :
     _id(id), _name(name), _socket(socket), _userId(userId)
@@ -30,6 +30,8 @@ void ClientChatRoom::newData(DataElement data, quint32 userId)
     case 6:
         readStatusMessage(data);
         break;
+    case 9:
+
     default:
         qDebug() << "ClientChatRoom::newData unknown type: " << data.type();
     }
@@ -79,7 +81,7 @@ void ClientChatRoom::sendMessage(QString text)
             else
             {
                 QString x = QString("unkown command: %1").arg(text);
-                window->setErrorMessage(x);
+                window->setStatusMessage(x);
                 return;
             }
             DataElement data(_id, 5, subType, _userId, 0);
@@ -90,7 +92,7 @@ void ClientChatRoom::sendMessage(QString text)
         else
         {
             QString x = QString("unkown command: %1").arg(text);
-            window->setErrorMessage(x);
+            window->setStatusMessage(x);
             return;
         }
     }
@@ -100,7 +102,7 @@ void ClientChatRoom::sendMessage(QString text)
     socket()->send(data, false);
 }
 
-void ClientChatRoom::showChatMessage(DataElement data, quint32 user)
+void ClientChatRoom::showChatMessage(DataElement data, quint32)
 {
     //qDebug() << senderId;
     QString name = "";
@@ -134,11 +136,11 @@ void ClientChatRoom::showChatMessage(DataElement data, quint32 user)
     window->addPublicChatMessage(name, textMessage);
 
     //show message using libnotify, but only when sender wasn't the user itself
-    if(data.sender() != user && !window->hasFocus())
-    {
-        NotifyNotification *notification = notify_notification_new(name.toUtf8().constData(), textMessage.toUtf8().constData(), 0, 0);
-        notify_notification_show(notification, 0);
-    }
+//    if(data.sender() != user && !window->hasFocus())
+//    {
+//        NotifyNotification *notification = notify_notification_new(name.toUtf8().constData(), textMessage.toUtf8().constData(), 0, 0);
+//        notify_notification_show(notification, 0);
+//    }
 }
 
 void ClientChatRoom::showDenyMessage(DataElement data, quint32)
@@ -243,4 +245,37 @@ void ClientChatRoom::serverQuit()
 QString ClientChatRoom::name()
 {
     return _name;
+}
+
+void ClientChatRoom::readActionAceptedMessage(DataElement data)
+{
+    QString sender = userInfo[data.sender()].name;
+    QString receiver = userInfo[data.receiver()].name;
+    switch(data.subType())
+    {
+    case 0:
+        window->addActionMessage("%1 granted %2 kick rights", sender, receiver, data.readString());
+        break;
+    case 1:
+        window->addActionMessage("%1 revoked kick rights from %2", sender, receiver, data.readString());
+        break;
+    case 2:
+        window->addActionMessage("%1 was kicked by %2", sender, receiver, data.readString());
+        if (userId() == data.receiver())
+            disableChatroom("You were kicked");
+        break;
+    case 3:
+        window->addActionMessage("%1 granted %2 mod rights", sender, receiver, data.readString());
+        break;
+    case 4:
+        window->addActionMessage("%1 revoked mod rights from %2", sender, receiver, data.readString());
+        break;
+    }
+}
+
+void ClientChatRoom::disableChatroom(QString reason)
+{
+    emit closed(socket()->ip(), userId());
+    window->setStatusMessage(reason);
+    window->disableInput();
 }

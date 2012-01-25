@@ -29,7 +29,8 @@ public:
     void activate();
     void joinDenied(int reason, QString additional);
     void serverQuit();
-    void setErrorMessage(QString &message, QString bgColor = "red", int timeOut = 5000);
+    void setStatusMessage(QString &message, QString bgColor = "red", int timeOut = 5000);
+    void disableInput();
 
 public slots:
     void returnPressed();

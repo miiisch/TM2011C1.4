@@ -108,7 +108,7 @@ void ChatRoomWindow::serverQuit()
     ui->textInput->setEnabled(false);
 }
 
-void ChatRoomWindow::setErrorMessage(QString &message, QString bgColor, int timeOut)
+void ChatRoomWindow::setStatusMessage(QString &message, QString bgColor, int timeOut)
 {
     ui->chatRoomStatus->setVisible(true);
     ui->chatRoomStatus->setText(message);
@@ -155,4 +155,9 @@ void ChatRoomWindow::addActionMessage(QString text, QString sender, QString rece
 void ChatRoomWindow::addErrorMessage(QString what, QString message, QString reason)
 {
     addLine(QString("<b>%1:</b> %2%3").arg(what, Qt::escape(message), reason.isEmpty() ? "" : Qt::escape(QString(" (%1)").arg(reason))));
+}
+
+void ChatRoomWindow::disableInput()
+{
+    ui->textInput->setEnabled(false);
 }

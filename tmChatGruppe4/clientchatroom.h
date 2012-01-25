@@ -31,11 +31,13 @@ signals:
 private:
     quint32 _id;
     QString _name;
-   void  readStatusMessage(DataElement data);
+    void readStatusMessage(DataElement data);
+    void readActionAceptedMessage(DataElement data);
     ChatSocket * _socket;
     quint32 _userId;
     ChatRoomWindow * window;
     QMap<quint32, UserInfo> userInfo;
+    void disableChatroom(QString reason);
 };
 
 #endif // CLIENTCHATROOM_H
