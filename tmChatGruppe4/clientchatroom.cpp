@@ -76,7 +76,7 @@ void ClientChatRoom::sendMessage(QString text)
             else
             {
                 QString x = QString("unkown command: %1").arg(text);
-                window->addErrorMessage(x);
+                window->setErrorMessage(x);
                 return;
             }
             DataElement data(_id, 5, subType, _userId, 0);
@@ -87,7 +87,7 @@ void ClientChatRoom::sendMessage(QString text)
         else
         {
             QString x = QString("unkown command: %1").arg(text);
-            window->addErrorMessage(x);
+            window->setErrorMessage(x);
             return;
         }
     }
@@ -128,7 +128,7 @@ void ClientChatRoom::showChatMessage(DataElement data, quint32)
     }
     QString textMessage = data.readString();
 
-    window->addLine("<b>" + name + ":</b> " + textMessage);
+    window->addPublicChatMessage(name, textMessage);
 }
 
 void ClientChatRoom::showDenyMessage(DataElement data, quint32)
@@ -146,7 +146,7 @@ void ClientChatRoom::showDenyMessage(DataElement data, quint32)
     QString textMessage = data.readString();
     QString denyMessage = data.readString();
 
-    window->addLine("<b>Message sending denied:</b> " + textMessage + "<b>(" + denyMessage + ")</b>");
+    window->addErrorMessage("Message sending denied", textMessage, denyMessage);
 }
 
 quint32 ClientChatRoom::id()
@@ -167,7 +167,7 @@ void ClientChatRoom::readStatusMessage(DataElement data)
         //qDebug() << "User joined id: " << id << " name: " << string;
         userInfo[id] = UserInfo(id, string, Online);
         window->setUserList(userInfo);
-        window->addLine(QString("<i>%1 joined</i>").arg(string));
+        window->addStatusMessage("%1 joined", string);
         break;
     case 3:
     case 4:
@@ -176,38 +176,26 @@ void ClientChatRoom::readStatusMessage(DataElement data)
         userInfo.remove(id);
         window->setUserList(userInfo);
         QString message = data.subType() == 3 ? "%1 quit" : "Connection with %1 lost";
-        message = message.arg(name);
-        if (!string.isEmpty())
-            message += QString(" (%1)").arg(string);
-        window->addLine(QString("<i>%1</i>").arg(message));
+        window->addStatusMessage(message, name, string);
         break;
     }
     case 0:
     {
-        QString message = QString("<i>%1 is available</i>").arg(name);
-        if (!string.isEmpty())
-            message += QString(" (%1)").arg(string);
-        window->addLine(message);
+        window->addStatusMessage("%1 is available", name, string);
         userInfo[id].status = Online;
         window->setUserList(userInfo);
         break;
     }
     case 1:
     {
-        QString message = QString("<i>%1 is away</i>").arg(name);
-        if (!string.isEmpty())
-            message += QString(" (%1)").arg(string);
-        window->addLine(message);
+        window->addStatusMessage("%1 is away", name, string);
         userInfo[id].status = Away;
         window->setUserList(userInfo);
         break;
     }
     case 2:
     {
-        QString message = QString("<i>%1 is busy</i>").arg(name);
-        if (!string.isEmpty())
-            message += QString(" (%1)").arg(string);
-        window->addLine(message);
+        window->addStatusMessage("%1 is busy", name, string);
         userInfo[id].status = Busy;
         window->setUserList(userInfo);
         break;
