@@ -58,6 +58,7 @@ void ChatRoomWindow::activate()
     ui->chatRoomStatus->setText("Connection established");
     ui->chatRoomStatus->setStyleSheet("background-color: #7fff00;");
     ui->textInput->setEnabled(true);
+    ui->textInput->setFocus();
     setRemoveStatusbarTimer(5000);
 }
 
