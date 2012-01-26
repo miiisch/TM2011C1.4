@@ -34,11 +34,11 @@ private:
     void readStatusMessage(DataElement data);
     void readActionAceptedMessage(DataElement data);
     void readActionDeniedMessage(DataElement data);
+    void disableChatroom(QString reason);
     ChatSocket * _socket;
     quint32 _userId;
     ChatRoomWindow * window;
     QMap<quint32, UserInfo> userInfo;
-    void disableChatroom(QString reason);
     bool splitInt(QString &s, quint32 &i);
 };
 

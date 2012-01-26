@@ -162,9 +162,18 @@ void ClientChatRoom::sendMessage(QString text)
             socket()->send(data, false);
             return;
         }
-        else
+        else if (text.startsWith("/quit"))
         {
-            //try private message
+            QString reason;
+            if (text.size() > QString("/quit").size())
+                reason = text.right(text.length() - QString("/quit ").length());
+            sendUserQuit(true, reason);
+            QString statusMessage = QString("You quit%1").arg(reason.isEmpty() ? "" : QString(" (%1)").arg(reason));
+            disableChatroom(statusMessage);
+            return;
+        }
+        else //try private message
+        {
             QString next = text.right(text.size() - 1);
             quint32 uid;
             if (!splitInt(next, uid))
