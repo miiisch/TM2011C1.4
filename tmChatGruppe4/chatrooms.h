@@ -13,8 +13,9 @@ public:
     ChatRooms();
     void newData(ChatSocket* socket, DataElement data, quint32 userId);
     QMap<quint32, QPair<QString, quint32> > chatRoomsInfo();
-    void addChatRoom(QString name);
+    void addChatRoom(QString name, bool denyAll);
     void userConnectionLost(quint32 uid);
+    void setDenyAll(bool deny);
 
 private:
     quint32 chatRoomIdCounter;

@@ -164,8 +164,19 @@ void ClientChatRoom::sendMessage(QString text)
         }
         else
         {
-            QString x = QString("unkown command: %1").arg(text);
-            window->setStatusMessage(x);
+            //try private message
+            QString next = text.right(text.size() - 1);
+            int uid;
+            if (!splitInt(next, uid))
+            {
+                QString x = QString("unkown command: %1").arg(text);
+                window->setStatusMessage(x);
+                return;
+            }
+
+            DataElement data(_id, 4, 0, _userId, uid);
+            data.writeString(next);
+            socket()->send(data, false);
             return;
         }
     }
@@ -178,35 +189,14 @@ void ClientChatRoom::sendMessage(QString text)
 void ClientChatRoom::showChatMessage(DataElement data, quint32)
 {
     //qDebug() << senderId;
-    QString name = "";
-    if (data.receiver() != 0)
+    QString sender = userInfo[data.sender()].name;
+    if (data.receiver() == 0)
+        window->addPublicChatMessage(sender, data.readString());
+    else
     {
-        name += "[";
+        QString receiver = userInfo[data.receiver()].name;
+        window->addPrivateChatMessage(sender, receiver, data.readString());
     }
-    foreach(UserInfo info, userInfo)
-    {
-        if(info.id == data.sender())
-        {
-            name += info.name;
-            break;
-        }
-    }
-    if (data.receiver() != 0)
-    {
-        name += " -> ";
-        foreach(UserInfo info, userInfo)
-        {
-            if(info.id == data.sender())
-            {
-                name += info.name;
-                break;
-            }
-        }
-        name = "]";
-    }
-    QString textMessage = data.readString();
-
-    window->addPublicChatMessage(name, textMessage);
 
     //show message using libnotify, but only when sender wasn't the user itself
 //    if(data.sender() != user && !window->hasFocus())
@@ -376,7 +366,7 @@ void ClientChatRoom::readActionDeniedMessage(DataElement data)
 void ClientChatRoom::disableChatroom(QString reason)
 {
     emit closed(socket()->ip(), userId());
-    window->setStatusMessage(reason);
+    window->setStatusMessage(reason, "red", 0);
     window->disableInput();
 }
 

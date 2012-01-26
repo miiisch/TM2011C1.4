@@ -9,12 +9,13 @@ class DataElement;
 class ChatRoom
 {
 public:
-    ChatRoom(quint32 id, QString name);
+    ChatRoom(quint32 id, QString name, bool denyAll);
     quint32 chatRoomUsersCount();
     void newData(ChatSocket* socket, DataElement data, quint32 userId);
     void userConnectionLost(quint32 uid);
     quint32 id();
     QString name();
+    void denyAll(bool);
 
 signals:
 
@@ -31,6 +32,7 @@ private:
 
     quint32 _id;
     QString _name;
+    bool _denyAll;
 };
 
 #endif // CHATROOM_H

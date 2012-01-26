@@ -28,6 +28,7 @@ signals:
     void addIp(QHostAddress);
     void enableClientKeepalive(bool);
     void enableServerKeepalive(bool);
+    void enableDenyAll(bool);
 
 private slots:
     void on_actionCreate_ChatRoom_triggered();

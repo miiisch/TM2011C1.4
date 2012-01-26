@@ -7,7 +7,7 @@
 #include "dataelementviewer.h"
 
 Client::Client(QString userName, quint16 serverPort, QObject *parent) :
-    QObject(parent), userName(userName), server(0), serverPort(serverPort), _serverSendKeepalives(true)
+    QObject(parent), userName(userName), server(0), serverPort(serverPort), _serverSendKeepalives(true), _serverDenyAll(false)
 {
     broadCastSocket = new QUdpSocket;
     broadCastSocket->bind(serverPort);
@@ -22,6 +22,7 @@ Client::Client(QString userName, quint16 serverPort, QObject *parent) :
 
     connect(mainWindow, SIGNAL(enableClientKeepalive(bool)), SLOT(enableKeepalivesClient(bool)));
     connect(mainWindow, SIGNAL(enableServerKeepalive(bool)), SLOT(enableKeepalivesServer(bool)));
+    connect(mainWindow, SIGNAL(enableDenyAll(bool)), SLOT(denyAllServer(bool)));
 
     sendBroadCast();
 
@@ -131,7 +132,6 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
         {
             quint32 id = data.readInt32();
             socket->setUserId(id);
-            server->registerLocalClient(id);
             foreach(ChatRoomInfo* info, joinQueues[socket->ip()]) {
                 sendJoinRequest(socket, info);
             }
@@ -191,7 +191,7 @@ void Client::createChatRoom(QString name)
 {
     if(server == 0)
     {
-        server = new Server(serverPort, _serverSendKeepalives);
+        server = new Server(serverPort, _serverSendKeepalives, _serverDenyAll);
     }
     server->createChatRoom(name);
     sendBroadCast();
@@ -213,4 +213,11 @@ void Client::enableKeepalivesServer(bool activate)
 void Client::enableKeepalivesClient(bool activate)
 {
     chatRooms.activateKeepalives(activate);
+}
+
+void Client::denyAllServer(bool denyAll)
+{
+    _serverDenyAll = denyAll;
+    if (server != 0)
+        server->activateDenyAll(denyAll);
 }

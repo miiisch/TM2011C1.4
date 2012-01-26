@@ -93,6 +93,31 @@ void MainWindow::commandLineSlot()
 
         ui->statusBar->showMessage(message, 5000);
     }
+    else if (command.startsWith("set deny "))
+    {
+        QString next = right(command, "set deny ");
+        QString message = "Deny everything %1";
+        if (next == "1")
+        {
+            emit enableDenyAll(true);
+            ui->statusBar->showMessage(message.arg("enabled"));
+        }
+        else if (next == "0")
+        {
+            emit enableDenyAll(false);
+            ui->statusBar->showMessage(message.arg("disabled"));
+        }
+        else
+        {
+            ui->statusBar->showMessage("Unknown command: " + command, 5000);
+            return;
+        }
+    }
+    else if (command.startsWith("create "))
+    {
+        QString next = right(command, "create ");
+        emit createChatRoom(next);
+    }
     else
         ui->statusBar->showMessage("Unknown command: " + command, 5000);
 }

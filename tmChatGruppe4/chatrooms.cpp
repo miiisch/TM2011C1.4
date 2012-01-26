@@ -29,17 +29,23 @@ QMap<quint32, QPair<QString, quint32> > ChatRooms::chatRoomsInfo()
     return infos;
 }
 
-void ChatRooms::addChatRoom(QString name)
+void ChatRooms::addChatRoom(QString name, bool denyAll)
 {
     while(chatRooms.contains(chatRoomIdCounter))
     {
         chatRoomIdCounter++;
     }
-    chatRooms.insert(chatRoomIdCounter, new ChatRoom(chatRoomIdCounter, name));
+    chatRooms.insert(chatRoomIdCounter, new ChatRoom(chatRoomIdCounter, name, denyAll));
 }
 
 void ChatRooms::userConnectionLost(quint32 uid)
 {
     foreach(ChatRoom* room, chatRooms)
         room->userConnectionLost(uid);
+}
+
+void ChatRooms::setDenyAll(bool deny)
+{
+    foreach(ChatRoom* room, chatRooms)
+        room->denyAll(deny);
 }
