@@ -6,12 +6,12 @@
 ChatRoomWindow::ChatRoomWindow(QWidget *parent) :
     QWidget(parent),
     statusbarTimerCounter(0),
+    statusbarStayForever(false),
     ui(new Ui::ChatRoomWindow)
 {
     ui->setupUi(this);
+    setStatusMessage("Waiting for server", "yellow", 0);
     ui->textInput->setEnabled(false);
-    ui->chatRoomStatus->setStyleSheet("background-color: yellow;");
-    ui->chatRoomStatus->setText("Waiting for server");
     connect(ui->textInput,SIGNAL(returnPressed()),SLOT(returnPressed()));
 }
 
@@ -55,17 +55,15 @@ void ChatRoomWindow::setTitle(QString name)
 
 void ChatRoomWindow::activate()
 {
-    ui->chatRoomStatus->setText("Connection established");
-    ui->chatRoomStatus->setStyleSheet("background-color: #7fff00;");
+    setStatusMessage("Connection established", "#7fff00");
     ui->textInput->setEnabled(true);
     ui->textInput->setFocus();
-    setRemoveStatusbarTimer(5000);
 }
 
 void ChatRoomWindow::removeStatusbar()
 {
     statusbarTimerCounter--;
-    if (statusbarTimerCounter == 0)
+    if (statusbarTimerCounter == 0 && !statusbarStayForever)
         ui->chatRoomStatus->setVisible(false);
 }
 
@@ -96,30 +94,26 @@ void ChatRoomWindow::joinDenied(int reason, QString additional)
     }
 
     mainReason += additional.isEmpty() ? "" : " (" + additional + ")";
-    ui->chatRoomStatus->setText("Join Denied: " + mainReason);
-    ui->chatRoomStatus->setStyleSheet("background-color: red;");
+    setStatusMessage("Join Denied " + mainReason, "red", 0);
 }
 
 void ChatRoomWindow::serverQuit()
 {
-    ui->chatRoomStatus->setVisible(true);
-    ui->chatRoomStatus->setText("Server connection closed");
-    ui->chatRoomStatus->setStyleSheet("background-color: red;");
+    setStatusMessage("Server closed connection", "red", 0);
     ui->textInput->setEnabled(false);
 }
 
-void ChatRoomWindow::setStatusMessage(QString &message, QString bgColor, int timeOut)
+void ChatRoomWindow::setStatusMessage(QString message, QString bgColor, int timeOut)
 {
     ui->chatRoomStatus->setVisible(true);
     ui->chatRoomStatus->setText(message);
     ui->chatRoomStatus->setStyleSheet(QString("background-color: %1;").arg(bgColor));
-    setRemoveStatusbarTimer(timeOut);
-}
 
-void ChatRoomWindow::setRemoveStatusbarTimer(int timeOut)
-{
-    if (timeOut != 0)
+    if (timeOut == 0)
+        statusbarStayForever = true;
+    else
     {
+        statusbarStayForever = false;
         statusbarTimerCounter++;
         QTimer::singleShot(timeOut, this, SLOT(removeStatusbar()));
     }

@@ -30,7 +30,7 @@ public:
     void activate();
     void joinDenied(int reason, QString additional);
     void serverQuit();
-    void setStatusMessage(QString &message, QString bgColor = "red", int timeOut = 5000);
+    void setStatusMessage(QString message, QString bgColor = "red", int timeOut = 5000);
     void disableInput();
 
 public slots:
@@ -46,9 +46,9 @@ protected:
 
 private:
     int statusbarTimerCounter;
+    bool statusbarStayForever;
     Ui::ChatRoomWindow *ui;
 
-    void setRemoveStatusbarTimer(int timeOut);
     void addLine(QString);
 };
 
