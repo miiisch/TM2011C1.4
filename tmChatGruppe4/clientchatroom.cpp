@@ -327,9 +327,11 @@ void ClientChatRoom::readActionAceptedMessage(DataElement data)
         window->addActionMessage("%1 revoked kick rights from %2", sender, receiver, data.readString());
         break;
     case 2:
-        window->addActionMessage("%1 was kicked by %2", sender, receiver, data.readString());
+        window->addActionMessage("%2 was kicked by %1", sender, receiver, data.readString());
         if (userId() == data.receiver())
             disableChatroom("You were kicked");
+        userInfo.remove(data.receiver());
+        window->setUserList(userInfo);
         break;
     case 3:
         window->addActionMessage("%1 granted %2 mod rights", sender, receiver, data.readString());
