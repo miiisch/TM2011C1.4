@@ -2,11 +2,13 @@
 #include "ui_dataelementviewer.h"
 #include <QTableWidget>
 #include <QDebug>
+#include <QTime>
 
 DataElementViewer* DataElementViewer::instance = 0;
 
 DataElementViewer::DataElementViewer(QWidget *parent) :
     QMainWindow(parent),
+    log("log"),
     ui(new Ui::DataUnitViewer),
     channelMatcher(".*"),
     typeMatcher(".*"),
@@ -21,17 +23,23 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
     connect(ui->outputTable, SIGNAL(currentCellChanged(int,int,int,int)), SLOT(showDetailedInformation(int)));
 
     QHeaderView * v = ui->outputTable->horizontalHeader();
-    v->resizeSection(0, 130);
-    v->resizeSection(1, 60);
-    v->resizeSection(2, 40);
-    v->resizeSection(3, 100);
-    v->resizeSection(4, 40);
-    v->resizeSection(5, 100);
-    v->resizeSection(6, 100);
-    v->resizeSection(7, 50);
-    v->resizeSection(8, 50);
-    v->resizeSection(9, 40);
-    v->resizeSection(10, 40);
+    int i = 0;
+    v->resizeSection(i++, 75);
+    v->resizeSection(i++, 130);
+    v->resizeSection(i++, 60);
+    v->resizeSection(i++, 40);
+    v->resizeSection(i++, 100);
+    v->resizeSection(i++, 40);
+    v->resizeSection(i++, 100);
+    v->resizeSection(i++, 100);
+    v->resizeSection(i++, 50);
+    v->resizeSection(i++, 50);
+    v->resizeSection(i++, 40);
+    v->resizeSection(i++, 40);
+
+    log.open(QIODevice::WriteOnly | QIODevice::Truncate);
+    ds = new QTextStream(&log);
+    log.flush();
 }
 
 DataElementViewer::~DataElementViewer()
@@ -50,9 +58,15 @@ DataElementViewer * DataElementViewer::getInstance()
 
 void DataElementViewer::addMessage(ClientServer clientServer, Direction direction, Protocol protocol, const QHostAddress & address, DataElement * data)
 {
-    Message m(clientServer, direction, protocol, address, data);
+    QTime time = QTime::currentTime();
+    Message m(clientServer, direction, protocol, address, data, time);
     messages += m;
     append(m);
+    *ds << "[" << m._time << "] Channel " << m._channel << " (" << m._type << " | " << m._subType << ") " << m._sender << " -> " << m._receiver << endl;
+    *ds << m._rawDataHex << endl;
+    *ds << m._rawDataChar << endl;
+    *ds << m._message << endl << endl;
+    log.flush();
 }
 
 void DataElementViewer::update()
@@ -101,6 +115,7 @@ void DataElementViewer::append(const Message & m)
         int col = 0;
         t->insertRow(row);
 
+        t->setItem(row, col++, new QTableWidgetItem(m._time));
         t->setItem(row, col++, new QTableWidgetItem(m._address));
         t->setItem(row, col++, new QTableWidgetItem(m._serverClient));
         t->setItem(row, col++, new QTableWidgetItem(m._direction));

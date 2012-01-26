@@ -5,6 +5,9 @@
 #include "dataelement.h"
 #include <QHostAddress>
 #include <QRegExp>
+#include <QFile>
+#include <QTextStream>
+#include <QTime>
 
 #define TYPE(X) if(data->type()==X)
 #define SUBTYPE(X) if(data->subType()==X)
@@ -62,11 +65,14 @@ private:
     static DataElementViewer * instance;
     explicit DataElementViewer(QWidget *parent = 0);
     ~DataElementViewer();
+    QFile log;
+    QTextStream * ds;
 
 
     Ui::DataUnitViewer *ui;
     struct Message {
-        Message (ClientServer clientServer, Direction direction, Protocol protocol, const QHostAddress & address, DataElement * data) :
+        Message (ClientServer clientServer, Direction direction, Protocol protocol, const QHostAddress & address, DataElement * data, QTime time) :
+            _time(time.toString()),
             _rawDataHex(data->rawDataHex()),
             _rawDataChar(data->rawDataChar()),
             _serverClient(clientServer == Client ? "Client" : "Server"),
@@ -94,6 +100,7 @@ private:
         }
 
         // Strings to put into table
+        QString _time;
         QString _rawDataHex;
         QString _rawDataChar;
         QString _serverClient;

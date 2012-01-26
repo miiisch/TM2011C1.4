@@ -2,3 +2,4 @@
 *-build-desktop
 *.pro.user
 *.moc
+log
