@@ -77,7 +77,15 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
 
     QString joinMessage = data.readString();
     ///qDebug() << "User(" << userName <<  ") joined channel " << _id << " with Message: " << joinMessage;
-    users.addUser(socket, uid, userName, ChatRoomUser::Online);
+    bool moderatorPermission = false;
+    bool kickPermission = false;
+    if(uid == localClientId)
+    {
+        qDebug() << "localClient joined and receives mod and kick permissions";
+        moderatorPermission = true;
+        kickPermission = true;
+    }
+    users.addUser(socket, uid, userName, ChatRoomUser::Online, moderatorPermission, kickPermission);
     QList<ChatRoomUser*> allUsers = users.allUsers();
     ChatRoomUser* newUser = (ChatRoomUser*)users.user(uid);
 
@@ -314,4 +322,9 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
 void ChatRoom::denyAll(bool x)
 {
     _denyAll = x;
+}
+
+void ChatRoom::registerLocalClient(quint32 clientId)
+{
+    localClientId = clientId;
 }

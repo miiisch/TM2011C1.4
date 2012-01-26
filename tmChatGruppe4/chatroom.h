@@ -16,6 +16,7 @@ public:
     quint32 id();
     QString name();
     void denyAll(bool);
+    void registerLocalClient(quint32 clientId);
 
 signals:
 
@@ -33,6 +34,7 @@ private:
     quint32 _id;
     QString _name;
     bool _denyAll;
+    quint32 localClientId;
 };
 
 #endif // CHATROOM_H

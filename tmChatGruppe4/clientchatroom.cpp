@@ -66,7 +66,7 @@ void ClientChatRoom::sendMessage(QString text)
         if (text.startsWith("/set status "))
         {
             QString arg = text.right(text.length() - QString("/set status ").length());
-            int subType;
+            quint32 subType;
             QString message;
             if (arg.startsWith("online"))
             {
@@ -99,7 +99,7 @@ void ClientChatRoom::sendMessage(QString text)
         }
         else if (text.startsWith("/kick ")) {
             QString next = text.right(text.length() - QString("/kick ").length());
-            int uid;
+            quint32 uid;
             bool ok = splitInt(next, uid);
             if (!ok)
             {
@@ -117,7 +117,7 @@ void ClientChatRoom::sendMessage(QString text)
         {
 
             QString next;
-            int subType;
+            quint32 subType;
             if (text.startsWith("/set kick "))
             {
                 next = text.right(text.length() - QString("/set kick ").length());
@@ -130,7 +130,7 @@ void ClientChatRoom::sendMessage(QString text)
             }
 
 
-            int giveRights;
+            quint32 giveRights;
             bool ok = splitInt(next, giveRights);
             if (!ok)
             {
@@ -139,7 +139,7 @@ void ClientChatRoom::sendMessage(QString text)
                 return;
             }
 
-            int uid;
+            quint32 uid;
             ok = splitInt(next, uid);
             if (!ok)
             {
@@ -166,7 +166,7 @@ void ClientChatRoom::sendMessage(QString text)
         {
             //try private message
             QString next = text.right(text.size() - 1);
-            int uid;
+            quint32 uid;
             if (!splitInt(next, uid))
             {
                 QString x = QString("unkown command: %1").arg(text);
@@ -299,7 +299,7 @@ void ClientChatRoom::activate(QMap<quint32, UserInfo> userInfo)
 
 void ClientChatRoom::denyJoin(DataElement &data)
 {
-    int reason = data.subType();
+    quint32 reason = data.subType();
     QString text = data.readString();
     window->joinDenied(reason, text);
 }
@@ -370,7 +370,7 @@ void ClientChatRoom::disableChatroom(QString reason)
     window->disableInput();
 }
 
-bool ClientChatRoom::splitInt(QString &s, int &i)
+bool ClientChatRoom::splitInt(QString &s, quint32 &i)
 {
     QList<QString> split = s.split(" ");
     if (split.isEmpty())

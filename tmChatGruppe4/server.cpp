@@ -18,23 +18,17 @@ Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, QObject 
     connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
     tcpServer->listen(QHostAddress::Any, serverPort);
     tcpPort = tcpServer->serverPort();
-    //qDebug() << " serverport " << tcpPort;
     connect(tcpServer,SIGNAL(newConnection()),SLOT(newConnection()));
 
     //every 2 seconds => keepalives
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(sendKeepAlives()));
     timer->start(2000);
-
-//    if(debug == "1")
-//        debugInitialisierung();
-    //qDebug() << "SERVER STARTED";
 }
 
 void Server::newConnection()
 {
     QTcpSocket * newSocket = tcpServer->nextPendingConnection();
-//    qDebug() << "NEW CONNECTION WITH: " << newSocket->peerAddress() << ":" << newSocket->peerPort();
     newUser(newSocket);
 }
 
@@ -180,7 +174,7 @@ void Server::activateKeepalives(bool x)
 
 void Server::registerLocalClient(quint32 clientId)
 {
-    localClientId = clientId;
+    chatRooms->registerLocalClient(clientId);
 }
 
 void Server::activateDenyAll(bool denyAll)

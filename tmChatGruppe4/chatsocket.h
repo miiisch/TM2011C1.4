@@ -23,6 +23,7 @@ public:
     void resetTimeOutCounter();
     bool handShakeDone();
     void setHandShakeDone();
+    QHostAddress localIp();
 
 signals:
     void newTcpData(DataElement data, quint32 userId, QHostAddress);

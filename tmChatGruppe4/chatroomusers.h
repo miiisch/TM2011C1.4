@@ -10,7 +10,7 @@ public:
     ChatRoomUsers();
     quint32 length();
     ChatRoomUser* user(quint32 uid);
-    void addUser(ChatSocket * socket, quint32 uid, QString userName, ChatRoomUser::Status status);
+    void addUser(ChatSocket * socket, quint32 uid, QString userName, ChatRoomUser::Status status, bool moderatorPermission, bool kickPermission);
     QList<ChatRoomUser*> allUsers();
     void remove(quint32 uid);
     bool contains(quint32 uid);

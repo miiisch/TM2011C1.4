@@ -16,10 +16,12 @@ public:
     void addChatRoom(QString name, bool denyAll);
     void userConnectionLost(quint32 uid);
     void setDenyAll(bool deny);
+    void registerLocalClient(quint32 clientId);
 
 private:
     quint32 chatRoomIdCounter;
     QHash<quint32, ChatRoom*> chatRooms;
+    quint32 localClientId;
 };
 
 #endif // CHATROOMS_H

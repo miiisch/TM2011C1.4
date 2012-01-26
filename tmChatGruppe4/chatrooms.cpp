@@ -4,7 +4,7 @@
 #include <QMap>
 
 ChatRooms::ChatRooms() :
-    chatRoomIdCounter(1)
+    chatRoomIdCounter(1), localClientId(0)
 {
 }
 
@@ -36,6 +36,7 @@ void ChatRooms::addChatRoom(QString name, bool denyAll)
         chatRoomIdCounter++;
     }
     chatRooms.insert(chatRoomIdCounter, new ChatRoom(chatRoomIdCounter, name, denyAll));
+    chatRooms[chatRoomIdCounter]->registerLocalClient(localClientId);
 }
 
 void ChatRooms::userConnectionLost(quint32 uid)
@@ -48,4 +49,13 @@ void ChatRooms::setDenyAll(bool deny)
 {
     foreach(ChatRoom* room, chatRooms)
         room->denyAll(deny);
+}
+
+void ChatRooms::registerLocalClient(quint32 clientId)
+{
+    localClientId = clientId;
+    foreach(quint32 channelId, chatRooms.keys())
+    {
+        chatRooms[channelId]->registerLocalClient(clientId);
+    }
 }

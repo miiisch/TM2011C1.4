@@ -39,7 +39,7 @@ private:
     ChatRoomWindow * window;
     QMap<quint32, UserInfo> userInfo;
     void disableChatroom(QString reason);
-    bool splitInt(QString &s, int &i);
+    bool splitInt(QString &s, quint32 &i);
 };
 
 #endif // CLIENTCHATROOM_H

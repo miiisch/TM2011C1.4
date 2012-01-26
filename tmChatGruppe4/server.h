@@ -44,11 +44,10 @@ private:
     ChatSocket * udpChatSocket;
     quint16 tcpPort;
     ChatRooms * chatRooms;
-    int userIdCounter;
+    quint32 userIdCounter;
     Users users;
     bool _sendKeepalives;
     bool _denyAll;
-    quint32 localClientId;
 
 };
 
