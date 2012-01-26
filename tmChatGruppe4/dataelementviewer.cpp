@@ -18,6 +18,7 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->applyButton, SIGNAL(clicked()), SLOT(update()));
+    connect(ui->outputTable, SIGNAL(currentCellChanged(int,int,int,int)), SLOT(showDetailedInformation(int)));
 }
 
 DataElementViewer::~DataElementViewer()
@@ -99,5 +100,14 @@ void DataElementViewer::append(const Message & m)
         t->setItem(row, col++, new QTableWidgetItem(m._validType));
         t->setItem(row, col++, new QTableWidgetItem(m._validMessage));
     }
+}
+
+void DataElementViewer::showDetailedInformation(int index)
+{
+    Message m = messages[index];
+    ui->rawDataDescription->setText("|----Magic Number-----| |-Length--| |-Channel-| |--Type---| |-Subtype-| |-Sender--| |Reciever-|");
+    ui->rawDataHex->setText(m._rawDataHex);
+    ui->rawDataChar->setText(m._rawDataChar);
+    ui->formattedContent->setText(m._message);
 }
 

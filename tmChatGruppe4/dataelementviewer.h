@@ -55,6 +55,9 @@ public:
     static DataElementViewer * getInstance();
     void addMessage(ClientServer clientServer, Direction direction, Protocol protocol, const QHostAddress & address, DataElement * data);
 
+private slots:
+    void showDetailedInformation(int index);
+
 private:
     static DataElementViewer * instance;
     explicit DataElementViewer(QWidget *parent = 0);
@@ -64,7 +67,8 @@ private:
     Ui::DataUnitViewer *ui;
     struct Message {
         Message (ClientServer clientServer, Direction direction, Protocol protocol, const QHostAddress & address, DataElement * data) :
-            _rawData(data->rawData()),
+            _rawDataHex(data->rawDataHex()),
+            _rawDataChar(data->rawDataChar()),
             _serverClient(clientServer == Client ? "Client" : "Server"),
             _direction(direction == In ? "In" : "Out"),
             _protocol(protocol == Tcp ? "Tcp" : (protocol == UdpUnicast ? "UdpUnicast" : "Broadcast")),
@@ -90,7 +94,8 @@ private:
         }
 
         // Strings to put into table
-        QString _rawData;
+        QString _rawDataHex;
+        QString _rawDataChar;
         QString _serverClient;
         QString _direction;
         QString _protocol;
