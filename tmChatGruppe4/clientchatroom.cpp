@@ -9,7 +9,7 @@ ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, qui
 {
     window = new ChatRoomWindow();
     connect(window,SIGNAL(textEntered(QString)),this,SLOT(sendMessage(QString)));
-    connect(window,SIGNAL(windowClosed()),this,SLOT(sendUserQuit()));
+    connect(window,SIGNAL(windowClosed(bool, QString)),this,SLOT(sendUserQuit(bool, QString)));
     window->setTitle(_name);
     window->show();
 }
@@ -282,12 +282,16 @@ void ClientChatRoom::readStatusMessage(DataElement data)
     }
 }
 
-void ClientChatRoom::sendUserQuit()
+void ClientChatRoom::sendUserQuit(bool joinNotDenied, QString reason)
 {
     emit closed(socket()->ip(), id());
-    DataElement data(_id,5,3,_userId,0);
-    data.writeString("Bye");
-    _socket->send(data, false);
+
+    if(joinNotDenied)
+    {
+        DataElement data(_id,5,3,_userId,0);
+        data.writeString(reason);
+        _socket->send(data, false);
+    }
 }
 
 void ClientChatRoom::activate(QMap<quint32, UserInfo> userInfo)

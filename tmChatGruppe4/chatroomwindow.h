@@ -39,7 +39,7 @@ public slots:
 
 signals:
     void textEntered(QString);
-    void windowClosed();
+    void windowClosed(bool, QString);
 
 protected:
     void closeEvent(QCloseEvent *);
