@@ -152,6 +152,11 @@ void ChatRoomWindow::addActionMessage(QString text, QString sender, QString rece
     addLine(QString("<i>%1%3</i>").arg(Qt::escape(text)).arg(Qt::escape(sender), Qt::escape(receiver), reason.isEmpty() ? "" : Qt::escape(QString(" (%1)").arg(reason))));
 }
 
+void ChatRoomWindow::addActionDeniedMessage(QString text, QString receiver, QString reason)
+{
+    addLine(QString("<i>%1%3</i>").arg(Qt::escape(text)).arg(Qt::escape(receiver), reason.isEmpty() ? "" : Qt::escape(QString(" (%1)").arg(reason))));
+}
+
 void ChatRoomWindow::addErrorMessage(QString what, QString message, QString reason)
 {
     addLine(QString("<b>%1:</b> %2%3").arg(what, Qt::escape(message), reason.isEmpty() ? "" : Qt::escape(QString(" (%1)").arg(reason))));

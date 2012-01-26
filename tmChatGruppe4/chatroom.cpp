@@ -193,6 +193,11 @@ QString ChatRoom::name()
 
 void ChatRoom::readActionMessage(DataElement data, quint32)
 {
+    if (!users.contains(data.receiver()))
+    {
+        qDebug() << "unknown receiver";
+        return;
+    }
     ChatRoomUser sender = *(users.user(data.sender()));
     ChatRoomUser receiver = *(users.user(data.receiver()));
 
@@ -242,12 +247,12 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
     case 2:
         if (sender.kickPermission)
         {
-            users.remove(data.receiver());
             data.setType(9);
             foreach(ChatRoomUser* user, users.allUsers())
             {
                 user->socket()->send(data, true);
             }
+            users.remove(data.receiver());
         }
         else
         {
@@ -257,7 +262,7 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
         break;
 
     case 3:
-        if (sender.moderatorPermission)
+        if (true)//sender.moderatorPermission)
         {
             receiver.moderatorPermission = true;
             data.setType(9);

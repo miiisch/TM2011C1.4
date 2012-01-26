@@ -1,0 +1,16 @@
+Chatroomlist:
+=============
+
+add ip <ip>
+remove ip <ip>
+
+
+Chatroom:
+=========
+
+to send "/<msg>" write "//<msg>"
+
+/set status (online|away|busy) (<reason>)?
+/kick <uid> (<reason>)?
+/set (kick|mod) [01] <uid> (<reason>)?
+

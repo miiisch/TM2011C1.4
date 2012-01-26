@@ -23,6 +23,7 @@ public:
     void addStatusMessage(QString text, QString sender);
     void addStatusMessage(QString text, QString sender, QString reason);
     void addActionMessage(QString text, QString sender, QString receiver, QString reason);
+    void addActionDeniedMessage(QString text, QString receiver, QString reason);
     void addErrorMessage(QString what, QString message, QString reason);
 
     void setTitle(QString name);
