@@ -47,8 +47,15 @@ private:
     int userIdCounter;
     Users users;
     bool _sendKeepalives;
+<<<<<<< HEAD
     bool _denyAll;
     quint32 localClientId;
+=======
+
+
+
+    void debugInitialisierung();
+>>>>>>> xeemed-dev
 };
 
 #endif // SERVER_H
