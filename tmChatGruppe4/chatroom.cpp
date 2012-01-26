@@ -198,22 +198,22 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
         qDebug() << "unknown receiver";
         return;
     }
-    ChatRoomUser sender = *(users.user(data.sender()));
-    ChatRoomUser receiver = *(users.user(data.receiver()));
+    ChatRoomUser *sender = users.user(data.sender());
+    ChatRoomUser *receiver = users.user(data.receiver());
 
     if (!users.contains(data.receiver()))
     {
         data.setType(10);
-        sender.socket()->send(data, true);
+        sender->socket()->send(data, true);
         return;
     }
 
     switch(data.subType())
     {
     case 0:
-        if (sender.moderatorPermission)
+        if (sender->moderatorPermission)
         {
-            receiver.kickPermission = true;
+            receiver->kickPermission = true;
             data.setType(9);
             foreach(ChatRoomUser* user, users.allUsers())
             {
@@ -223,14 +223,14 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
         else
         {
             data.setType(10);
-            sender.socket()->send(data, true);
+            sender->socket()->send(data, true);
         }
         break;
 
     case 1:
-        if (sender.moderatorPermission)
+        if (sender->moderatorPermission)
         {
-            receiver.kickPermission = false;
+            receiver->kickPermission = false;
             data.setType(9);
             foreach(ChatRoomUser* user, users.allUsers())
             {
@@ -240,12 +240,12 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
         else
         {
             data.setType(10);
-            sender.socket()->send(data, true);
+            sender->socket()->send(data, true);
         }
         break;
 
     case 2:
-        if (sender.kickPermission)
+        if (sender->kickPermission)
         {
             data.setType(9);
             foreach(ChatRoomUser* user, users.allUsers())
@@ -257,14 +257,14 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
         else
         {
             data.setType(10);
-            sender.socket()->send(data, true);
+            sender->socket()->send(data, true);
         }
         break;
 
     case 3:
-        if (true)//sender.moderatorPermission)
+        if (true)//sender->moderatorPermission)
         {
-            receiver.moderatorPermission = true;
+            receiver->moderatorPermission = true;
             data.setType(9);
             foreach(ChatRoomUser* user, users.allUsers())
             {
@@ -274,14 +274,14 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
         else
         {
             data.setType(10);
-            sender.socket()->send(data, true);
+            sender->socket()->send(data, true);
         }
         break;
 
     case 4:
-        if (sender.moderatorPermission)
+        if (sender->moderatorPermission)
         {
-            receiver.moderatorPermission = false;
+            receiver->moderatorPermission = false;
             data.setType(9);
             foreach(ChatRoomUser* user, users.allUsers())
             {
@@ -291,7 +291,7 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
         else
         {
             data.setType(10);
-            sender.socket()->send(data, true);
+            sender->socket()->send(data, true);
         }
         break;
     }

@@ -2,7 +2,7 @@ Chatroomlist:
 =============
 
 add ip <ip>
-remove ip <ip>
+set null (client|server)? [01]
 
 
 Chatroom:

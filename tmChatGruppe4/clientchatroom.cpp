@@ -376,7 +376,7 @@ void ClientChatRoom::readActionDeniedMessage(DataElement data)
 void ClientChatRoom::disableChatroom(QString reason)
 {
     emit closed(socket()->ip(), userId());
-    window->setStatusMessage(reason);
+    window->setStatusMessage(reason, "red", 0);
     window->disableInput();
 }
 
