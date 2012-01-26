@@ -8,8 +8,8 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 
-Server::Server(quint16 serverPort, bool enableKeepalives, QObject *parent) :
-    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives)
+Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, QObject *parent) :
+    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll)
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
@@ -168,13 +168,9 @@ void Server::readHandshake(DataElement data, quint32 userId)
     users.user(userId)->socket()->send(newDataElement, true);
 }
 
-void Server::debugInitialisierung()
-{
-}
-
 void Server::createChatRoom(QString name)
 {
-    chatRooms->addChatRoom(name);
+    chatRooms->addChatRoom(name, _denyAll);
 }
 
 void Server::activateKeepalives(bool x)
@@ -185,4 +181,10 @@ void Server::activateKeepalives(bool x)
 void Server::registerLocalClient(quint32 clientId)
 {
     localClientId = clientId;
+}
+
+void Server::activateDenyAll(bool denyAll)
+{
+    _denyAll = denyAll;
+    chatRooms->setDenyAll(denyAll);
 }

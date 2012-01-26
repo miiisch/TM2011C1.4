@@ -93,6 +93,19 @@ void MainWindow::commandLineSlot()
 
         ui->statusBar->showMessage(message, 5000);
     }
+    else if (command.startsWith("set deny "))
+    {
+        QString next = right(command, "set deny ");
+        if (next == "1")
+            emit enableDenyAll(true);
+        else if (next == "0")
+            emit enableDenyAll(false);
+        else
+        {
+            ui->statusBar->showMessage("Unknown command: " + command, 5000);
+            return;
+        }
+    }
     else
         ui->statusBar->showMessage("Unknown command: " + command, 5000);
 }

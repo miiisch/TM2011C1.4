@@ -2,8 +2,8 @@
 #include "dataelement.h"
 #include <QDebug>
 
-ChatRoom::ChatRoom(quint32 id, QString name) :
-    _id(id), _name(name)
+ChatRoom::ChatRoom(quint32 id, QString name, bool denyAll) :
+    _id(id), _name(name), _denyAll(denyAll)
 {
 }
 
@@ -67,6 +67,14 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
         return;
     }
 
+    if (_denyAll)
+    {
+        DataElement data(_id, 3, 2, uid, 0);
+        data.writeString("Server rejecting everything for testing purposes");
+        socket->send(data, true);
+        return;
+    }
+
     QString joinMessage = data.readString();
     ///qDebug() << "User(" << userName <<  ") joined channel " << _id << " with Message: " << joinMessage;
     users.addUser(socket, uid, userName, ChatRoomUser::Online);
@@ -106,6 +114,14 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
 
 void ChatRoom::readChatMessage(DataElement data, quint32)
 {
+    if (_denyAll)
+    {
+        data.setSubType(2);
+        data.writeString("Server rejecting everything for testing purposes");
+        users.user(data.sender())->socket()->send(data, true);
+        return;
+    }
+
     switch(data.receiver())
     {
     case 0:
@@ -295,4 +311,9 @@ void ChatRoom::readActionMessage(DataElement data, quint32)
         }
         break;
     }
+}
+
+void ChatRoom::denyAll(bool x)
+{
+    _denyAll = x;
 }
