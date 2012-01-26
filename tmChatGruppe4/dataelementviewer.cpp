@@ -19,6 +19,19 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
 
     connect(ui->applyButton, SIGNAL(clicked()), SLOT(update()));
     connect(ui->outputTable, SIGNAL(currentCellChanged(int,int,int,int)), SLOT(showDetailedInformation(int)));
+
+    QHeaderView * v = ui->outputTable->horizontalHeader();
+    v->resizeSection(0, 130);
+    v->resizeSection(1, 60);
+    v->resizeSection(2, 40);
+    v->resizeSection(3, 100);
+    v->resizeSection(4, 40);
+    v->resizeSection(5, 100);
+    v->resizeSection(6, 100);
+    v->resizeSection(7, 50);
+    v->resizeSection(8, 50);
+    v->resizeSection(9, 40);
+    v->resizeSection(10, 40);
 }
 
 DataElementViewer::~DataElementViewer()
@@ -99,6 +112,7 @@ void DataElementViewer::append(const Message & m)
         t->setItem(row, col++, new QTableWidgetItem(m._receiver));
         t->setItem(row, col++, new QTableWidgetItem(m._validType));
         t->setItem(row, col++, new QTableWidgetItem(m._validMessage));
+        t->setItem(row, col++, new QTableWidgetItem(m._message));
     }
 }
 
