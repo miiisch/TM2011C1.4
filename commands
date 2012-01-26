@@ -4,6 +4,7 @@ Chatroomlist:
 add ip <ip>
 set null (client|server)? [01]
 set deny [01]
+creat <chatroomname>
 
 Chatroom:
 =========

@@ -113,6 +113,11 @@ void MainWindow::commandLineSlot()
             return;
         }
     }
+    else if (command.startsWith("create "))
+    {
+        QString next = right(command, "create ");
+        emit createChatRoom(next);
+    }
     else
         ui->statusBar->showMessage("Unknown command: " + command, 5000);
 }
