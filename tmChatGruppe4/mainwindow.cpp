@@ -96,10 +96,17 @@ void MainWindow::commandLineSlot()
     else if (command.startsWith("set deny "))
     {
         QString next = right(command, "set deny ");
+        QString message = "Deny everything %1";
         if (next == "1")
+        {
             emit enableDenyAll(true);
+            ui->statusBar->showMessage(message.arg("enabled"));
+        }
         else if (next == "0")
+        {
             emit enableDenyAll(false);
+            ui->statusBar->showMessage(message.arg("disabled"));
+        }
         else
         {
             ui->statusBar->showMessage("Unknown command: " + command, 5000);
