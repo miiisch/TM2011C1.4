@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "createchatroomdialog.h"
+#include "dataelementviewer.h"
 
 MainWindow::MainWindow(Client *client, QWidget *parent) :
     QMainWindow(parent),
@@ -10,6 +11,7 @@ MainWindow::MainWindow(Client *client, QWidget *parent) :
     connect(ui->chatRoomTable,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(cellSelected(int,int)));
     connect(ui->refreshButton, SIGNAL(clicked()), client, SLOT(sendBroadCast()));
     connect(ui->commandLine, SIGNAL(returnPressed()), SLOT(commandLineSlot()));
+    connect(ui->viewerButton, SIGNAL(clicked()), SLOT(showViewer()));
 }
 
 MainWindow::~MainWindow()
@@ -135,4 +137,9 @@ QString MainWindow::right(QString &input, const char cutoffLeft[])
 void MainWindow::closeEvent(QCloseEvent *)
 {
     exit(0);
+}
+
+void MainWindow::showViewer()
+{
+    DataElementViewer::getInstance()->show();
 }

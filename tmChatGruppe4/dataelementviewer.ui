@@ -31,7 +31,7 @@
       </attribute>
       <column>
        <property name="text">
-        <string>rawData</string>
+        <string>host</string>
        </property>
       </column>
       <column>
@@ -81,17 +81,7 @@
       </column>
       <column>
        <property name="text">
-        <string>message</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
         <string>valid message</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>host</string>
        </property>
       </column>
      </widget>
@@ -116,7 +106,7 @@
          <x>0</x>
          <y>0</y>
          <width>1004</width>
-         <height>108</height>
+         <height>104</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -157,9 +147,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_7">
+         <widget class="QLabel" name="formattedContent">
           <property name="text">
-           <string>TextLabel</string>
+           <string/>
           </property>
          </widget>
         </item>
@@ -364,17 +354,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1024</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

@@ -16,7 +16,6 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
     addressMatcher(".*")
 {
     ui->setupUi(this);
-    setWindowState(Qt::WindowMinimized);
 
     connect(ui->applyButton, SIGNAL(clicked()), SLOT(update()));
 }
@@ -31,7 +30,6 @@ DataElementViewer * DataElementViewer::getInstance()
     if (instance == 0)
     {
         instance = new DataElementViewer;
-        instance->show();
     }
     return instance;
 }
@@ -89,7 +87,7 @@ void DataElementViewer::append(const Message & m)
         int col = 0;
         t->insertRow(row);
 
-        t->setItem(row, col++, new QTableWidgetItem(m._rawData));
+        t->setItem(row, col++, new QTableWidgetItem(m._address));
         t->setItem(row, col++, new QTableWidgetItem(m._serverClient));
         t->setItem(row, col++, new QTableWidgetItem(m._direction));
         t->setItem(row, col++, new QTableWidgetItem(m._protocol));
@@ -99,9 +97,7 @@ void DataElementViewer::append(const Message & m)
         t->setItem(row, col++, new QTableWidgetItem(m._sender));
         t->setItem(row, col++, new QTableWidgetItem(m._receiver));
         t->setItem(row, col++, new QTableWidgetItem(m._validType));
-        t->setItem(row, col++, new QTableWidgetItem(m._message));
         t->setItem(row, col++, new QTableWidgetItem(m._validMessage));
-        t->setItem(row, col++, new QTableWidgetItem(m._address));
     }
 }
 
