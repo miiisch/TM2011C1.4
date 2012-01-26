@@ -16,9 +16,22 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
     addressMatcher(".*")
 {
     ui->setupUi(this);
-    setWindowState(Qt::WindowMinimized);
 
     connect(ui->applyButton, SIGNAL(clicked()), SLOT(update()));
+    connect(ui->outputTable, SIGNAL(currentCellChanged(int,int,int,int)), SLOT(showDetailedInformation(int)));
+
+    QHeaderView * v = ui->outputTable->horizontalHeader();
+    v->resizeSection(0, 130);
+    v->resizeSection(1, 60);
+    v->resizeSection(2, 40);
+    v->resizeSection(3, 100);
+    v->resizeSection(4, 40);
+    v->resizeSection(5, 100);
+    v->resizeSection(6, 100);
+    v->resizeSection(7, 50);
+    v->resizeSection(8, 50);
+    v->resizeSection(9, 40);
+    v->resizeSection(10, 40);
 }
 
 DataElementViewer::~DataElementViewer()
@@ -31,7 +44,6 @@ DataElementViewer * DataElementViewer::getInstance()
     if (instance == 0)
     {
         instance = new DataElementViewer;
-        instance->show();
     }
     return instance;
 }
@@ -89,7 +101,7 @@ void DataElementViewer::append(const Message & m)
         int col = 0;
         t->insertRow(row);
 
-        t->setItem(row, col++, new QTableWidgetItem(m._rawData));
+        t->setItem(row, col++, new QTableWidgetItem(m._address));
         t->setItem(row, col++, new QTableWidgetItem(m._serverClient));
         t->setItem(row, col++, new QTableWidgetItem(m._direction));
         t->setItem(row, col++, new QTableWidgetItem(m._protocol));
@@ -99,9 +111,17 @@ void DataElementViewer::append(const Message & m)
         t->setItem(row, col++, new QTableWidgetItem(m._sender));
         t->setItem(row, col++, new QTableWidgetItem(m._receiver));
         t->setItem(row, col++, new QTableWidgetItem(m._validType));
-        t->setItem(row, col++, new QTableWidgetItem(m._message));
         t->setItem(row, col++, new QTableWidgetItem(m._validMessage));
-        t->setItem(row, col++, new QTableWidgetItem(m._address));
+        t->setItem(row, col++, new QTableWidgetItem(m._message));
     }
+}
+
+void DataElementViewer::showDetailedInformation(int index)
+{
+    Message m = messages[index];
+    ui->rawDataDescription->setText("|----Magic Number-----| |-Length--| |-Channel-| |--Type---| |-Subtype-| |-Sender--| |Reciever-|");
+    ui->rawDataHex->setText(m._rawDataHex);
+    ui->rawDataChar->setText(m._rawDataChar);
+    ui->formattedContent->setText(m._message);
 }
 

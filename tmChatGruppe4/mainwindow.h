@@ -33,6 +33,7 @@ signals:
 private slots:
     void on_actionCreate_ChatRoom_triggered();
     void commandLineSlot();
+    void showViewer();
 
 protected:
     void closeEvent(QCloseEvent *);

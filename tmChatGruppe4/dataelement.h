@@ -30,7 +30,8 @@ public:
     QByteArray data();
     operator QString() const;
 
-    QString rawData() const;
+    QString rawDataHex() const;
+    QString rawDataChar() const;
     bool rewind() const;
 
 private:
