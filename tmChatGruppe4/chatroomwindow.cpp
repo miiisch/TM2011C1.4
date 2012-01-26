@@ -1,6 +1,7 @@
 #include "chatroomwindow.h"
 #include "ui_chatroomwindow.h"
 #include <QTimer>
+#include <QTime>
 #include <QTextDocument>
 
 ChatRoomWindow::ChatRoomWindow(QWidget *parent) :
@@ -39,7 +40,7 @@ void ChatRoomWindow::returnPressed()
 
 void ChatRoomWindow::addLine(QString text)
 {
-    ui->textBrowser->append(text);
+    ui->textBrowser->append(QString("[%1] %2").arg(QTime::currentTime().toString(), text));
 }
 
 void ChatRoomWindow::closeEvent(QCloseEvent * e)
