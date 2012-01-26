@@ -146,9 +146,10 @@ void ChatRoom::sendChatMessage(DataElement data)
 
 void ChatRoom::sendPrivateMessage(DataElement data)
 {
-    data.setSubType(2);
+    data.setSubType(1);
     users.user(data.receiver())->socket()->send(data, true);
-    users.user(data.sender())->socket()->send(data, true); // send message to sender (ack)
+    if (data.receiver() != data.sender())
+        users.user(data.sender())->socket()->send(data, true); // send message to sender (ack)
 }
 
 void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
@@ -157,9 +158,6 @@ void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
     //Update serverside
     switch(data.subType())
     {
-//    case X:
-//        currentUser->setName(data.readString());
-//        break;
     case 0:
         currentUser->setStatus(ChatRoomUser::Online);
         break;

@@ -178,7 +178,6 @@ void Server::activateKeepalives(bool x)
     _sendKeepalives = x;
 }
 
-<<<<<<< HEAD
 void Server::registerLocalClient(quint32 clientId)
 {
     localClientId = clientId;
@@ -189,5 +188,3 @@ void Server::activateDenyAll(bool denyAll)
     _denyAll = denyAll;
     chatRooms->setDenyAll(denyAll);
 }
-=======
->>>>>>> xeemed-dev
