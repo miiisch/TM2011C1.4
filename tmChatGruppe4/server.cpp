@@ -7,9 +7,22 @@
 #include "dataelement.h"
 #include <QTimer>
 #include "dataelementviewer.h"
+#include <cstdio>
 
 Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, QObject *parent) :
-    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll)
+    QObject(parent)    chatRooms = new ChatRooms();
+QUdpSocket * socket = new QUdpSocket;
+qDebug() << socket->bind(10222);
+udpChatSocket = new ChatSocket(socket);
+connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
+tcpServer->listen(QHostAddress::Any, serverPort);
+tcpPort = tcpServer->serverPort();
+connect(tcpServer,SIGNAL(newConnection()),SLOT(newConnection()));
+
+//every 2 seconds => keepalives
+QTimer *timer = new QTimer(this);
+connect(timer, SIGNAL(timeout()), this, SLOT(sendKeepAlives()));
+timer->start(2000);, tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll), _gui(gui)
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
@@ -186,4 +199,100 @@ void Server::activateDenyAll(bool denyAll)
 void Server::closeChatRoom(quint32 id, QString text)
 {
     chatRooms->removeChatRoom(id, text);
+}
+
+void Server::newCommand(QString command)
+{
+    ui->commandLine->clear();
+    if (command.startsWith("add ip "))
+    {
+        QHostAddress add(right(command, "add ip "));
+        emit addIp(add);
+        writeStatus("IP Address " + add.toString() + " added", 5000);
+    }
+    else if (command.startsWith("set null "))
+    {
+        QString next = right(command, "set null ");
+        bool client = true;
+        bool server = true;
+        if (next.startsWith("client "))
+        {
+            next = right(next, "client ");
+            server = false;
+        }
+        else if (next.startsWith("server "))
+        {
+            next = right(next, "server ");
+            client = false;
+        }
+
+        if (next != "0" && next != "1") {
+            writeStatus("Unknown command: " + command, 5000);
+            return;
+        }
+
+        bool enable = (next == "1");
+
+        if (client)
+            emit enableClientKeepalive(enable);
+        if (server)
+            emit enableServerKeepalive(enable);
+
+        QString message = "Keepalives ";
+        message += enable ? "enabled " : "disabled ";
+        message += "for ";
+        if (client && server)
+            message += "Client and Server";
+        else
+            message += client ? "Client" : "Server";
+
+        writeStatus(message, 5000);
+    }
+    else if (command.startsWith("set deny "))
+    {
+        QString next = right(command, "set deny ");
+        QString message = "Deny everything %1";
+        if (next == "1")
+        {
+            emit enableDenyAll(true);
+            writeStatus(message.arg("enabled"));
+        }
+        else if (next == "0")
+        {
+            emit enableDenyAll(false);
+            writeStatus(message.arg("disabled"));
+        }
+        else
+        {
+            writeStatus("Unknown command: " + command, 5000);
+            return;
+        }
+    }
+    else if (command.startsWith("create "))
+    {
+        QString next = right(command, "create ");
+        emit createChatRoom(next);
+    }
+    else if (command.startsWith("close "))
+    {
+        quint32 id;
+        QString next = right(command, "close ");
+        bool valid = splitInt(next, id);
+        if (!valid)
+        {
+            writeStatus("Unknown command: " + command, 5000);
+            return;
+        }
+        emit closeChannel(id, next);
+    }
+    else
+        writeStatus("Unknown command: " + command, 5000);
+}
+
+void Server::writeStatus(QString text, int timeOut)
+{
+    if (_gui)
+        emit writeToStatusbar(text, timeOut);
+    else
+        printf(text);
 }

@@ -5,7 +5,7 @@ add ip <ip>
 set null (client|server)? [01]
 set deny [01]
 create <chatroomname>
-close <chatroomid>
+close <chatroomid> (<reason>)?
 
 Chatroom:
 =========

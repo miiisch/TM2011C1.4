@@ -37,7 +37,6 @@ private:
     QUdpSocket * broadCastSocket;
     MainWindow * mainWindow;
     QString userName;
-//    QHash<QHostAddress*, QHash<quint32, ChatRoomInfo*> > chatRoomInfo;
     QList<ChatRoomInfo*> chatRoomInfo;
     ClientChatRooms chatRooms;
     QHash<QHostAddress,QList<ChatRoomInfo*> > joinQueues;

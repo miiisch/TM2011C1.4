@@ -10,23 +10,50 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication * a;
 
 //    if(notify_init("tmChatGruppe4"))
 //        qDebug("libnotify initialized!");
 
-    quint16 serverPort = 0;
-    if (argc == 3)
+    QString usage = QString("Usage: %s <username> [-p <port>] [--no-gui]").arg(argv[0]);
+
+    quint16 port = 0;
+    bool gui = true;
+
+    if (argc < 2)
+        qFatal(usage);
+    QString name = argv[1];
+    for (int i = 0; i < argv; ++i)
     {
-        bool ok;
-        serverPort = QString(argv[2]).toInt(&ok);
-        if (!ok)
-            qFatal("Usage: %s username [server port]", argv[0]);
+        if (argv[i] == "-p")
+        {
+            i++;
+            if (argc == i)
+                qFatal(usage);
+            QString portString = argv[i];
+            bool ok;
+            port = portString.toInt(&ok);
+            if (!ok)
+                qFatal(usage);
+        }
+        else if (argv[i] == "--no-gui")
+        {
+            gui = false;
+        }
+        else
+            qFatal(usage);
     }
-    else if (argc != 2)
-         qFatal("Usage: %s username [server port]", argv[0]);
 
-    new Client(argv[1], serverPort);
+    if (gui)
+    {
+        a = new QApplication(argc, argv);
+        new Client(name, port, gui);
+    }
+    else
+    {
+        a = new QCoreApplication(argc, argv);
+        new Server(port, true, false, false);
+    }
 
-    return a.exec();
+    return a->exec();
 }
