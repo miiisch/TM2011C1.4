@@ -327,3 +327,11 @@ void ChatRoom::registerLocalClient(quint32 clientId)
 {
     localClientId = clientId;
 }
+
+void ChatRoom::close(QString reason)
+{
+    DataElement data(_id, 7, 0, 0, 0);
+    data.writeString(reason);
+    foreach (ChatRoomUser* user, users.allUsers())
+        user->socket()->send(data, true);
+}

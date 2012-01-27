@@ -23,6 +23,7 @@ Client::Client(QString userName, quint16 serverPort, QObject *parent) :
     connect(mainWindow, SIGNAL(enableClientKeepalive(bool)), SLOT(enableKeepalivesClient(bool)));
     connect(mainWindow, SIGNAL(enableServerKeepalive(bool)), SLOT(enableKeepalivesServer(bool)));
     connect(mainWindow, SIGNAL(enableDenyAll(bool)), SLOT(denyAllServer(bool)));
+    connect(mainWindow, SIGNAL(closeChannel(quint32,QString)), SLOT(closeChatRoom(quint32,QString)));
 
     sendBroadCast();
 
@@ -225,4 +226,11 @@ void Client::denyAllServer(bool denyAll)
     _serverDenyAll = denyAll;
     if (server != 0)
         server->activateDenyAll(denyAll);
+}
+
+void Client::closeChatRoom(quint32 id, QString message)
+{
+    if (server != 0)
+        server->closeChatRoom(id, message);
+    sendBroadCast();
 }

@@ -17,10 +17,7 @@ public:
     QString name();
     void denyAll(bool);
     void registerLocalClient(quint32 clientId);
-
-signals:
-
-public slots:
+    void close(QString reason);
 
 private:
     void readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid);

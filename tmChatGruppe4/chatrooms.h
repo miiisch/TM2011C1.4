@@ -14,6 +14,7 @@ public:
     void newData(ChatSocket* socket, DataElement data, quint32 userId);
     QMap<quint32, QPair<QString, quint32> > chatRoomsInfo();
     void addChatRoom(QString name, bool denyAll);
+    void removeChatRoom(uint id, QString reason);
     void userConnectionLost(quint32 uid);
     void setDenyAll(bool deny);
     void registerLocalClient(quint32 clientId);

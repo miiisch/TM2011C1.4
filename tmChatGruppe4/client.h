@@ -30,6 +30,7 @@ private slots:
     void enableKeepalivesServer(bool);
     void enableKeepalivesClient(bool);
     void denyAllServer(bool);
+    void closeChatRoom(quint32 id, QString message);
 
 private:
     ChatSocket * udpSocket;

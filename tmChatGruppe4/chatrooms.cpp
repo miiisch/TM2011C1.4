@@ -59,3 +59,12 @@ void ChatRooms::registerLocalClient(quint32 clientId)
         chatRooms[channelId]->registerLocalClient(clientId);
     }
 }
+
+void ChatRooms::removeChatRoom(uint id, QString reason)
+{
+    if (chatRooms.contains(id))
+    {
+        chatRooms[id]->close(reason);
+        chatRooms.remove(id);
+    }
+}
