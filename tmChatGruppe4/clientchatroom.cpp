@@ -34,6 +34,14 @@ void ClientChatRoom::newData(DataElement data, quint32 userId)
     case 6:
         readStatusMessage(data);
         break;
+    case 7:
+    {
+        QString reason = data.readString();
+        if (!reason.isEmpty())
+            reason = QString(" (%1)").arg(reason);
+        disableChatroom(QString("Server closed Chatroom%1").arg(reason));
+        break;
+    }
     case 9:
         readActionAceptedMessage(data);
         break;
@@ -340,7 +348,10 @@ void ClientChatRoom::readActionAceptedMessage(DataElement data)
         window->addActionMessage("%1 revoked kick rights from %2", sender, receiver, data.readString());
         break;
     case 2:
-        window->addActionMessage("%2 was kicked by %1", sender, receiver, data.readString());
+        if (data.sender() == data.receiver())
+            window->addStatusMessage("%1 kicked himself", sender, data.readString());
+        else
+            window->addActionMessage("%2 was kicked by %1", sender, receiver, data.readString());
         if (userId() == data.receiver())
             disableChatroom("You were kicked");
         userInfo.remove(data.receiver());

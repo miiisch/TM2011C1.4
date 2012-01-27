@@ -182,3 +182,8 @@ void Server::activateDenyAll(bool denyAll)
     _denyAll = denyAll;
     chatRooms->setDenyAll(denyAll);
 }
+
+void Server::closeChatRoom(quint32 id, QString text)
+{
+    chatRooms->removeChatRoom(id, text);
+}

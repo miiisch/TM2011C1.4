@@ -24,6 +24,7 @@ public:
     void activateKeepalives(bool);
     void activateDenyAll(bool);
     void registerLocalClient(quint32 clientId);
+    void closeChatRoom(quint32 id, QString text);
 
 signals:
 

@@ -120,6 +120,18 @@ void MainWindow::commandLineSlot()
         QString next = right(command, "create ");
         emit createChatRoom(next);
     }
+    else if (command.startsWith("close "))
+    {
+        quint32 id;
+        QString next = right(command, "close ");
+        bool valid = splitInt(next, id);
+        if (!valid)
+        {
+            ui->statusBar->showMessage("Unknown command: " + command, 5000);
+            return;
+        }
+        emit closeChannel(id, next);
+    }
     else
         ui->statusBar->showMessage("Unknown command: " + command, 5000);
 }
@@ -142,4 +154,22 @@ void MainWindow::closeEvent(QCloseEvent *)
 void MainWindow::showViewer()
 {
     DataElementViewer::getInstance()->show();
+}
+
+bool MainWindow::splitInt(QString &s, quint32 &i)
+{
+    QList<QString> split = s.split(" ");
+    if (split.isEmpty())
+        return false;
+
+    bool ok;
+    i = split[0].toInt(&ok);
+    if (!ok) {
+        return false;
+    }
+
+    if (split.size() > 0)
+        s = s.right(s.length() - split[0].size() - (split.size() > 1 ? 1 : 0));
+
+    return true;
 }

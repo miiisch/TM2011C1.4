@@ -29,6 +29,7 @@ signals:
     void enableClientKeepalive(bool);
     void enableServerKeepalive(bool);
     void enableDenyAll(bool);
+    void closeChannel(quint32 id, QString message);
 
 private slots:
     void on_actionCreate_ChatRoom_triggered();
@@ -43,6 +44,7 @@ private:
     QHash<int, quint32> chatRoomIds;
 
     QString right(QString & input, const char cutoffLeft[]);
+    bool splitInt(QString &s, quint32 &i);
 };
 
 #endif // MAINWINDOW_H
