@@ -44,6 +44,7 @@ signals:
 protected:
     void closeEvent(QCloseEvent *);
 
+
 private:
     int statusbarTimerCounter;
     bool statusbarStayForever;

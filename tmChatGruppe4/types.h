@@ -9,8 +9,9 @@ struct ChatRoomInfo{
     QString name;
     quint32 numberOfUsers;
     QHostAddress address;
-    ChatRoomInfo(quint16 tcpPort, quint32 id, QString name, quint32 numberOfUsers, QHostAddress address)
-        : tcpPort(tcpPort), id(id), name(name), numberOfUsers(numberOfUsers), address(address){}
+    bool isLocalChatRoom;
+    ChatRoomInfo(quint16 tcpPort, quint32 id, QString name, quint32 numberOfUsers, QHostAddress address, bool isLocalChatRoom)
+        : tcpPort(tcpPort), id(id), name(name), numberOfUsers(numberOfUsers), address(address), isLocalChatRoom(isLocalChatRoom){}
 };
 
 enum Status{

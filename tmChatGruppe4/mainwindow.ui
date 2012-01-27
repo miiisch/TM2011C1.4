@@ -81,7 +81,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLineEdit" name="commandLine"/>
+       <widget class="CommandLine" name="commandLine"/>
       </item>
       <item>
        <widget class="QPushButton" name="refreshButton">
@@ -107,7 +107,7 @@
      <x>0</x>
      <y>0</y>
      <width>718</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
@@ -126,6 +126,13 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>CommandLine</class>
+   <extends>QLineEdit</extends>
+   <header>commandline.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

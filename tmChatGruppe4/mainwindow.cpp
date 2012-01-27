@@ -27,7 +27,7 @@ void MainWindow::setChatRoomInfo(QList<ChatRoomInfo*> chatRoomsInfo)
         int rowCount = ui->chatRoomTable->rowCount();
         chatRoomIds.insert(rowCount, chatRoomInfo->id);
         ui->chatRoomTable->insertRow(rowCount);
-        ui->chatRoomTable->setItem(rowCount, 0, new QTableWidgetItem(chatRoomInfo->address.toString(), Qt::NoItemFlags));
+        ui->chatRoomTable->setItem(rowCount, 0, new QTableWidgetItem(chatRoomInfo->address.toString() + "*", Qt::NoItemFlags));
         ui->chatRoomTable->setItem(rowCount, 1, new QTableWidgetItem(QString::number(chatRoomInfo->id), Qt::NoItemFlags));
         ui->chatRoomTable->setItem(rowCount, 2, new QTableWidgetItem(QString::number(chatRoomInfo->numberOfUsers), Qt::NoItemFlags));
         ui->chatRoomTable->setItem(rowCount, 3, new QTableWidgetItem(chatRoomInfo->name,Qt::NoItemFlags));
