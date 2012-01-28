@@ -52,11 +52,6 @@ void MainWindow::clearChatRoomInfo()
     ui->chatRoomTable->model()->removeRows(0,ui->chatRoomTable->rowCount());
 }
 
-QString MainWindow::right(QString &input, const char cutoffLeft[])
-{
-    return input.right(input.length() - QString(cutoffLeft).length());
-}
-
 void MainWindow::closeEvent(QCloseEvent *)
 {
     exit(0);
@@ -65,24 +60,6 @@ void MainWindow::closeEvent(QCloseEvent *)
 void MainWindow::showViewer()
 {
     DataElementViewer::getInstance()->show();
-}
-
-bool MainWindow::splitInt(QString &s, quint32 &i)
-{
-    QList<QString> split = s.split(" ");
-    if (split.isEmpty())
-        return false;
-
-    bool ok;
-    i = split[0].toInt(&ok);
-    if (!ok) {
-        return false;
-    }
-
-    if (split.size() > 0)
-        s = s.right(s.length() - split[0].size() - (split.size() > 1 ? 1 : 0));
-
-    return true;
 }
 
 void MainWindow::setCommandLineText(QString text, int timeout)

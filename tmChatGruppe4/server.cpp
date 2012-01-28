@@ -9,20 +9,8 @@
 #include "dataelementviewer.h"
 #include <cstdio>
 
-Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, QObject *parent) :
-    QObject(parent)    chatRooms = new ChatRooms();
-QUdpSocket * socket = new QUdpSocket;
-qDebug() << socket->bind(10222);
-udpChatSocket = new ChatSocket(socket);
-connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
-tcpServer->listen(QHostAddress::Any, serverPort);
-tcpPort = tcpServer->serverPort();
-connect(tcpServer,SIGNAL(newConnection()),SLOT(newConnection()));
-
-//every 2 seconds => keepalives
-QTimer *timer = new QTimer(this);
-connect(timer, SIGNAL(timeout()), this, SLOT(sendKeepAlives()));
-timer->start(2000);, tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll), _gui(gui)
+Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, bool gui, QObject *parent) :
+    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll), _gui(gui)
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
@@ -203,10 +191,10 @@ void Server::closeChatRoom(quint32 id, QString text)
 
 void Server::newCommand(QString command)
 {
-    ui->commandLine->clear();
     if (command.startsWith("add ip "))
     {
-        QHostAddress add(right(command, "add ip "));
+        QString address = right(command, "add ip ");
+        QHostAddress add(address);
         emit addIp(add);
         writeStatus("IP Address " + add.toString() + " added", 5000);
     }
@@ -295,4 +283,27 @@ void Server::writeStatus(QString text, int timeOut)
         emit writeToStatusbar(text, timeOut);
     else
         printf(text);
+}
+
+QString Server::right(QString &input, const char cutoffLeft[])
+{
+    return input.right(input.length() - QString(cutoffLeft).length());
+}
+
+bool Server::splitInt(QString &s, quint32 &i)
+{
+    QList<QString> split = s.split(" ");
+    if (split.isEmpty())
+        return false;
+
+    bool ok;
+    i = split[0].toInt(&ok);
+    if (!ok) {
+        return false;
+    }
+
+    if (split.size() > 0)
+        s = s.right(s.length() - split[0].size() - (split.size() > 1 ? 1 : 0));
+
+    return true;
 }

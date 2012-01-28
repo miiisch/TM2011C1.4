@@ -21,33 +21,33 @@ int main(int argc, char *argv[])
     bool gui = true;
 
     if (argc < 2)
-        qFatal(usage);
+        qFatal("%s", qPrintable(usage));
     QString name = argv[1];
-    for (int i = 0; i < argv; ++i)
+    for (int i = 0; i < argc; ++i)
     {
-        if (argv[i] == "-p")
+        if (qstrcmp(argv[i], "-p") == 0)
         {
             i++;
             if (argc == i)
-                qFatal(usage);
+                qFatal("%s", qPrintable(usage));
             QString portString = argv[i];
             bool ok;
             port = portString.toInt(&ok);
             if (!ok)
-                qFatal(usage);
+                qFatal("%s", qPrintable(usage));
         }
-        else if (argv[i] == "--no-gui")
+        else if (qstrcmp(argv[i], "--no-gui") == 0)
         {
             gui = false;
         }
         else
-            qFatal(usage);
+            qFatal("%s", qPrintable(usage));
     }
 
     if (gui)
     {
         a = new QApplication(argc, argv);
-        new Client(name, port, gui);
+        new Client(name, port);
     }
     else
     {

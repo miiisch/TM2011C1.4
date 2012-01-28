@@ -54,6 +54,9 @@ private:
     bool _denyAll;
     bool _gui;
 
+    QString right(QString &input, const char cutoffLeft[]);
+    bool splitInt(QString &s, quint32 &i);
+
 };
 
 #endif // SERVER_H

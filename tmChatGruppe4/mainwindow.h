@@ -43,9 +43,6 @@ protected:
 private:
     Ui::MainWindow *ui;
     QHash<int, quint32> chatRoomIds;
-
-    QString right(QString & input, const char cutoffLeft[]);
-    bool splitInt(QString &s, quint32 &i);
 };
 
 #endif // MAINWINDOW_H
