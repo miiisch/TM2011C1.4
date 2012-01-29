@@ -32,10 +32,12 @@ signals:
 //    void enableServerKeepalive(bool);
 //    void enableDenyAll(bool);
 //    void closeChannel(quint32 id, QString message);
+    void processCommand(QString);
 
 private slots:
     void on_actionCreate_ChatRoom_triggered();
     void showViewer();
+    void sendCommandFromCommandLine();
 
 protected:
     void closeEvent(QCloseEvent *);

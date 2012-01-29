@@ -39,7 +39,9 @@ SOURCES += main.cpp\
     clientchatroom.cpp \
     chatroomwindow.cpp \
     createchatroomdialog.cpp \
-    dataelementviewer.cpp
+    dataelementviewer.cpp \
+    commandprocessor.cpp \
+    stdinreader.cpp
 
 HEADERS  += mainwindow.h \
     server.h \
@@ -57,7 +59,9 @@ HEADERS  += mainwindow.h \
     chatroomwindow.h \
     types.h \
     createchatroomdialog.h \
-    dataelementviewer.h
+    dataelementviewer.h \
+    commandprocessor.h \
+    stdinreader.h
 
 FORMS    += mainwindow.ui \
     chatroomwindow.ui \

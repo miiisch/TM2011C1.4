@@ -10,7 +10,7 @@ MainWindow::MainWindow(Client *client, QWidget *parent) :
     ui->setupUi(this);
     connect(ui->chatRoomTable,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(cellSelected(int,int)));
     connect(ui->refreshButton, SIGNAL(clicked()), client, SLOT(sendBroadCast()));
-    connect(ui->commandLine, SIGNAL(returnPressed()), SLOT(commandLineSlot()));
+    connect(ui->commandLine, SIGNAL(returnPressed()), SLOT(sendCommandFromCommandLine()));
     connect(ui->viewerButton, SIGNAL(clicked()), SLOT(showViewer()));
 }
 
@@ -65,4 +65,10 @@ void MainWindow::showViewer()
 void MainWindow::setCommandLineText(QString text, int timeout)
 {
     ui->statusBar->showMessage(text, timeout);
+}
+
+void MainWindow::sendCommandFromCommandLine()
+{
+    emit processCommand(ui->commandLine->text());
+    ui->commandLine->clear();
 }
