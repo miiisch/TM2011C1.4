@@ -8,8 +8,8 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 
-Server::Server(quint16 serverPort, bool enableKeepalives, QObject *parent) :
-    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives)
+Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, QObject *parent) :
+    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll)
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
@@ -18,23 +18,17 @@ Server::Server(quint16 serverPort, bool enableKeepalives, QObject *parent) :
     connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
     tcpServer->listen(QHostAddress::Any, serverPort);
     tcpPort = tcpServer->serverPort();
-    //qDebug() << " serverport " << tcpPort;
     connect(tcpServer,SIGNAL(newConnection()),SLOT(newConnection()));
 
     //every 2 seconds => keepalives
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(sendKeepAlives()));
     timer->start(2000);
-
-//    if(debug == "1")
-//        debugInitialisierung();
-    //qDebug() << "SERVER STARTED";
 }
 
 void Server::newConnection()
 {
     QTcpSocket * newSocket = tcpServer->nextPendingConnection();
-//    qDebug() << "NEW CONNECTION WITH: " << newSocket->peerAddress() << ":" << newSocket->peerPort();
     newUser(newSocket);
 }
 
@@ -117,7 +111,7 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16
                                                      DataElementViewer::Out,
                                                      DataElementViewer::UdpUnicast,
                                                      *peerAddress,
-                                                     &data);
+                                                     &newDataElement);
     } else {
         qDebug() << "Unknown broadcast";
     }
@@ -168,16 +162,28 @@ void Server::readHandshake(DataElement data, quint32 userId)
     users.user(userId)->socket()->send(newDataElement, true);
 }
 
-void Server::debugInitialisierung()
-{
-}
-
 void Server::createChatRoom(QString name)
 {
-    chatRooms->addChatRoom(name);
+    chatRooms->addChatRoom(name, _denyAll);
 }
 
 void Server::activateKeepalives(bool x)
 {
     _sendKeepalives = x;
+}
+
+void Server::registerLocalClient(quint32 clientId)
+{
+    chatRooms->registerLocalClient(clientId);
+}
+
+void Server::activateDenyAll(bool denyAll)
+{
+    _denyAll = denyAll;
+    chatRooms->setDenyAll(denyAll);
+}
+
+void Server::closeChatRoom(quint32 id, QString text)
+{
+    chatRooms->removeChatRoom(id, text);
 }

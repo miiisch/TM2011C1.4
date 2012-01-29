@@ -12,13 +12,16 @@ public:
         Away,
         Busy
     };
-    ChatRoomUser(ChatSocket* socket, quint32 uid, QString name, Status status);
+    ChatRoomUser(ChatSocket* socket, quint32 uid, QString name, Status status, bool moderatorPermission , bool kickPermission);
     void setName(QString name);
     void setStatus(ChatRoomUser::Status status);
     QString name();
     Status status();
     quint32 uid();
     ChatSocket * socket();
+    bool moderatorPermission;
+    bool kickPermission;
+
 
 private:
     quint32 _uid;

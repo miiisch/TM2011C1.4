@@ -1,7 +1,7 @@
 #include "chatroomuser.h"
 
-ChatRoomUser::ChatRoomUser(ChatSocket* socket, quint32 uid, QString name, Status status) :
-    _uid(uid), _socket(socket), _name(name), _status(status)
+ChatRoomUser::ChatRoomUser(ChatSocket *socket, quint32 uid, QString name, Status status, bool moderatorPermission, bool kickPermission) :
+    moderatorPermission(moderatorPermission), kickPermission(kickPermission), _uid(uid), _socket(socket), _name(name), _status(status)
 {
 }
 

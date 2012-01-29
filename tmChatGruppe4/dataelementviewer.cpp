@@ -2,11 +2,13 @@
 #include "ui_dataelementviewer.h"
 #include <QTableWidget>
 #include <QDebug>
+#include <QTime>
 
 DataElementViewer* DataElementViewer::instance = 0;
 
 DataElementViewer::DataElementViewer(QWidget *parent) :
     QMainWindow(parent),
+    log("log"),
     ui(new Ui::DataUnitViewer),
     channelMatcher(".*"),
     typeMatcher(".*"),
@@ -16,9 +18,28 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
     addressMatcher(".*")
 {
     ui->setupUi(this);
-    setWindowState(Qt::WindowMinimized);
 
     connect(ui->applyButton, SIGNAL(clicked()), SLOT(update()));
+    connect(ui->outputTable, SIGNAL(currentCellChanged(int,int,int,int)), SLOT(showDetailedInformation(int)));
+
+    QHeaderView * v = ui->outputTable->horizontalHeader();
+    int i = 0;
+    v->resizeSection(i++, 75);
+    v->resizeSection(i++, 130);
+    v->resizeSection(i++, 60);
+    v->resizeSection(i++, 40);
+    v->resizeSection(i++, 100);
+    v->resizeSection(i++, 40);
+    v->resizeSection(i++, 100);
+    v->resizeSection(i++, 100);
+    v->resizeSection(i++, 50);
+    v->resizeSection(i++, 50);
+    v->resizeSection(i++, 40);
+    v->resizeSection(i++, 40);
+
+    log.open(QIODevice::WriteOnly | QIODevice::Truncate);
+    ds = new QTextStream(&log);
+    log.flush();
 }
 
 DataElementViewer::~DataElementViewer()
@@ -31,16 +52,21 @@ DataElementViewer * DataElementViewer::getInstance()
     if (instance == 0)
     {
         instance = new DataElementViewer;
-        instance->show();
     }
     return instance;
 }
 
 void DataElementViewer::addMessage(ClientServer clientServer, Direction direction, Protocol protocol, const QHostAddress & address, DataElement * data)
 {
-    Message m(clientServer, direction, protocol, address, data);
+    QTime time = QTime::currentTime();
+    Message m(clientServer, direction, protocol, address, data, time);
     messages += m;
     append(m);
+    *ds << "[" << m._time << "] Channel " << m._channel << " (" << m._type << " | " << m._subType << ") " << m._sender << " -> " << m._receiver << endl;
+    *ds << m._rawDataHex << endl;
+    *ds << m._rawDataChar << endl;
+    *ds << m._message << endl << endl;
+    log.flush();
 }
 
 void DataElementViewer::update()
@@ -89,7 +115,8 @@ void DataElementViewer::append(const Message & m)
         int col = 0;
         t->insertRow(row);
 
-        t->setItem(row, col++, new QTableWidgetItem(m._rawData));
+        t->setItem(row, col++, new QTableWidgetItem(m._time));
+        t->setItem(row, col++, new QTableWidgetItem(m._address));
         t->setItem(row, col++, new QTableWidgetItem(m._serverClient));
         t->setItem(row, col++, new QTableWidgetItem(m._direction));
         t->setItem(row, col++, new QTableWidgetItem(m._protocol));
@@ -99,9 +126,17 @@ void DataElementViewer::append(const Message & m)
         t->setItem(row, col++, new QTableWidgetItem(m._sender));
         t->setItem(row, col++, new QTableWidgetItem(m._receiver));
         t->setItem(row, col++, new QTableWidgetItem(m._validType));
-        t->setItem(row, col++, new QTableWidgetItem(m._message));
         t->setItem(row, col++, new QTableWidgetItem(m._validMessage));
-        t->setItem(row, col++, new QTableWidgetItem(m._address));
+        t->setItem(row, col++, new QTableWidgetItem(m._message));
     }
+}
+
+void DataElementViewer::showDetailedInformation(int index)
+{
+    Message m = messages[index];
+    ui->rawDataDescription->setText("|----Magic Number-----| |-Length--| |-Channel-| |--Type---| |-Subtype-| |-Sender--| |Reciever-|");
+    ui->rawDataHex->setText(m._rawDataHex);
+    ui->rawDataChar->setText(m._rawDataChar);
+    ui->formattedContent->setText(m._message);
 }
 

@@ -2,8 +2,8 @@
 #include "dataelement.h"
 #include <QDebug>
 
-ChatRoom::ChatRoom(quint32 id, QString name) :
-    _id(id), _name(name)
+ChatRoom::ChatRoom(quint32 id, QString name, bool denyAll) :
+    _id(id), _name(name), _denyAll(denyAll)
 {
 }
 
@@ -35,6 +35,12 @@ void ChatRoom::newData(ChatSocket* socket, DataElement data, quint32 userId)
         else
             qDebug() << "Unknown SubType";
         break;
+    case 8:
+        if (data.subType() <= 4)
+            readActionMessage(data, userId);
+        else
+            qDebug() << "Unknown SubType";
+        break;
 
     default:
         qDebug() << "Unknown Type";
@@ -61,9 +67,24 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
         return;
     }
 
+    if (_denyAll)
+    {
+        DataElement data(_id, 3, 2, uid, 0);
+        data.writeString("Server rejecting everything for testing purposes");
+        socket->send(data, true);
+        return;
+    }
+
     QString joinMessage = data.readString();
     ///qDebug() << "User(" << userName <<  ") joined channel " << _id << " with Message: " << joinMessage;
-    users.addUser(socket, uid, userName, ChatRoomUser::Online);
+    bool moderatorPermission = false;
+    bool kickPermission = false;
+    if(uid == localClientId)
+    {
+        moderatorPermission = true;
+        kickPermission = true;
+    }
+    users.addUser(socket, uid, userName, ChatRoomUser::Online, moderatorPermission, kickPermission);
     QList<ChatRoomUser*> allUsers = users.allUsers();
     ChatRoomUser* newUser = (ChatRoomUser*)users.user(uid);
 
@@ -100,6 +121,14 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
 
 void ChatRoom::readChatMessage(DataElement data, quint32)
 {
+    if (_denyAll)
+    {
+        data.setSubType(2);
+        data.writeString("Server rejecting everything for testing purposes");
+        users.user(data.sender())->socket()->send(data, true);
+        return;
+    }
+
     switch(data.receiver())
     {
     case 0:
@@ -124,9 +153,10 @@ void ChatRoom::sendChatMessage(DataElement data)
 
 void ChatRoom::sendPrivateMessage(DataElement data)
 {
-    data.setSubType(2);
+    data.setSubType(1);
     users.user(data.receiver())->socket()->send(data, true);
-    users.user(data.sender())->socket()->send(data, true); // send message to sender (ack)
+    if (data.receiver() != data.sender())
+        users.user(data.sender())->socket()->send(data, true); // send message to sender (ack)
 }
 
 void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
@@ -135,9 +165,6 @@ void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
     //Update serverside
     switch(data.subType())
     {
-//    case X:
-//        currentUser->setName(data.readString());
-//        break;
     case 0:
         currentUser->setStatus(ChatRoomUser::Online);
         break;
@@ -183,4 +210,128 @@ quint32 ChatRoom::id()
 QString ChatRoom::name()
 {
     return _name;
+}
+
+void ChatRoom::readActionMessage(DataElement data, quint32)
+{
+    if (!users.contains(data.receiver()))
+    {
+        qDebug() << "unknown receiver";
+        return;
+    }
+    ChatRoomUser *sender = users.user(data.sender());
+    ChatRoomUser *receiver = users.user(data.receiver());
+
+    if (!users.contains(data.receiver()))
+    {
+        data.setType(10);
+        sender->socket()->send(data, true);
+        return;
+    }
+
+    switch(data.subType())
+    {
+    case 0:
+        if (sender->moderatorPermission)
+        {
+            receiver->kickPermission = true;
+            data.setType(9);
+            foreach(ChatRoomUser* user, users.allUsers())
+            {
+                user->socket()->send(data, true);
+            }
+        }
+        else
+        {
+            data.setType(10);
+            sender->socket()->send(data, true);
+        }
+        break;
+
+    case 1:
+        if (sender->moderatorPermission)
+        {
+            receiver->kickPermission = false;
+            data.setType(9);
+            foreach(ChatRoomUser* user, users.allUsers())
+            {
+                user->socket()->send(data, true);
+            }
+        }
+        else
+        {
+            data.setType(10);
+            sender->socket()->send(data, true);
+        }
+        break;
+
+    case 2:
+        if (sender->kickPermission)
+        {
+            data.setType(9);
+            foreach(ChatRoomUser* user, users.allUsers())
+            {
+                user->socket()->send(data, true);
+            }
+            users.remove(data.receiver());
+        }
+        else
+        {
+            data.setType(10);
+            sender->socket()->send(data, true);
+        }
+        break;
+
+    case 3:
+        if (true)//sender->moderatorPermission)
+        {
+            receiver->moderatorPermission = true;
+            data.setType(9);
+            foreach(ChatRoomUser* user, users.allUsers())
+            {
+                user->socket()->send(data, true);
+            }
+        }
+        else
+        {
+            data.setType(10);
+            sender->socket()->send(data, true);
+        }
+        break;
+
+    case 4:
+        if (sender->moderatorPermission)
+        {
+            receiver->moderatorPermission = false;
+            data.setType(9);
+            foreach(ChatRoomUser* user, users.allUsers())
+            {
+                user->socket()->send(data, true);
+            }
+        }
+        else
+        {
+            data.setType(10);
+            sender->socket()->send(data, true);
+        }
+        break;
+    }
+}
+
+void ChatRoom::denyAll(bool x)
+{
+    _denyAll = x;
+}
+
+void ChatRoom::registerLocalClient(quint32 clientId)
+{
+    localClientId = clientId;
+}
+
+void ChatRoom::close(QString reason)
+{
+    DataElement data(_id, 7, 0, 0, 0);
+    data.writeString(reason);
+    foreach (ChatRoomUser* user, users.allUsers())
+        user->socket()->send(data, true);
 }

@@ -23,7 +23,7 @@ public slots:
     void sendMessage(QString text);
     void showChatMessage(DataElement data, quint32 userId);
     void showDenyMessage(DataElement data, quint32 userId);
-    void sendUserQuit();
+    void sendUserQuit(bool joinNotDenied, QString reason);
 
 signals:
     void closed(QHostAddress address, quint32 id);
@@ -31,11 +31,15 @@ signals:
 private:
     quint32 _id;
     QString _name;
-   void  readStatusMessage(DataElement data);
+    void readStatusMessage(DataElement data);
+    void readActionAceptedMessage(DataElement data);
+    void readActionDeniedMessage(DataElement data);
+    void disableChatroom(QString reason);
     ChatSocket * _socket;
     quint32 _userId;
     ChatRoomWindow * window;
     QMap<quint32, UserInfo> userInfo;
+    bool splitInt(QString &s, quint32 &i);
 };
 
 #endif // CLIENTCHATROOM_H

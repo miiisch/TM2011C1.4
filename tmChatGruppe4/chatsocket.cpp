@@ -181,3 +181,11 @@ void ChatSocket::setHandShakeDone()
 {
     _handshakeDone = true;
 }
+
+QHostAddress ChatSocket::localIp()
+{
+    if(type == UDP)
+        return udpSocket->localAddress();
+    else
+        return tcpSocket->localAddress();
+}

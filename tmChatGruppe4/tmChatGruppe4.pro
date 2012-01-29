@@ -9,6 +9,19 @@ QT       += core gui network
 TARGET = tmChatEric
 TEMPLATE = app
 
+CONFIG += link_pkgconfig
+PKGCONFIG += libnotify
+PKGCONFIG += libglib
+
+#INCLUDEPATH += "/usr/include/glib-2.0"
+#INCLUDEPATH += "/usr/include/gtk-2.0"
+#INCLUDEPATH += "/usr/lib/gtk-2.0/include"
+#INCLUDEPATH += "/usr/include/cairo"
+#INCLUDEPATH += "/usr/include/pango-1.0"
+#INCLUDEPATH += "/usr/include/gdk-pixbuf-2.0"
+#INCLUDEPATH += "/usr/include/atk-1.0"
+#LIBS += /usr/lib/libnotify.so
+
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -26,7 +39,8 @@ SOURCES += main.cpp\
     clientchatroom.cpp \
     chatroomwindow.cpp \
     createchatroomdialog.cpp \
-    dataelementviewer.cpp
+    dataelementviewer.cpp \
+    commandline.cpp
 
 HEADERS  += mainwindow.h \
     server.h \
@@ -44,7 +58,8 @@ HEADERS  += mainwindow.h \
     chatroomwindow.h \
     types.h \
     createchatroomdialog.h \
-    dataelementviewer.h
+    dataelementviewer.h \
+    commandline.h
 
 FORMS    += mainwindow.ui \
     chatroomwindow.ui \

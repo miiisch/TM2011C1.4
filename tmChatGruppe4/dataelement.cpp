@@ -217,23 +217,35 @@ void DataElement::updateLength()
     ds << length;
 }
 
-QString DataElement::rawData() const
+QString DataElement::rawDataHex() const
 {
-    char toHex[17] = "0123456789abcdef";
+    uchar toHex[17] = "0123456789abcdef";
     QDataStream ds(_data);
     QString result;
     while(!ds.atEnd())
     {
+        uchar c;
+        ds.readRawData(reinterpret_cast<char*>(&c), 1);
+        result += toHex[c / 16];
+        result += toHex[c % 16];
+        result += " ";
+    }
+    return result;
+}
+
+QString DataElement::rawDataChar() const
+{
+    QDataStream ds(_data);
+    QString result;
+    while(!ds.atEnd())
+    {
+        result += " ";
         char c;
         ds.readRawData(&c, 1);
-        result += toHex[c / 0x10];
-        result += toHex[c % 0x10];
         if (('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'))
-        {
-            result += "[";
             result += c;
-            result += "]";
-        }
+        else
+            result += " ";
         result += " ";
     }
     return result;

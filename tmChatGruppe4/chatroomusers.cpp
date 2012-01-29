@@ -14,9 +14,9 @@ ChatRoomUser * ChatRoomUsers::user(quint32 uid)
     return (ChatRoomUser*) users[uid];
 }
 
-void ChatRoomUsers::addUser(ChatSocket* socket, quint32 uid, QString userName, ChatRoomUser::Status status)
+void ChatRoomUsers::addUser(ChatSocket* socket, quint32 uid, QString userName, ChatRoomUser::Status status, bool moderatorPermission, bool kickPermission)
 {
-    users[uid] = new ChatRoomUser(socket, uid, userName, status);
+    users[uid] = new ChatRoomUser(socket, uid, userName, status, moderatorPermission, kickPermission);
 }
 
 QList<ChatRoomUser *> ChatRoomUsers::allUsers()

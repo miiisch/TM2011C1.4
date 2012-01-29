@@ -1,0 +1,19 @@
+Chatroomlist:
+=============
+
+add ip <ip>
+set null (client|server)? [01]
+set deny [01]
+create <chatroomname>
+close <chatroomid>
+
+Chatroom:
+=========
+
+to send "/<msg>" write "//<msg>"
+
+/set status (online|away|busy) (<reason>)?
+/kick <uid> (<reason>)?
+/set (kick|mod) [01] <uid> (<reason>)?
+/quit (<reason>)?
+/<uid> <message>

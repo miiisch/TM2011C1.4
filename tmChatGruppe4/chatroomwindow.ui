@@ -48,7 +48,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="textInput">
+        <widget class="CommandLine" name="textInput">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>1</horstretch>
@@ -73,6 +73,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CommandLine</class>
+   <extends>QLineEdit</extends>
+   <header>commandline.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
