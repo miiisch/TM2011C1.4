@@ -12,8 +12,9 @@ class ChatSocket : public QObject
 {
     Q_OBJECT
 public:
-    explicit ChatSocket(QTcpSocket * socket, quint32 userId, QObject *parent = 0);
-    ChatSocket(QUdpSocket * socket, QObject *parent = 0);
+    explicit ChatSocket(QTcpSocket * socket, quint32 userId, bool gui, QObject *parent);
+    explicit ChatSocket(QUdpSocket * socket, bool gui, QObject *parent);
+
     bool send(DataElement data, bool server);
     QHostAddress ip();
     quint32 userId();
@@ -55,6 +56,8 @@ private:
     bool everyThingRead;
     int _timeOutCounter;
     bool _handshakeDone;
+
+    bool _gui;
 };
 
 #endif // CHATSOCKET_H

@@ -12,7 +12,7 @@ class Client : public QObject
 {
     Q_OBJECT
 public:
-    explicit Client(QString userName, quint16 serverPort, QObject *parent = 0);
+    explicit Client(QString userName, quint16 serverPort);
 
 signals:
     void serverCreated(Server*); // gets emitted, when a server instance has been created in order to host some chat rooms

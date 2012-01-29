@@ -6,14 +6,14 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 
-ChatSocket::ChatSocket(QTcpSocket *socket, quint32 userId, QObject *parent) :
-    QObject(parent), tcpSocket(socket), type(TCP), currentState(Idle), _userId(userId), _handshakeDone(false)
+ChatSocket::ChatSocket(QTcpSocket *socket, quint32 userId, bool gui, QObject *parent) :
+    QObject(parent), tcpSocket(socket), type(TCP), currentState(Idle), _userId(userId), _handshakeDone(false), _gui(gui)
 {
     connect(this->tcpSocket,SIGNAL(readyRead()),SLOT(readTcpData()));
 }
 
-ChatSocket::ChatSocket(QUdpSocket *socket, QObject *parent) :
-    QObject(parent), udpSocket(socket), type(UDP), currentState(Idle), _handshakeDone(false)
+ChatSocket::ChatSocket(QUdpSocket *socket, bool gui, QObject *parent) :
+    QObject(parent), udpSocket(socket), type(UDP), currentState(Idle), _handshakeDone(false), _gui(gui)
 {
     connect(this->udpSocket,SIGNAL(readyRead()),SLOT(readUdpData()));
 }
@@ -121,11 +121,13 @@ bool ChatSocket::send(DataElement data, bool server)
     if(type == TCP)
     {
         if(tcpSocket->isOpen()) {
-            DataElementViewer::getInstance()->addMessage(server ? DataElementViewer::Server : DataElementViewer::Client,
-                                                         DataElementViewer::Out,
-                                                         DataElementViewer::Tcp,
-                                                         tcpSocket->peerAddress(),
-                                                         &data);
+            if(_gui) {
+                DataElementViewer::getInstance()->addMessage(server ? DataElementViewer::Server : DataElementViewer::Client,
+                                                             DataElementViewer::Out,
+                                                             DataElementViewer::Tcp,
+                                                             tcpSocket->peerAddress(),
+                                                             &data);
+            }
             tcpSocket->write(data.data());
             return true;
         } else {

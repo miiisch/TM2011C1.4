@@ -8,15 +8,16 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 #include <cstdio>
+#include <QCoreApplication>
 
-Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, QObject *parent) :
-    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll)
+Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, bool gui, QObject *parent) :
+    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll), _gui(gui)
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
     if(!socket->bind(10222))
         qWarning("Can't bind to UDP port 10222, so discovery of chat servers will not work.");
-    udpChatSocket = new ChatSocket(socket);
+    udpChatSocket = new ChatSocket(socket, gui, this);
     connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
     tcpServer->listen(QHostAddress::Any, serverPort);
     tcpPort = tcpServer->serverPort();
@@ -37,18 +38,22 @@ void Server::newConnection()
 void Server::newUser(QTcpSocket *socket)
 {
     quint32 uid = userIdCounter++;
-    ChatSocket * chatSocket = new ChatSocket(socket, uid);
+    ChatSocket * chatSocket = new ChatSocket(socket, uid, _gui, this);
     connect(chatSocket,SIGNAL(newTcpData(DataElement,quint32,QHostAddress)),SLOT(readData(DataElement,quint32,QHostAddress)));
     users.createUser(chatSocket, uid);
 }
 
 void Server::readData(DataElement data, quint32 userId, QHostAddress address)
 {
-    DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
-                                                 DataElementViewer::In,
-                                                 DataElementViewer::Tcp,
-                                                 address,
-                                                 &data);
+    if(_gui)
+    {
+        DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
+                                                     DataElementViewer::In,
+                                                     DataElementViewer::Tcp,
+                                                     address,
+                                                     &data);
+    }
+
     //before the handshake is completed, the user can't know his id
     //sender = 0 in NULL Message
     if (data.type() != 2 && data.type() != 1 && userId != data.sender())
@@ -89,11 +94,15 @@ void Server::readData(DataElement data, quint32 userId, QHostAddress address)
 
 void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16 port, QUdpSocket* udpSocket)
 {
-    DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
-                                                 DataElementViewer::In,
-                                                 DataElementViewer::UdpBroadcast,
-                                                 *peerAddress,
-                                                 &data);
+    if(_gui)
+    {
+        DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
+                                                     DataElementViewer::In,
+                                                     DataElementViewer::UdpBroadcast,
+                                                     *peerAddress,
+                                                     &data);
+    }
+
     if(data.type() == 0 && data.subType() == 0 && data.chatRoomIdentifier() == 0)
     {
         //send tcp port, and channellist to user
@@ -109,11 +118,14 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16
             newDataElement.writeInt32(pair.second);
         }
         udpSocket->writeDatagram(newDataElement.data(), *peerAddress, port);
-        DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
-                                                     DataElementViewer::Out,
-                                                     DataElementViewer::UdpUnicast,
-                                                     *peerAddress,
-                                                     &newDataElement);
+        if(_gui)
+        {
+            DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
+                                                         DataElementViewer::Out,
+                                                         DataElementViewer::UdpUnicast,
+                                                         *peerAddress,
+                                                         &newDataElement);
+        }
     } else {
         qDebug() << "Unknown broadcast";
     }

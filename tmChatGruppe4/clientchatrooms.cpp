@@ -25,7 +25,7 @@ ChatSocket * ClientChatRooms::serverConnection(QHostAddress ip, quint16 port)
     QTcpSocket * socket = new QTcpSocket();
     socket->connectToHost(ip, port);
     socket->waitForConnected();
-    return new ChatSocket(socket, 0);
+    return new ChatSocket(socket, 0, true, this);
 }
 
 void ClientChatRooms::addChatRoom(ChatSocket* socket, quint32 id, quint32 userId, QString name)

@@ -6,14 +6,14 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 
-Client::Client(QString userName, quint16 serverPort, QObject *parent) :
-    QObject(parent), userName(userName), server(0), serverPort(serverPort), _serverSendKeepalives(true), _serverDenyAll(false)
+Client::Client(QString userName, quint16 serverPort) :
+    QObject(0), userName(userName), server(0), serverPort(serverPort), _serverSendKeepalives(true), _serverDenyAll(false)
 {
     broadCastSocket = new QUdpSocket;
     broadCastSocket->bind(serverPort);
     //qDebug() << "client udp port" << broadCastSocket->localPort();
-    udpSocket = new ChatSocket(broadCastSocket,0);
-    connect(udpSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readUniCast(DataElement,QHostAddress*,quint16)));
+    udpSocket = new ChatSocket(broadCastSocket, true, this);
+    connect(udpSocket, SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)), SLOT(readUniCast(DataElement,QHostAddress*,quint16)));
 
     mainWindow = new MainWindow(this);
     mainWindow->show();
@@ -21,19 +21,12 @@ Client::Client(QString userName, quint16 serverPort, QObject *parent) :
     connect(mainWindow, SIGNAL(chatRoomSelected(quint32)), SLOT(enterChatRoom(quint32)));
     connect(mainWindow, SIGNAL(createChatRoom(QString)), SLOT(createChatRoom(QString)));
 
-    //connect(mainWindow, SIGNAL(enableClientKeepalive(bool)), SLOT(enableKeepalivesClient(bool)));
-    //connect(mainWindow, SIGNAL(enableServerKeepalive(bool)), SLOT(enableKeepalivesServer(bool)));
-    //connect(mainWindow, SIGNAL(enableDenyAll(bool)), SLOT(denyAllServer(bool)));
-    //connect(mainWindow, SIGNAL(closeChannel(quint32,QString)), SLOT(closeChatRoom(quint32,QString)));
-    //connect(mainWindow, SIGNAL(addIp(QHostAddress)), SLOT(addIp(QHostAddress)));
-
     sendBroadCast();
 
     //every 2 seconds => keepalives
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), &chatRooms, SLOT(sendKeepAlives()));
     timer->start(2000);
-
 }
 
 void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
@@ -198,7 +191,7 @@ void Client::createChatRoom(QString name)
 {
     if(server == 0)
     {
-        server = new Server(serverPort, _serverSendKeepalives, _serverDenyAll);
+        server = new Server(serverPort, _serverSendKeepalives, _serverDenyAll, true, this);
         emit serverCreated(server);
     }
     server->createChatRoom(name);

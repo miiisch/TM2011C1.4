@@ -3,7 +3,7 @@
 #include <QThread>
 #include <cstdio>
 
-
+/* Qt 4.3 compatibility */
 class MyThread : public QThread
 {
 public:
