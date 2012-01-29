@@ -200,8 +200,10 @@ void Client::createChatRoom(QString name)
 
 void Client::addIp(QHostAddress address)
 {
-    addresses += address;
-    sendBroadCast();
+    if(!addresses.contains(address)) {
+        addresses += address;
+        sendBroadCast();
+    }
 }
 
 void Client::enableKeepalivesServer(bool activate)
@@ -228,4 +230,9 @@ void Client::closeChatRoom(quint32 id, QString message)
     if (server != 0)
         server->closeChatRoom(id, message);
     sendBroadCast();
+}
+
+void Client::showCommandLineStatus(QString text)
+{
+    mainWindow->showCommandLineStatus(text);
 }

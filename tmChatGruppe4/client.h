@@ -33,6 +33,9 @@ public slots:
     void denyAllServer(bool);
     void closeChatRoom(quint32 id, QString message);
 
+    void showCommandLineStatus(QString text);
+
+
 private:
     ChatSocket * udpSocket;
     QUdpSocket * broadCastSocket;

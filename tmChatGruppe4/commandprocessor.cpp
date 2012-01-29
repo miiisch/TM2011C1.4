@@ -4,6 +4,7 @@
 #include <iostream>
 using namespace std;
 #include "stdinreader.h"
+#include <QHostInfo>
 
 
 CommandProcessor::CommandProcessor() :
@@ -57,6 +58,23 @@ void CommandProcessor::processCommand(QString command)
     {
         QString address = right(command, "add ip ");
         QHostAddress add(address);
+        client->addIp(add);
+        writeStatus("IP Address " + add.toString() + " added");
+    }
+    else if (command.startsWith("add host "))
+    {
+        QString address = right(command, "add host ");
+        QHostAddress add(address);
+        if(add.isNull())
+        {
+            QHostInfo host = QHostInfo::fromName(address);
+            if(host.addresses().isEmpty()) {
+                writeStatus("Lookup failed for host name " + address);
+                return;
+            }
+            else
+                add = host.addresses().first();
+        }
         client->addIp(add);
         writeStatus("IP Address " + add.toString() + " added");
     }
@@ -145,8 +163,7 @@ void CommandProcessor::processCommand(QString command)
 
 void CommandProcessor::writeStatus(QString text)
 {
-    //if (_gui)
-    //    emit writeToStatusbar(text, 5000);
-//    else
+    if(client)
+        client->showCommandLineStatus(text);
     cout << qPrintable(text) << endl;
 }

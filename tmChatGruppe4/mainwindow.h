@@ -21,7 +21,7 @@ public:
 
 public slots:
     void cellSelected(int row, int col);
-    void setCommandLineText(QString text, int timeout);
+    void showCommandLineStatus(QString text);
 
 signals:
     void chatRoomSelected(quint32);

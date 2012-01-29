@@ -62,9 +62,9 @@ void MainWindow::showViewer()
     DataElementViewer::getInstance()->show();
 }
 
-void MainWindow::setCommandLineText(QString text, int timeout)
+void MainWindow::showCommandLineStatus(QString text)
 {
-    ui->statusBar->showMessage(text, timeout);
+    ui->statusBar->showMessage(text, 5000);
 }
 
 void MainWindow::sendCommandFromCommandLine()

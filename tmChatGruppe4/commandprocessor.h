@@ -26,12 +26,6 @@ private:
     Server *server;
     StdinReader *stdinReader;
 
-    enum Target {
-        TargetClient,
-        TargetServer
-    };
-
-    void registerCommand(QString prefix, Target target);
     QString right(QString &input, const char cutoffLeft[]);
     bool splitInt(QString &s, quint32 &i);
 };
