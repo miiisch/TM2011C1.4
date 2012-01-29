@@ -3,6 +3,7 @@
 #include <QTableWidget>
 #include <QDebug>
 #include <QTime>
+#include <QHeaderView>
 
 DataElementViewer* DataElementViewer::instance = 0;
 

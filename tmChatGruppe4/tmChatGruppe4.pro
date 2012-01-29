@@ -9,9 +9,9 @@ QT       += core gui network
 TARGET = tmChatEric
 TEMPLATE = app
 
-CONFIG += link_pkgconfig
-PKGCONFIG += libnotify
-PKGCONFIG += libglib
+#CONFIG += link_pkgconfig
+#PKGCONFIG += libnotify
+#PKGCONFIG += libglib
 
 #INCLUDEPATH += "/usr/include/glib-2.0"
 #INCLUDEPATH += "/usr/include/gtk-2.0"
