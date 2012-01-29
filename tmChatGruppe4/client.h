@@ -15,6 +15,8 @@ public:
     explicit Client(QString userName, quint16 serverPort, QObject *parent = 0);
 
 signals:
+    void serverCreated(Server*); // gets emitted, when a server instance has been created in order to host some chat rooms
+    void processCommand(QString);
 
 public slots:
     void readUniCast(DataElement data, QHostAddress * address, quint16 port);
@@ -25,7 +27,6 @@ public slots:
     void createChatRoom(QString name);
     void sendBroadCast();
 
-private slots:
     void addIp(QHostAddress);
     void enableKeepalivesServer(bool);
     void enableKeepalivesClient(bool);
@@ -37,7 +38,6 @@ private:
     QUdpSocket * broadCastSocket;
     MainWindow * mainWindow;
     QString userName;
-//    QHash<QHostAddress*, QHash<quint32, ChatRoomInfo*> > chatRoomInfo;
     QList<ChatRoomInfo*> chatRoomInfo;
     ClientChatRooms chatRooms;
     QHash<QHostAddress,QList<ChatRoomInfo*> > joinQueues;

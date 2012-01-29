@@ -10,7 +10,7 @@ MainWindow::MainWindow(Client *client, QWidget *parent) :
     ui->setupUi(this);
     connect(ui->chatRoomTable,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(cellSelected(int,int)));
     connect(ui->refreshButton, SIGNAL(clicked()), client, SLOT(sendBroadCast()));
-    connect(ui->commandLine, SIGNAL(returnPressed()), SLOT(commandLineSlot()));
+    connect(ui->commandLine, SIGNAL(returnPressed()), SLOT(sendCommandFromCommandLine()));
     connect(ui->viewerButton, SIGNAL(clicked()), SLOT(showViewer()));
 }
 
@@ -47,103 +47,9 @@ void MainWindow::on_actionCreate_ChatRoom_triggered()
     dialog->exec();
 }
 
-void MainWindow::commandLineSlot()
-{
-    QString command = ui->commandLine->text();
-    ui->commandLine->clear();
-    if (command.startsWith("add ip "))
-    {
-        QHostAddress add(right(command, "add ip "));
-        emit addIp(add);
-        ui->statusBar->showMessage("IP Address " + add.toString() + " added", 5000);
-    }
-    else if (command.startsWith("set null "))
-    {
-        QString next = right(command, "set null ");
-        bool client = true;
-        bool server = true;
-        if (next.startsWith("client "))
-        {
-            next = right(next, "client ");
-            server = false;
-        }
-        else if (next.startsWith("server "))
-        {
-            next = right(next, "server ");
-            client = false;
-        }
-
-        if (next != "0" && next != "1") {
-            ui->statusBar->showMessage("Unknown command: " + command, 5000);
-            return;
-        }
-
-        bool enable = (next == "1");
-
-        if (client)
-            emit enableClientKeepalive(enable);
-        if (server)
-            emit enableServerKeepalive(enable);
-
-        QString message = "Keepalives ";
-        message += enable ? "enabled " : "disabled ";
-        message += "for ";
-        if (client && server)
-            message += "Client and Server";
-        else
-            message += client ? "Client" : "Server";
-
-        ui->statusBar->showMessage(message, 5000);
-    }
-    else if (command.startsWith("set deny "))
-    {
-        QString next = right(command, "set deny ");
-        QString message = "Deny everything %1";
-        if (next == "1")
-        {
-            emit enableDenyAll(true);
-            ui->statusBar->showMessage(message.arg("enabled"));
-        }
-        else if (next == "0")
-        {
-            emit enableDenyAll(false);
-            ui->statusBar->showMessage(message.arg("disabled"));
-        }
-        else
-        {
-            ui->statusBar->showMessage("Unknown command: " + command, 5000);
-            return;
-        }
-    }
-    else if (command.startsWith("create "))
-    {
-        QString next = right(command, "create ");
-        emit createChatRoom(next);
-    }
-    else if (command.startsWith("close "))
-    {
-        quint32 id;
-        QString next = right(command, "close ");
-        bool valid = splitInt(next, id);
-        if (!valid)
-        {
-            ui->statusBar->showMessage("Unknown command: " + command, 5000);
-            return;
-        }
-        emit closeChannel(id, next);
-    }
-    else
-        ui->statusBar->showMessage("Unknown command: " + command, 5000);
-}
-
 void MainWindow::clearChatRoomInfo()
 {
     ui->chatRoomTable->model()->removeRows(0,ui->chatRoomTable->rowCount());
-}
-
-QString MainWindow::right(QString &input, const char cutoffLeft[])
-{
-    return input.right(input.length() - QString(cutoffLeft).length());
 }
 
 void MainWindow::closeEvent(QCloseEvent *)
@@ -156,20 +62,13 @@ void MainWindow::showViewer()
     DataElementViewer::getInstance()->show();
 }
 
-bool MainWindow::splitInt(QString &s, quint32 &i)
+void MainWindow::setCommandLineText(QString text, int timeout)
 {
-    QList<QString> split = s.split(" ");
-    if (split.isEmpty())
-        return false;
+    ui->statusBar->showMessage(text, timeout);
+}
 
-    bool ok;
-    i = split[0].toInt(&ok);
-    if (!ok) {
-        return false;
-    }
-
-    if (split.size() > 0)
-        s = s.right(s.length() - split[0].size() - (split.size() > 1 ? 1 : 0));
-
-    return true;
+void MainWindow::sendCommandFromCommandLine()
+{
+    emit processCommand(ui->commandLine->text());
+    ui->commandLine->clear();
 }

@@ -7,13 +7,15 @@
 #include "dataelement.h"
 #include <QTimer>
 #include "dataelementviewer.h"
+#include <cstdio>
 
 Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, QObject *parent) :
     QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll)
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
-    qDebug() << socket->bind(10222);
+    if(!socket->bind(10222))
+        qWarning("Can't bind to UDP port 10222, so discovery of chat servers will not work.");
     udpChatSocket = new ChatSocket(socket);
     connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
     tcpServer->listen(QHostAddress::Any, serverPort);
@@ -187,3 +189,4 @@ void Server::closeChatRoom(quint32 id, QString text)
 {
     chatRooms->removeChatRoom(id, text);
 }
+

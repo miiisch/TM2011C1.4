@@ -17,13 +17,15 @@ Client::Client(QString userName, quint16 serverPort, QObject *parent) :
 
     mainWindow = new MainWindow(this);
     mainWindow->show();
-    connect(mainWindow,SIGNAL(chatRoomSelected(quint32)),SLOT(enterChatRoom(quint32)));
-    connect(mainWindow,SIGNAL(createChatRoom(QString)),SLOT(createChatRoom(QString)));
+    connect(mainWindow, SIGNAL(processCommand(QString)), SIGNAL(processCommand(QString)));
+    connect(mainWindow, SIGNAL(chatRoomSelected(quint32)), SLOT(enterChatRoom(quint32)));
+    connect(mainWindow, SIGNAL(createChatRoom(QString)), SLOT(createChatRoom(QString)));
 
-    connect(mainWindow, SIGNAL(enableClientKeepalive(bool)), SLOT(enableKeepalivesClient(bool)));
-    connect(mainWindow, SIGNAL(enableServerKeepalive(bool)), SLOT(enableKeepalivesServer(bool)));
-    connect(mainWindow, SIGNAL(enableDenyAll(bool)), SLOT(denyAllServer(bool)));
-    connect(mainWindow, SIGNAL(closeChannel(quint32,QString)), SLOT(closeChatRoom(quint32,QString)));
+    //connect(mainWindow, SIGNAL(enableClientKeepalive(bool)), SLOT(enableKeepalivesClient(bool)));
+    //connect(mainWindow, SIGNAL(enableServerKeepalive(bool)), SLOT(enableKeepalivesServer(bool)));
+    //connect(mainWindow, SIGNAL(enableDenyAll(bool)), SLOT(denyAllServer(bool)));
+    //connect(mainWindow, SIGNAL(closeChannel(quint32,QString)), SLOT(closeChatRoom(quint32,QString)));
+    //connect(mainWindow, SIGNAL(addIp(QHostAddress)), SLOT(addIp(QHostAddress)));
 
     sendBroadCast();
 
@@ -32,7 +34,6 @@ Client::Client(QString userName, quint16 serverPort, QObject *parent) :
     connect(timer, SIGNAL(timeout()), &chatRooms, SLOT(sendKeepAlives()));
     timer->start(2000);
 
-    connect(mainWindow, SIGNAL(addIp(QHostAddress)), SLOT(addIp(QHostAddress)));
 }
 
 void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
@@ -198,6 +199,7 @@ void Client::createChatRoom(QString name)
     if(server == 0)
     {
         server = new Server(serverPort, _serverSendKeepalives, _serverDenyAll);
+        emit serverCreated(server);
     }
     server->createChatRoom(name);
     sendBroadCast();

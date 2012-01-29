@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     chatroomwindow.cpp \
     createchatroomdialog.cpp \
     dataelementviewer.cpp \
-    commandline.cpp
+    commandprocessor.cpp \
+    stdinreader.cpp
 
 HEADERS  += mainwindow.h \
     server.h \
@@ -59,7 +60,8 @@ HEADERS  += mainwindow.h \
     types.h \
     createchatroomdialog.h \
     dataelementviewer.h \
-    commandline.h
+    commandprocessor.h \
+    stdinreader.h
 
 FORMS    += mainwindow.ui \
     chatroomwindow.ui \

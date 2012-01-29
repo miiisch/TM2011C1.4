@@ -26,8 +26,6 @@ public:
     void registerLocalClient(quint32 clientId);
     void closeChatRoom(quint32 id, QString text);
 
-signals:
-
 public slots:
     void newConnection();
     void readData(DataElement data, quint32 userId, QHostAddress address);
@@ -35,7 +33,6 @@ public slots:
     void readBroadCast(DataElement data, QHostAddress * peerAddress, quint16 port, QUdpSocket* udpSocket);
 
 private:
-
     void newUser(QTcpSocket * socket);
     void readHandshake(DataElement data, quint32 userId);
     void errorType();
@@ -49,7 +46,6 @@ private:
     Users users;
     bool _sendKeepalives;
     bool _denyAll;
-
 };
 
 #endif // SERVER_H

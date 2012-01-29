@@ -2,31 +2,67 @@
 #include "mainwindow.h"
 #include "client.h"
 #include "server.h"
+#include "commandprocessor.h"
 
 #include <QTcpSocket>
 //#undef signals
 //#include <libnotify/notify.h>
 //#include <libnotify/notification.h>
 
+
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication * a;
 
 //    if(notify_init("tmChatGruppe4"))
 //        qDebug("libnotify initialized!");
 
-    quint16 serverPort = 0;
-    if (argc == 3)
+    QString usage = QString("Usage: %1 <username> [-p <port>] [--no-gui]").arg(argv[0]);
+
+    quint16 port = 0;
+    bool gui = true;
+
+    if (argc < 2)
+        qFatal("%s", qPrintable(usage));
+    QString name = argv[1];
+    for (int i = 2; i < argc; ++i)
     {
-        bool ok;
-        serverPort = QString(argv[2]).toInt(&ok);
-        if (!ok)
-            qFatal("Usage: %s username [server port]", argv[0]);
+        if (qstrcmp(argv[i], "-p") == 0)
+        {
+            i++;
+            if (argc == i)
+                qFatal("%s", qPrintable(usage));
+            QString portString = argv[i];
+            bool ok;
+            port = portString.toInt(&ok);
+            if (!ok)
+                qFatal("%s", qPrintable(usage));
+        }
+        else if (qstrcmp(argv[i], "--no-gui") == 0)
+        {
+            gui = false;
+        }
+        else
+            qFatal("%s", qPrintable(usage));
     }
-    else if (argc != 2)
-         qFatal("Usage: %s username [server port]", argv[0]);
 
-    new Client(argv[1], serverPort);
+    CommandProcessor * cmd = new CommandProcessor();
 
-    return a.exec();
+    if(gui)
+    {
+        a = new QApplication(argc, argv);
+        Client * client = new Client(name, port);
+        CommandProcessor * cmd = new CommandProcessor();
+        cmd->setClient(client);
+        QObject::connect(client, SIGNAL(processCommand(QString)), cmd, SLOT(processCommand(QString)));
+        QObject::connect(client, SIGNAL(serverCreated(Server*)), cmd, SLOT(setServer(Server*)));
+    }
+    else
+    {
+        a = new QCoreApplication(argc, argv);
+        Server * server = new Server(port, true, false);
+        cmd->setServer(server);
+    }
+
+    return a->exec();
 }
