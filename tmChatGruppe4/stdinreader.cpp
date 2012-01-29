@@ -3,11 +3,20 @@
 #include <QThread>
 #include <cstdio>
 
+
+class MyThread : public QThread
+{
+public:
+    MyThread(QObject *parent) : QThread(parent) {}
+    void run() { exec(); }
+};
+
+
 StdinReader::StdinReader(QObject *parent)
 {
     reader = new StdinReaderHelper();
 
-    QThread *readerThread = new QThread(this);
+    QThread *readerThread = new MyThread(this);
     reader->moveToThread(readerThread);
     readerThread->start();
 
