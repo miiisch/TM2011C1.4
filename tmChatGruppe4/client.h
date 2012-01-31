@@ -12,9 +12,11 @@ class Client : public QObject
 {
     Q_OBJECT
 public:
-    explicit Client(QString userName, quint16 serverPort, QObject *parent = 0);
+    explicit Client(QString userName, quint16 serverPort);
 
 signals:
+    void serverCreated(Server*); // gets emitted, when a server instance has been created in order to host some chat rooms
+    void processCommand(QString);
 
 public slots:
     void readUniCast(DataElement data, QHostAddress * address, quint16 port);
@@ -25,12 +27,14 @@ public slots:
     void createChatRoom(QString name);
     void sendBroadCast();
 
-private slots:
     void addIp(QHostAddress);
     void enableKeepalivesServer(bool);
     void enableKeepalivesClient(bool);
     void denyAllServer(bool);
     void closeChatRoom(quint32 id, QString message);
+
+    void showCommandLineStatus(QString text);
+
 
 private:
     ChatSocket * udpSocket;

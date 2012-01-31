@@ -52,6 +52,7 @@ DataElementViewer * DataElementViewer::getInstance()
 {
     if (instance == 0)
     {
+        qDebug("create DEV");
         instance = new DataElementViewer;
     }
     return instance;

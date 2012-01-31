@@ -21,7 +21,7 @@ public:
 
 public slots:
     void cellSelected(int row, int col);
-    void setCommandLineText(QString text, int timeout);
+    void showCommandLineStatus(QString text);
 
 signals:
     void chatRoomSelected(quint32);
@@ -32,10 +32,12 @@ signals:
 //    void enableServerKeepalive(bool);
 //    void enableDenyAll(bool);
 //    void closeChannel(quint32 id, QString message);
+    void processCommand(QString);
 
 private slots:
     void on_actionCreate_ChatRoom_triggered();
     void showViewer();
+    void sendCommandFromCommandLine();
 
 protected:
     void closeEvent(QCloseEvent *);
@@ -43,9 +45,6 @@ protected:
 private:
     Ui::MainWindow *ui;
     QHash<int, quint32> chatRoomIds;
-
-    QString right(QString & input, const char cutoffLeft[]);
-    bool splitInt(QString &s, quint32 &i);
 };
 
 #endif // MAINWINDOW_H

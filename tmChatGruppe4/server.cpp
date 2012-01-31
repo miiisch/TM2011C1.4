@@ -8,26 +8,16 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 #include <cstdio>
+#include <QCoreApplication>
 
-Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, QObject *parent) :
-    QObject(parent)    chatRooms = new ChatRooms();
-QUdpSocket * socket = new QUdpSocket;
-qDebug() << socket->bind(10222);
-udpChatSocket = new ChatSocket(socket);
-connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
-tcpServer->listen(QHostAddress::Any, serverPort);
-tcpPort = tcpServer->serverPort();
-connect(tcpServer,SIGNAL(newConnection()),SLOT(newConnection()));
-
-//every 2 seconds => keepalives
-QTimer *timer = new QTimer(this);
-connect(timer, SIGNAL(timeout()), this, SLOT(sendKeepAlives()));
-timer->start(2000);, tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll), _gui(gui)
+Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, bool gui, QObject *parent) :
+    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll), _gui(gui)
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
-    qDebug() << socket->bind(10222);
-    udpChatSocket = new ChatSocket(socket);
+    if(!socket->bind(10222))
+        qWarning("Can't bind to UDP port 10222, so discovery of chat servers will not work.");
+    udpChatSocket = new ChatSocket(socket, gui, this);
     connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
     tcpServer->listen(QHostAddress::Any, serverPort);
     tcpPort = tcpServer->serverPort();
@@ -48,18 +38,22 @@ void Server::newConnection()
 void Server::newUser(QTcpSocket *socket)
 {
     quint32 uid = userIdCounter++;
-    ChatSocket * chatSocket = new ChatSocket(socket, uid);
+    ChatSocket * chatSocket = new ChatSocket(socket, uid, _gui, this);
     connect(chatSocket,SIGNAL(newTcpData(DataElement,quint32,QHostAddress)),SLOT(readData(DataElement,quint32,QHostAddress)));
     users.createUser(chatSocket, uid);
 }
 
 void Server::readData(DataElement data, quint32 userId, QHostAddress address)
 {
-    DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
-                                                 DataElementViewer::In,
-                                                 DataElementViewer::Tcp,
-                                                 address,
-                                                 &data);
+    if(_gui)
+    {
+        DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
+                                                     DataElementViewer::In,
+                                                     DataElementViewer::Tcp,
+                                                     address,
+                                                     &data);
+    }
+
     //before the handshake is completed, the user can't know his id
     //sender = 0 in NULL Message
     if (data.type() != 2 && data.type() != 1 && userId != data.sender())
@@ -100,11 +94,15 @@ void Server::readData(DataElement data, quint32 userId, QHostAddress address)
 
 void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16 port, QUdpSocket* udpSocket)
 {
-    DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
-                                                 DataElementViewer::In,
-                                                 DataElementViewer::UdpBroadcast,
-                                                 *peerAddress,
-                                                 &data);
+    if(_gui)
+    {
+        DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
+                                                     DataElementViewer::In,
+                                                     DataElementViewer::UdpBroadcast,
+                                                     *peerAddress,
+                                                     &data);
+    }
+
     if(data.type() == 0 && data.subType() == 0 && data.chatRoomIdentifier() == 0)
     {
         //send tcp port, and channellist to user
@@ -120,11 +118,14 @@ void Server::readBroadCast(DataElement data, QHostAddress * peerAddress, quint16
             newDataElement.writeInt32(pair.second);
         }
         udpSocket->writeDatagram(newDataElement.data(), *peerAddress, port);
-        DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
-                                                     DataElementViewer::Out,
-                                                     DataElementViewer::UdpUnicast,
-                                                     *peerAddress,
-                                                     &newDataElement);
+        if(_gui)
+        {
+            DataElementViewer::getInstance()->addMessage(DataElementViewer::Server,
+                                                         DataElementViewer::Out,
+                                                         DataElementViewer::UdpUnicast,
+                                                         *peerAddress,
+                                                         &newDataElement);
+        }
     } else {
         qDebug() << "Unknown broadcast";
     }
@@ -201,98 +202,3 @@ void Server::closeChatRoom(quint32 id, QString text)
     chatRooms->removeChatRoom(id, text);
 }
 
-void Server::newCommand(QString command)
-{
-    ui->commandLine->clear();
-    if (command.startsWith("add ip "))
-    {
-        QHostAddress add(right(command, "add ip "));
-        emit addIp(add);
-        writeStatus("IP Address " + add.toString() + " added", 5000);
-    }
-    else if (command.startsWith("set null "))
-    {
-        QString next = right(command, "set null ");
-        bool client = true;
-        bool server = true;
-        if (next.startsWith("client "))
-        {
-            next = right(next, "client ");
-            server = false;
-        }
-        else if (next.startsWith("server "))
-        {
-            next = right(next, "server ");
-            client = false;
-        }
-
-        if (next != "0" && next != "1") {
-            writeStatus("Unknown command: " + command, 5000);
-            return;
-        }
-
-        bool enable = (next == "1");
-
-        if (client)
-            emit enableClientKeepalive(enable);
-        if (server)
-            emit enableServerKeepalive(enable);
-
-        QString message = "Keepalives ";
-        message += enable ? "enabled " : "disabled ";
-        message += "for ";
-        if (client && server)
-            message += "Client and Server";
-        else
-            message += client ? "Client" : "Server";
-
-        writeStatus(message, 5000);
-    }
-    else if (command.startsWith("set deny "))
-    {
-        QString next = right(command, "set deny ");
-        QString message = "Deny everything %1";
-        if (next == "1")
-        {
-            emit enableDenyAll(true);
-            writeStatus(message.arg("enabled"));
-        }
-        else if (next == "0")
-        {
-            emit enableDenyAll(false);
-            writeStatus(message.arg("disabled"));
-        }
-        else
-        {
-            writeStatus("Unknown command: " + command, 5000);
-            return;
-        }
-    }
-    else if (command.startsWith("create "))
-    {
-        QString next = right(command, "create ");
-        emit createChatRoom(next);
-    }
-    else if (command.startsWith("close "))
-    {
-        quint32 id;
-        QString next = right(command, "close ");
-        bool valid = splitInt(next, id);
-        if (!valid)
-        {
-            writeStatus("Unknown command: " + command, 5000);
-            return;
-        }
-        emit closeChannel(id, next);
-    }
-    else
-        writeStatus("Unknown command: " + command, 5000);
-}
-
-void Server::writeStatus(QString text, int timeOut)
-{
-    if (_gui)
-        emit writeToStatusbar(text, timeOut);
-    else
-        printf(text);
-}

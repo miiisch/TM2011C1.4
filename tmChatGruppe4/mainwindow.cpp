@@ -10,7 +10,7 @@ MainWindow::MainWindow(Client *client, QWidget *parent) :
     ui->setupUi(this);
     connect(ui->chatRoomTable,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(cellSelected(int,int)));
     connect(ui->refreshButton, SIGNAL(clicked()), client, SLOT(sendBroadCast()));
-    connect(ui->commandLine, SIGNAL(returnPressed()), SLOT(commandLineSlot()));
+    connect(ui->commandLine, SIGNAL(returnPressed()), SLOT(sendCommandFromCommandLine()));
     connect(ui->viewerButton, SIGNAL(clicked()), SLOT(showViewer()));
 }
 
@@ -52,11 +52,6 @@ void MainWindow::clearChatRoomInfo()
     ui->chatRoomTable->model()->removeRows(0,ui->chatRoomTable->rowCount());
 }
 
-QString MainWindow::right(QString &input, const char cutoffLeft[])
-{
-    return input.right(input.length() - QString(cutoffLeft).length());
-}
-
 void MainWindow::closeEvent(QCloseEvent *)
 {
     exit(0);
@@ -67,25 +62,13 @@ void MainWindow::showViewer()
     DataElementViewer::getInstance()->show();
 }
 
-bool MainWindow::splitInt(QString &s, quint32 &i)
+void MainWindow::showCommandLineStatus(QString text)
 {
-    QList<QString> split = s.split(" ");
-    if (split.isEmpty())
-        return false;
-
-    bool ok;
-    i = split[0].toInt(&ok);
-    if (!ok) {
-        return false;
-    }
-
-    if (split.size() > 0)
-        s = s.right(s.length() - split[0].size() - (split.size() > 1 ? 1 : 0));
-
-    return true;
+    ui->statusBar->showMessage(text, 5000);
 }
 
-void MainWindow::setCommandLineText(QString text, int timeout)
+void MainWindow::sendCommandFromCommandLine()
 {
-    ui->statusBar->showMessage(text, timeout);
+    emit processCommand(ui->commandLine->text());
+    ui->commandLine->clear();
 }

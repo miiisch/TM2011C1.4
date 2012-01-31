@@ -81,7 +81,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="CommandLine" name="commandLine"/>
+       <widget class="QLineEdit" name="commandLine"/>
       </item>
       <item>
        <widget class="QPushButton" name="refreshButton">
@@ -126,13 +126,6 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>CommandLine</class>
-   <extends>QLineEdit</extends>
-   <header>commandline.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
