@@ -13,6 +13,7 @@ public:
     ~User();
     ChatSocket* socket();
     quint32 uid();
+    QList<QString> modules;
 
 
 private:

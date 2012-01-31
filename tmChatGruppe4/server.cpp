@@ -167,8 +167,11 @@ void Server::errorSender()
 
 void Server::readHandshake(DataElement data, quint32 userId)
 {
-    (void)data;
-    //user modules will be ignored
+    int count = data.readInt32();
+    QList<QString> * userModulesList = &(users.user(userId)->modules);
+    for (int i = 0; i < count; ++i)
+        *userModulesList << data.readString();
+
     DataElement newDataElement(0,2,1,0,0);
     newDataElement.writeInt32(userId);
     //empty modules list
