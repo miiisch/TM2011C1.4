@@ -12,7 +12,7 @@ public:
 };
 
 
-StdinReader::StdinReader(QObject *parent)
+StdinReader::StdinReader(QObject *)
 {
     reader = new StdinReaderHelper();
 
