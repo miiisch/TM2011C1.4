@@ -161,3 +161,5 @@ void ChatRoomWindow::disableInput()
 {
     ui->textInput->setEnabled(false);
 }
+
+

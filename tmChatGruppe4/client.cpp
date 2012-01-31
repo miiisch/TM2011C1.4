@@ -54,7 +54,8 @@ void Client::readUniCast(DataElement data, QHostAddress *address, quint16 port)
                 quint32 id = data.readInt32();
                 QString name = data.readString();
                 quint32 numberOfUsers = data.readInt32();
-                ChatRoomInfo * info = new ChatRoomInfo(tcpPort, id, name, numberOfUsers, *address);
+                ChatRoomInfo * info = new ChatRoomInfo(tcpPort, id, name, numberOfUsers, *address, udpSocket->localIp().toString() == address->toString());
+
                 chatRoomInfo << info;
             }
             mainWindow->setChatRoomInfo(chatRoomInfo);

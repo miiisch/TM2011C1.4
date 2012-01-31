@@ -81,7 +81,6 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
     bool kickPermission = false;
     if(uid == localClientId)
     {
-        qDebug() << "localClient joined and receives mod and kick permissions";
         moderatorPermission = true;
         kickPermission = true;
     }
@@ -93,7 +92,7 @@ void ChatRoom::readJoinRequest(ChatSocket* socket, DataElement data, quint32 uid
 
         //Join-Request answer
         DataElement newDataElement(_id,3,1,uid,0);
-        newDataElement.writeInt32(allUsers.length());
+        newDataElement.writeInt32(allUsers.count());
         foreach(ChatRoomUser* user, allUsers)
         {
             newDataElement.writeInt32(user->uid());
