@@ -30,6 +30,7 @@ SOURCES += main.cpp\
     chatroom.cpp \
     users.cpp \
     user.cpp \
+    commandline.cpp \
     chatroomusers.cpp \
     chatroomuser.cpp \
     client.cpp \
@@ -49,6 +50,7 @@ HEADERS  += mainwindow.h \
     chatroom.h \
     users.h \
     user.h \
+    commandline.h \
     chatroomusers.h \
     chatroomuser.h \
     client.h \
