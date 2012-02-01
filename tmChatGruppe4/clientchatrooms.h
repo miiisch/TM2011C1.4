@@ -16,7 +16,8 @@ public:
     void activateChatRoom(QHostAddress address, quint32 id, QMap<quint32, UserInfo> userInfo);
     void denyJoin(QHostAddress address, quint32 id, DataElement & data);
     bool containsRoom(QHostAddress address, quint32 id);
-    void activateKeepalives(bool);
+    void activateSendKeepalives(bool);
+    void activateCheckKeepalives(bool);
 
 public slots:
     void sendKeepAlives();
@@ -27,6 +28,7 @@ private slots:
 private:
     QHash<QHostAddress, QHash<quint32, ClientChatRoom*> > chatRooms;
     bool _sendKeepalives;
+    bool _checkKeepalives;
 };
 
 #endif // CLIENTCHATROOMS_H

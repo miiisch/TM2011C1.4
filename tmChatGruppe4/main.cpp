@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     else
     {
         a = new QCoreApplication(argc, argv);
-        Server * server = new Server(port, true, false, false);
+        Server * server = new Server(port, true, true, false, false);
         cmd->setServer(server);
     }
 

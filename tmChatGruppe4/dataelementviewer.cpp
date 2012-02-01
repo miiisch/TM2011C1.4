@@ -5,6 +5,8 @@
 #include <QTime>
 #include <QHeaderView>
 
+#define DATAELEMENT_HEADER "|----Magic Number-----| |-Length--| |-Channel-| |--Type---| |-Subtype-| |-Sender--| |Reciever-|"
+
 DataElementViewer* DataElementViewer::instance = 0;
 
 DataElementViewer::DataElementViewer(QWidget *parent) :
@@ -65,6 +67,7 @@ void DataElementViewer::addMessage(ClientServer clientServer, Direction directio
     messages += m;
     append(m);
     *ds << "[" << m._time << "] Channel " << m._channel << " (" << m._type << " | " << m._subType << ") " << m._sender << " -> " << m._receiver << endl;
+    *ds << DATAELEMENT_HEADER << endl;
     *ds << m._rawDataHex << endl;
     *ds << m._rawDataChar << endl;
     *ds << m._message << endl << endl;
@@ -135,8 +138,16 @@ void DataElementViewer::append(const Message & m)
 
 void DataElementViewer::showDetailedInformation(int index)
 {
+    if (index < 0 || index >= messages.length())
+    {
+        ui->rawDataDescription->clear();
+        ui->rawDataHex->clear();
+        ui->rawDataChar->clear();
+        ui->formattedContent->clear();
+        return;
+    }
     Message m = messages[index];
-    ui->rawDataDescription->setText("|----Magic Number-----| |-Length--| |-Channel-| |--Type---| |-Subtype-| |-Sender--| |Reciever-|");
+    ui->rawDataDescription->setText(DATAELEMENT_HEADER);
     ui->rawDataHex->setText(m._rawDataHex);
     ui->rawDataChar->setText(m._rawDataChar);
     ui->formattedContent->setText(m._message);

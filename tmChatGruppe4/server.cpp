@@ -10,8 +10,8 @@
 #include <cstdio>
 #include <QCoreApplication>
 
-Server::Server(quint16 serverPort, bool enableKeepalives, bool denyAll, bool gui, QObject *parent) :
-    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableKeepalives), _denyAll(denyAll), _gui(gui)
+Server::Server(quint16 serverPort, bool enableSendKeepalives, bool enableCheckKeepalives, bool denyAll, bool gui, QObject *parent) :
+    QObject(parent), tcpServer(new QTcpServer()), userIdCounter(1), _sendKeepalives(enableSendKeepalives), _checkKeepalives(enableCheckKeepalives), _denyAll(denyAll), _gui(gui)
 {
     chatRooms = new ChatRooms();
     QUdpSocket * socket = new QUdpSocket;
@@ -136,7 +136,7 @@ void Server::sendKeepAlives()
     QList<User*> currentUsers = users.allUsers();
     foreach(User* user, currentUsers)
     {
-        if(user->socket()->timeOutCounter() == 5)
+        if(user->socket()->timeOutCounter() == 5 && _checkKeepalives)
         {
             chatRooms->userConnectionLost(user->uid());
             users.remove(user->uid());
@@ -184,9 +184,14 @@ void Server::createChatRoom(QString name)
     chatRooms->addChatRoom(name, _denyAll);
 }
 
-void Server::activateKeepalives(bool x)
+void Server::activateSendKeepalives(bool x)
 {
     _sendKeepalives = x;
+}
+
+void Server::activateCheckKeepalives(bool x)
+{
+    _checkKeepalives = x;
 }
 
 void Server::registerLocalClient(quint32 clientId)

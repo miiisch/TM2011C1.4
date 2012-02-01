@@ -3,7 +3,7 @@ Chatroomlist:
 
 add ip <ip>
 add host <hostname>
-set null (client|server)? [01]
+set (send|check)? null (client|server)? [01]
 set deny [01]
 create <chatroomname>
 close <chatroomid> (<reason>)?

@@ -19,9 +19,10 @@ class Server : public QObject
 {
     Q_OBJECT
 public:
-    explicit Server(quint16 serverPort, bool enableKeepalives, bool denyAll, bool gui = true, QObject *parent = 0);
+    explicit Server(quint16 serverPort, bool enableSendKeepalives, bool enableCheckKeepalives, bool denyAll, bool gui = true, QObject *parent = 0);
     void createChatRoom(QString name);
-    void activateKeepalives(bool);
+    void activateSendKeepalives(bool);
+    void activateCheckKeepalives(bool);
     void activateDenyAll(bool);
     void registerLocalClient(quint32 clientId);
     void closeChatRoom(quint32 id, QString text);
@@ -45,6 +46,7 @@ private:
     quint32 userIdCounter;
     Users users;
     bool _sendKeepalives;
+    bool _checkKeepalives;
     bool _denyAll;
     bool _gui;
 };

@@ -78,6 +78,82 @@ void CommandProcessor::processCommand(QString command)
         client->addIp(add);
         writeStatus("IP Address " + add.toString() + " added");
     }
+    else if (command.startsWith("set send null "))
+    {
+        QString next = right(command, "set send null ");
+        bool typeClient = true;
+        bool typeServer = true;
+        if (next.startsWith("client "))
+        {
+            next = right(next, "client ");
+            typeServer = false;
+        }
+        else if (next.startsWith("server "))
+        {
+            next = right(next, "server ");
+            typeClient = false;
+        }
+
+        if (next != "0" && next != "1") {
+            writeStatus("Unknown command: " + command);
+            return;
+        }
+
+        bool enable = (next == "1");
+
+        if(typeClient)
+            client->enableSendKeepalivesClient(enable);
+        if(typeServer)
+            client->enableSendKeepalivesServer(enable);
+
+        QString message = "Sending Keepalives ";
+        message += enable ? "enabled " : "disabled ";
+        message += "for ";
+        if (typeClient && typeServer)
+            message += "Client and Server";
+        else
+            message += typeClient ? "Client" : "Server";
+
+        writeStatus(message);
+    }
+    else if (command.startsWith("set check null "))
+    {
+        QString next = right(command, "set check null ");
+        bool typeClient = true;
+        bool typeServer = true;
+        if (next.startsWith("client "))
+        {
+            next = right(next, "client ");
+            typeServer = false;
+        }
+        else if (next.startsWith("server "))
+        {
+            next = right(next, "server ");
+            typeClient = false;
+        }
+
+        if (next != "0" && next != "1") {
+            writeStatus("Unknown command: " + command);
+            return;
+        }
+
+        bool enable = (next == "1");
+
+        if(typeClient)
+            client->enableCheckKeepalivesClient(enable);
+        if(typeServer)
+            client->enableCheckKeepalivesServer(enable);
+
+        QString message = "Checking Keepalives ";
+        message += enable ? "enabled " : "disabled ";
+        message += "for ";
+        if (typeClient && typeServer)
+            message += "Client and Server";
+        else
+            message += typeClient ? "Client" : "Server";
+
+        writeStatus(message);
+    }
     else if (command.startsWith("set null "))
     {
         QString next = right(command, "set null ");
@@ -102,11 +178,17 @@ void CommandProcessor::processCommand(QString command)
         bool enable = (next == "1");
 
         if(typeClient)
-            client->enableKeepalivesClient(enable);
+        {
+            client->enableCheckKeepalivesClient(enable);
+            client->enableSendKeepalivesClient(enable);
+        }
         if(typeServer)
-            client->enableKeepalivesServer(enable);
+        {
+            client->enableCheckKeepalivesServer(enable);
+            client->enableSendKeepalivesServer(enable);
+        }
 
-        QString message = "Keepalives ";
+        QString message = "Sending and checking Keepalives ";
         message += enable ? "enabled " : "disabled ";
         message += "for ";
         if (typeClient && typeServer)

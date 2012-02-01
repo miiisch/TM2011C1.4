@@ -7,7 +7,7 @@
 #include "dataelementviewer.h"
 
 Client::Client(QString userName, quint16 serverPort) :
-    QObject(0), userName(userName), server(0), serverPort(serverPort), _serverSendKeepalives(true), _serverDenyAll(false)
+    QObject(0), userName(userName), server(0), serverPort(serverPort), _serverSendKeepalives(true), _serverCheckKeepalives(true), _serverDenyAll(false)
 {
     broadCastSocket = new QUdpSocket;
     broadCastSocket->bind(serverPort);
@@ -129,7 +129,7 @@ void Client::readTcpData(DataElement data, quint32 uid, QHostAddress address)
         {
             quint32 id = data.readInt32();
             socket->setUserId(id);
-            if(socket->ip() == socket->localIp())
+            if(socket->ip() == socket->localIp() && server != 0)
             {
                 server->registerLocalClient(id);
             }
@@ -192,7 +192,7 @@ void Client::createChatRoom(QString name)
 {
     if(server == 0)
     {
-        server = new Server(serverPort, _serverSendKeepalives, _serverDenyAll, true, this);
+        server = new Server(serverPort, _serverSendKeepalives, _serverCheckKeepalives, _serverDenyAll, true, this);
         emit serverCreated(server);
     }
     server->createChatRoom(name);
@@ -207,16 +207,28 @@ void Client::addIp(QHostAddress address)
     }
 }
 
-void Client::enableKeepalivesServer(bool activate)
+void Client::enableSendKeepalivesServer(bool activate)
 {
     _serverSendKeepalives = activate;
     if (server != 0)
-        server->activateKeepalives(activate);
+        server->activateSendKeepalives(activate);
 }
 
-void Client::enableKeepalivesClient(bool activate)
+void Client::enableCheckKeepalivesServer(bool activate)
 {
-    chatRooms.activateKeepalives(activate);
+    _serverCheckKeepalives = activate;
+    if (server != 0)
+        server->activateCheckKeepalives(activate);
+}
+
+void Client::enableSendKeepalivesClient(bool activate)
+{
+    chatRooms.activateSendKeepalives(activate);
+}
+
+void Client::enableCheckKeepalivesClient(bool activate)
+{
+    chatRooms.activateCheckKeepalives(activate);
 }
 
 void Client::denyAllServer(bool denyAll)

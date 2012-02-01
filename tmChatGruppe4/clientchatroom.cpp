@@ -16,9 +16,11 @@ ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, qui
 
 void ClientChatRoom::newData(DataElement data, quint32 userId)
 {
-    if (!userInfo.contains(data.sender()))
+    // reject unknown sender, except on join message
+    if (!userInfo.contains(data.sender()) && !(data.type() == 6 && data.subType() == 5))
     {
-        qDebug() << "received message from unknown sender";
+        qDebug() << "received message from unknown sender in channel" << _id << data ;
+        return;
     }
     switch(data.type())
     {

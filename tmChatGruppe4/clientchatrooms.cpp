@@ -3,7 +3,7 @@
 #include "client.h"
 
 ClientChatRooms::ClientChatRooms() :
-    _sendKeepalives(true)
+    _sendKeepalives(true), _checkKeepalives(true)
 {
 }
 
@@ -48,7 +48,7 @@ void ClientChatRooms::sendKeepAlives()
         if (!v1.isEmpty())
         {
             ChatSocket * socket = v1[v1.keys()[0]]->socket();
-            if(socket->timeOutCounter() > 5)
+            if(socket->timeOutCounter() > 5 && _checkKeepalives)
             {
                 foreach(ClientChatRoom * c, chatRooms[address])
                     c->serverQuit();
@@ -82,7 +82,12 @@ void ClientChatRooms::roomClosed(QHostAddress address, quint32 id)
     chatRooms[address].remove(id);
 }
 
-void ClientChatRooms::activateKeepalives(bool x)
+void ClientChatRooms::activateSendKeepalives(bool x)
 {
     _sendKeepalives = x;
+}
+
+void ClientChatRooms::activateCheckKeepalives(bool x)
+{
+    _checkKeepalives = x;
 }

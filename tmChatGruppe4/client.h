@@ -28,8 +28,10 @@ public slots:
     void sendBroadCast();
 
     void addIp(QHostAddress);
-    void enableKeepalivesServer(bool);
-    void enableKeepalivesClient(bool);
+    void enableSendKeepalivesServer(bool);
+    void enableCheckKeepalivesServer(bool);
+    void enableSendKeepalivesClient(bool);
+    void enableCheckKeepalivesClient(bool);
     void denyAllServer(bool);
     void closeChatRoom(quint32 id, QString message);
 
@@ -49,6 +51,7 @@ private:
     QList<QHostAddress> addresses;
     quint16 serverPort;
     bool _serverSendKeepalives; // if server not yet open, client has to remember decision
+    bool _serverCheckKeepalives;
     bool _serverDenyAll;
 };
 
