@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     if (argc < 2)
         qFatal("%s", qPrintable(usage));
-    QString name = argv[1];
+    QString name = QString::fromUtf8(argv[1]);
     for (int i = 2; i < argc; ++i)
     {
         if (qstrcmp(argv[i], "-p") == 0)
