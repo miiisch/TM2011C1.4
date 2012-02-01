@@ -2,6 +2,7 @@
 #include "chatroom.h"
 #include <QPair>
 #include <QMap>
+#include <QDebug>
 
 ChatRooms::ChatRooms() :
     chatRoomIdCounter(1), localClientId(0)

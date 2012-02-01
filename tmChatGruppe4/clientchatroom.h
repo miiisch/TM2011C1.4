@@ -3,7 +3,9 @@
 
 #include "chatroomwindow.h"
 #include "types.h"
-#include "chatsocket.h"
+#include "dataelement.h"
+
+class ChatSocket;
 
 class ClientChatRoom : public QObject
 {

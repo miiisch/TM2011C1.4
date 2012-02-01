@@ -1,4 +1,5 @@
 #include "client.h"
+#include "chatsocket.h"
 #include "dataelement.h"
 #include <QUdpSocket>
 #include <QDebug>
@@ -12,7 +13,7 @@ Client::Client(QString userName, quint16 serverPort) :
     broadCastSocket = new QUdpSocket;
     broadCastSocket->bind(serverPort);
     //qDebug() << "client udp port" << broadCastSocket->localPort();
-    udpSocket = new ChatSocket(broadCastSocket, true, this);
+    udpSocket = new ChatSocket(broadCastSocket, true);
     connect(udpSocket, SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)), SLOT(readUniCast(DataElement,QHostAddress*,quint16)));
 
     mainWindow = new MainWindow(this);

@@ -2,11 +2,11 @@
 #define CLIENT_H
 
 #include <QObject>
-#include "chatsocket.h"
 #include "clientchatrooms.h"
 #include "server.h"
 
 class MainWindow;
+class ChatSocket;
 
 class Client : public QObject
 {

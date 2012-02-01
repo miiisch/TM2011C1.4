@@ -6,14 +6,14 @@
 #include <QTimer>
 #include "dataelementviewer.h"
 
-ChatSocket::ChatSocket(QTcpSocket *socket, quint32 userId, bool gui, QObject *parent) :
-    QObject(parent), tcpSocket(socket), type(TCP), currentState(Idle), _userId(userId), _handshakeDone(false), _gui(gui)
+ChatSocket::ChatSocket(QTcpSocket *socket, quint32 userId, bool gui) :
+    QObject(0), tcpSocket(socket), type(TCP), currentState(Idle), _userId(userId), _timeOutCounter(0), _handshakeDone(false), _gui(gui)
 {
     connect(this->tcpSocket,SIGNAL(readyRead()),SLOT(readTcpData()));
 }
 
-ChatSocket::ChatSocket(QUdpSocket *socket, bool gui, QObject *parent) :
-    QObject(parent), udpSocket(socket), type(UDP), currentState(Idle), _handshakeDone(false), _gui(gui)
+ChatSocket::ChatSocket(QUdpSocket *socket, bool gui) :
+    QObject(0), udpSocket(socket), type(UDP), currentState(Idle), _timeOutCounter(0), _handshakeDone(false), _gui(gui)
 {
     connect(this->udpSocket,SIGNAL(readyRead()),SLOT(readUdpData()));
 }
@@ -84,7 +84,6 @@ void ChatSocket::readTcpData()
             break;
         case CorruptMagicNumber:
             tcpSocket->close();
-            deleteLater();
             break;
         default:
             qFatal("Socket State unknown");
@@ -99,9 +98,9 @@ void ChatSocket::readTcpData()
 
 bool ChatSocket::checkMagicNumber(QByteArray magicNumber)
 {
-    if(magicNumber != QString("TM2011C1"))
+    if(magicNumber != "TM2011C1")
     {
-        qDebug() << "No valid dataElement (Magic number incorrect)";
+        qDebug() << "No valid dataElement (Magic number incorrect:" << magicNumber.toHex() << ", should be" << QByteArray("TM2011C1").toHex() << ")";
         return false;
     }
     return true;
@@ -134,7 +133,7 @@ bool ChatSocket::send(DataElement data, bool server)
             return false;
         }
     } else {
-        qFatal("only use chatsocket::send with tcp");
+        qDebug("only use chatsocket::send with tcp");
         return false;
     }
 }

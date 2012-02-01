@@ -1,5 +1,6 @@
 #include "clientchatroom.h"
 #include "chatroomwindow.h"
+#include "chatsocket.h"
 
 //#undef signals
 //#include <libnotify/notification.h>

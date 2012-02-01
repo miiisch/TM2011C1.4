@@ -14,7 +14,8 @@ User::User() :
 
 User::~User()
 {
-    delete _socket;
+    if (_socket != 0)
+        delete _socket;
 }
 
 ChatSocket * User::socket()

@@ -2,7 +2,8 @@
 #define CHATROOMUSER_H
 
 #include <QString>
-#include "chatsocket.h"
+
+class ChatSocket;
 
 class ChatRoomUser
 {

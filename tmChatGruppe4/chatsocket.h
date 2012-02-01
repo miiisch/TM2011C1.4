@@ -12,8 +12,8 @@ class ChatSocket : public QObject
 {
     Q_OBJECT
 public:
-    explicit ChatSocket(QTcpSocket * socket, quint32 userId, bool gui, QObject *parent);
-    explicit ChatSocket(QUdpSocket * socket, bool gui, QObject *parent);
+    explicit ChatSocket(QTcpSocket * socket, quint32 userId, bool gui);
+    explicit ChatSocket(QUdpSocket * socket, bool gui);
 
     bool send(DataElement data, bool server);
     QHostAddress ip();
@@ -37,8 +37,10 @@ public slots:
 private:
     bool checkMagicNumber(QByteArray magicNumber);
     quint32 readLength(QByteArray length);
-    QTcpSocket * tcpSocket;
-    QUdpSocket * udpSocket;
+    union {
+        QTcpSocket * tcpSocket;
+        QUdpSocket * udpSocket;
+    };
     enum State{
         Idle,
         WaitingForLength,
@@ -46,8 +48,8 @@ private:
         CorruptMagicNumber
     };
     enum Type{
-        TCP,
-        UDP
+        TCP = 0,
+        UDP = 1
     };
     Type type;
     quint32 contentLength;
@@ -58,6 +60,8 @@ private:
     bool _handshakeDone;
 
     bool _gui;
+
+    Q_DISABLE_COPY(ChatSocket)
 };
 
 #endif // CHATSOCKET_H

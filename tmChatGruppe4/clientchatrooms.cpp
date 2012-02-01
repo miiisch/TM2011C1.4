@@ -1,6 +1,7 @@
 #include "clientchatrooms.h"
 #include <QTcpSocket>
 #include "client.h"
+#include "chatsocket.h"
 
 ClientChatRooms::ClientChatRooms() :
     _sendKeepalives(true), _checkKeepalives(true)
@@ -25,7 +26,7 @@ ChatSocket * ClientChatRooms::serverConnection(QHostAddress ip, quint16 port)
     QTcpSocket * socket = new QTcpSocket();
     socket->connectToHost(ip, port);
     socket->waitForConnected();
-    return new ChatSocket(socket, 0, true, this);
+    return new ChatSocket(socket, 0, true);
 }
 
 void ClientChatRooms::addChatRoom(ChatSocket* socket, quint32 id, quint32 userId, QString name)
@@ -48,12 +49,12 @@ void ClientChatRooms::sendKeepAlives()
         if (!v1.isEmpty())
         {
             ChatSocket * socket = v1[v1.keys()[0]]->socket();
-            if(socket->timeOutCounter() > 5 && _checkKeepalives)
+            if (socket->timeOutCounter() > 5 && _checkKeepalives)
             {
                 foreach(ClientChatRoom * c, chatRooms[address])
                     c->serverQuit();
                 chatRooms.remove(address);
-            } else {
+            } else if (socket) {
                 socket->incrementTimeOutCounter();
                 if (_sendKeepalives)
                     socket->send(DataElement(0,1,0,0,0), false);

@@ -1,8 +1,9 @@
 #ifndef CLIENTCHATROOMS_H
 #define CLIENTCHATROOMS_H
 
-#include "chatsocket.h"
 #include "clientchatroom.h"
+
+class ChatSocket;
 
 class ClientChatRooms: public QObject
 {

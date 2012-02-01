@@ -1,6 +1,7 @@
 #include "chatroom.h"
 #include "dataelement.h"
 #include <QDebug>
+#include "chatsocket.h"
 
 ChatRoom::ChatRoom(quint32 id, QString name, bool denyAll) :
     _id(id), _name(name), _denyAll(denyAll)

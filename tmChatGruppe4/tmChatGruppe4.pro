@@ -9,6 +9,8 @@ QT       += core gui network
 TARGET = tmChatEric
 TEMPLATE = app
 
+CXXFLAGS += -Wall -Werror
+
 #CONFIG += link_pkgconfig
 #PKGCONFIG += libnotify
 #PKGCONFIG += libglib

@@ -17,7 +17,7 @@ Server::Server(quint16 serverPort, bool enableSendKeepalives, bool enableCheckKe
     QUdpSocket * socket = new QUdpSocket;
     if(!socket->bind(10222))
         qWarning("Can't bind to UDP port 10222, so discovery of chat servers will not work.");
-    udpChatSocket = new ChatSocket(socket, gui, this);
+    udpChatSocket = new ChatSocket(socket, gui);
     connect(udpChatSocket,SIGNAL(newUdpData(DataElement,QHostAddress*,quint16,QUdpSocket*)),SLOT(readBroadCast(DataElement,QHostAddress*,quint16,QUdpSocket*)));
     tcpServer->listen(QHostAddress::Any, serverPort);
     tcpPort = tcpServer->serverPort();
@@ -38,7 +38,7 @@ void Server::newConnection()
 void Server::newUser(QTcpSocket *socket)
 {
     quint32 uid = userIdCounter++;
-    ChatSocket * chatSocket = new ChatSocket(socket, uid, _gui, this);
+    ChatSocket * chatSocket = new ChatSocket(socket, uid, _gui);
     connect(chatSocket,SIGNAL(newTcpData(DataElement,quint32,QHostAddress)),SLOT(readData(DataElement,quint32,QHostAddress)));
     users.createUser(chatSocket, uid);
 }
@@ -141,7 +141,7 @@ void Server::sendKeepAlives()
             chatRooms->userConnectionLost(user->uid());
             users.remove(user->uid());
         }
-        else
+        else if(user->socket())
         {
             user->socket()->incrementTimeOutCounter();
             if (_sendKeepalives)
