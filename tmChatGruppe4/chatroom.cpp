@@ -154,10 +154,17 @@ void ChatRoom::sendChatMessage(DataElement data)
 
 void ChatRoom::sendPrivateMessage(DataElement data)
 {
-    data.setSubType(1);
-    users.user(data.receiver())->socket()->send(data, true);
-    if (data.receiver() != data.sender())
-        users.user(data.sender())->socket()->send(data, true); // send message to sender (ack)
+    if (users.contains(data.receiver()))
+    {
+        data.setSubType(1);
+        users.user(data.receiver())->socket()->send(data, true);
+        if (data.receiver() != data.sender())
+            users.user(data.sender())->socket()->send(data, true); // send message to sender (ack)
+    }
+    else
+    {
+        qDebug() << "private message with unknown receiver received (ignoring message)";
+    }
 }
 
 void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
