@@ -9,7 +9,7 @@ class DataElement
 {
 public:
     DataElement(quint32 chatRoomIdentifier, quint32 type, quint32 subType, quint32 sender, quint32 receiver);
-    DataElement(QByteArray ba);
+    DataElement(QByteArray ba, quint32 contentLength);
     QString readString(bool * valid = 0);
     quint32 readInt32(bool * valid = 0);
     quint16 readInt16(bool * valid = 0);

@@ -292,7 +292,6 @@ private:
                 {
                     subType = "4 Connection Lost";
                     validType = data->sender() != 0 && data->receiver() == 0;
-                    STRING;
                 }
                 else SUBTYPE(5)
                 {

@@ -36,7 +36,7 @@ void ChatSocket::readUdpData()
 
         //remove magicnumber and length
         ba.remove(0,12);
-        DataElement dataElement(ba);
+        DataElement dataElement(ba, contentLength);
 
         //new Data signal
         emit newUdpData(dataElement, senderAddress, *senderPort, udpSocket);
@@ -78,7 +78,7 @@ void ChatSocket::readTcpData()
         case WaitingForContent:
             if(tcpSocket->bytesAvailable() >= (contentLength + 20))
             {
-                emit newTcpData(DataElement(tcpSocket->read(contentLength+20)), _userId, tcpSocket->peerAddress());
+                emit newTcpData(DataElement(tcpSocket->read(contentLength+20), contentLength), _userId, tcpSocket->peerAddress());
                 currentState = Idle;
             }
             break;

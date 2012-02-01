@@ -19,11 +19,12 @@ DataElement::DataElement(quint32 chatRoomIdentifier, quint32 type, quint32 subTy
     messageDataStream = new QDataStream(&_message,QIODevice::ReadWrite);
 }
 
-DataElement::DataElement(QByteArray ba)
+DataElement::DataElement(QByteArray ba, quint32 contentLength)
 {
     QByteArray prefix;
     QDataStream dsPreFix(&prefix, QIODevice::WriteOnly);
     dsPreFix << (quint8)'T' << (quint8)'M' << (quint8)'2' << (quint8)'0' << (quint8)'1' << (quint8)'1' << (quint8)'C' << (quint8)'1';
+    _contentLength = contentLength;
     dsPreFix << _contentLength;
 
     _data.append(ba);
