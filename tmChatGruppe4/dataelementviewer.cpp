@@ -6,6 +6,7 @@
 #include <QHeaderView>
 
 #define DATAELEMENT_HEADER "|----Magic Number-----| |-Length--| |-Channel-| |--Type---| |-Subtype-| |-Sender--| |Reciever-|"
+#define HIDE_INDEX_COLUMN false
 
 DataElementViewer* DataElementViewer::instance = 0;
 
@@ -27,6 +28,7 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
 
     QHeaderView * v = ui->outputTable->horizontalHeader();
     int i = 0;
+    v->resizeSection(i++, 30);
     v->resizeSection(i++, 75);
     v->resizeSection(i++, 130);
     v->resizeSection(i++, 60);
@@ -40,6 +42,9 @@ DataElementViewer::DataElementViewer(QWidget *parent) :
     v->resizeSection(i++, 40);
     v->resizeSection(i++, 40);
 
+    if(HIDE_INDEX_COLUMN)
+        ui->outputTable->setColumnHidden(0, true);
+
     log.open(QIODevice::WriteOnly | QIODevice::Truncate);
     ds = new QTextStream(&log);
     log.flush();
@@ -52,20 +57,16 @@ DataElementViewer::~DataElementViewer()
 
 DataElementViewer * DataElementViewer::getInstance()
 {
-    if (instance == 0)
-    {
-        qDebug("create DEV");
-        instance = new DataElementViewer;
-    }
-    return instance;
+    return instance ? instance : (instance = new DataElementViewer);
 }
 
 void DataElementViewer::addMessage(ClientServer clientServer, Direction direction, Protocol protocol, const QHostAddress & address, DataElement * data)
 {
     QTime time = QTime::currentTime();
     Message m(clientServer, direction, protocol, address, data, time);
+    int index = messages.count();
     messages += m;
-    append(m);
+    append(m, index);
     *ds << "[" << m._time << "] Channel " << m._channel << " (" << m._type << " | " << m._subType << ") " << m._sender << " -> " << m._receiver << endl;
     *ds << DATAELEMENT_HEADER << endl;
     *ds << m._rawDataHex << endl;
@@ -85,11 +86,12 @@ void DataElementViewer::update()
 
     while(ui->outputTable->rowCount() != 0)
         ui->outputTable->removeRow(0);
+    int index = 0;
     foreach (Message m, messages)
-        append(m);
+        append(m, index++);
 }
 
-void DataElementViewer::append(const Message & m)
+void DataElementViewer::append(const Message &m, int index)
 {
     bool filter = true;
     filter &= ui->filterIn->isChecked()             || m.direction != In;
@@ -120,6 +122,7 @@ void DataElementViewer::append(const Message & m)
         int col = 0;
         t->insertRow(row);
 
+        t->setItem(row, col++, new QTableWidgetItem(QString::number(index)));
         t->setItem(row, col++, new QTableWidgetItem(m._time));
         t->setItem(row, col++, new QTableWidgetItem(m._address));
         t->setItem(row, col++, new QTableWidgetItem(m._serverClient));
@@ -136,20 +139,24 @@ void DataElementViewer::append(const Message & m)
     }
 }
 
-void DataElementViewer::showDetailedInformation(int index)
+void DataElementViewer::showDetailedInformation(int row)
 {
-    if (index < 0 || index >= messages.length())
+    if (row >= 0 && row < ui->outputTable->rowCount())
     {
-        ui->rawDataDescription->clear();
-        ui->rawDataHex->clear();
-        ui->rawDataChar->clear();
-        ui->formattedContent->clear();
-        return;
+        int index = ui->outputTable->item(row, 0)->text().toInt();
+        if (index < 0 || index >= messages.length())
+        {
+            ui->rawDataDescription->clear();
+            ui->rawDataHex->clear();
+            ui->rawDataChar->clear();
+            ui->formattedContent->clear();
+            return;
+        }
+        Message m = messages[index];
+        ui->rawDataDescription->setText(DATAELEMENT_HEADER);
+        ui->rawDataHex->setText(m._rawDataHex);
+        ui->rawDataChar->setText(m._rawDataChar);
+        ui->formattedContent->setText(m._message);
     }
-    Message m = messages[index];
-    ui->rawDataDescription->setText(DATAELEMENT_HEADER);
-    ui->rawDataHex->setText(m._rawDataHex);
-    ui->rawDataChar->setText(m._rawDataChar);
-    ui->formattedContent->setText(m._message);
 }
 

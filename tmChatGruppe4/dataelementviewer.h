@@ -441,7 +441,7 @@ private:
     QRegExp receiverMatcher;
     QRegExp addressMatcher;
 
-    void append(const Message & m);
+    void append(const Message & m, int index);
 
 private slots:
     void update();

@@ -37,6 +37,11 @@
       </attribute>
       <column>
        <property name="text">
+        <string>#</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
         <string>Time</string>
        </property>
       </column>
@@ -125,7 +130,7 @@
          <x>0</x>
          <y>0</y>
          <width>1072</width>
-         <height>106</height>
+         <height>94</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
