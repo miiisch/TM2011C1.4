@@ -130,6 +130,9 @@ void ChatRoom::readChatMessage(DataElement data, quint32)
         return;
     }
 
+    if (!users.contains(data.sender()))
+        return;
+
     switch(data.receiver())
     {
     case 0:
@@ -169,6 +172,9 @@ void ChatRoom::sendPrivateMessage(DataElement data)
 
 void ChatRoom::readStatusMessage(DataElement data, quint32 uid)
 {
+    if (!users.contains(data.sender()))
+        return;
+
     ChatRoomUser* currentUser = (ChatRoomUser*)users.user(uid);
     //Update serverside
     switch(data.subType())
@@ -222,6 +228,9 @@ QString ChatRoom::name()
 
 void ChatRoom::readActionMessage(DataElement data, quint32)
 {
+    if (!users.contains(data.sender()))
+        return;
+
     if (!users.contains(data.receiver()))
     {
         qDebug() << "unknown receiver";
