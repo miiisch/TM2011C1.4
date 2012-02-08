@@ -13,7 +13,6 @@ ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, qui
     connect(window,SIGNAL(windowClosed(bool, QString)),this,SLOT(sendUserQuit(bool, QString)));
     window->setTitle(_name);
     window->show();
-    qDebug() << "userlist:" << userInfo;
 }
 
 void ClientChatRoom::newData(DataElement data, quint32 userId)
