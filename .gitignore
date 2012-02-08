@@ -1,5 +1,5 @@
 *.o
-*-build-desktop
-*.pro.user
+*-build-*
 *.moc
+*.user
 log
