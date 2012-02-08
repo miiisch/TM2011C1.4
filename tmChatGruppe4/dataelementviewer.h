@@ -216,13 +216,13 @@ private:
                 SUBTYPE(0)
                 {
                     subType = "0 Request";
-                    validType = data->sender() != 0;
+                    validType = true;
                     STRING;
                 }
                 else SUBTYPE(1)
                 {
                     subType = "1 Distribution";
-                    validType = data->sender() != 0;
+                    validType = true;
                     STRING;
                 }
                 else SUBTYPE(2)
@@ -316,31 +316,31 @@ private:
                 SUBTYPE(0)
                 {
                     subType = "0 Grant Kick Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(1)
                 {
                     subType = "1 Revoke Kick Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(2)
                 {
                     subType = "2 Kick";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(3)
                 {
                     subType = "3 Grant Mod Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(4)
                 {
                     subType = "0 Revoke Mod Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
             }
@@ -350,31 +350,31 @@ private:
                 SUBTYPE(0)
                 {
                     subType = "0 Grant Kick Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(1)
                 {
                     subType = "1 Revoke Kick Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(2)
                 {
                     subType = "2 Kick";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(3)
                 {
                     subType = "3 Grant Mod Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(4)
                 {
                     subType = "0 Revoke Mod Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
             }
@@ -384,31 +384,31 @@ private:
                 SUBTYPE(0)
                 {
                     subType = "0 Grant Kick Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(1)
                 {
                     subType = "1 Revoke Kick Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(2)
                 {
                     subType = "2 Kick";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(3)
                 {
                     subType = "3 Grant Mod Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
                 else SUBTYPE(4)
                 {
                     subType = "0 Revoke Mod Right";
-                    validType = data->sender() != 0 && data->receiver() != 0;
+                    validType = data->receiver() != 0;
                     STRING;
                 }
             }
