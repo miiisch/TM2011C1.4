@@ -26,6 +26,8 @@ void ChatRoomWindow::setUserList(QMap<quint32, UserInfo> userInfo)
     ui->userList->clear();
     foreach(UserInfo info, userInfo)
     {
+        if (info.id == 0)
+            continue;
         int row = ui->userList->count();
         QString status = info.status == Online ? "+" : (info.status == Away ? "-" : "!");
         ui->userList->insertItem(row, new QListWidgetItem(QString::number(info.id) + " " + status + " " + info.name));

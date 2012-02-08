@@ -13,6 +13,7 @@ ClientChatRoom::ClientChatRoom(ChatSocket* socket, quint32 id, QString name, qui
     connect(window,SIGNAL(windowClosed(bool, QString)),this,SLOT(sendUserQuit(bool, QString)));
     window->setTitle(_name);
     window->show();
+    qDebug() << "userlist:" << userInfo;
 }
 
 void ClientChatRoom::newData(DataElement data, quint32 userId)
@@ -21,6 +22,7 @@ void ClientChatRoom::newData(DataElement data, quint32 userId)
     if (!userInfo.contains(data.sender()) && !(data.type() == 6 && data.subType() == 5))
     {
         qDebug() << "received message from unknown sender in channel" << _id << data ;
+        qDebug() << "userlist:" << userInfo;
         return;
     }
     switch(data.type())
@@ -317,6 +319,7 @@ void ClientChatRoom::sendUserQuit(bool joinNotDenied, QString reason)
 void ClientChatRoom::activate(QMap<quint32, UserInfo> userInfo)
 {
     this->userInfo = userInfo;
+    this->userInfo[0] = UserInfo(0, "Server", Online);
     window->setUserList(userInfo);
     window->activate();
 }
